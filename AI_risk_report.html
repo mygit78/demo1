@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI哨兵 · 风控综合分析报告</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.report-header {
+  background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8d 50%, #1a3a5c 100%);
+  color: #fff;
+  padding: 40px 50px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+.report-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+.report-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.report-header .subtitle {
+  font-size: 16px;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+.report-header .meta {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+/* Navigation tabs */
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #f0f2f5;
+  padding: 12px 0;
+}
+.nav-tab {
+  padding: 10px 20px;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.nav-tab:hover { border-color: #2c5f8d; color: #2c5f8d; }
+.nav-tab.active {
+  background: #2c5f8d;
+  color: #fff;
+  border-color: #2c5f8d;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+}
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.card h2 {
+  font-size: 20px;
+  color: #1a3a5c;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e8edf2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card h3 {
+  font-size: 16px;
+  color: #2c5f8d;
+  margin: 18px 0 12px;
+}
+
+/* KPI Row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.kpi-card .kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+.kpi-card .kpi-label {
+  font-size: 13px;
+  color: #666;
+}
+.kpi-card .kpi-sub {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+}
+.kpi-card.blue::after { background: #007bff; }
+.kpi-card.red::after { background: #dc3545; }
+.kpi-card.orange::after { background: #fd7e14; }
+.kpi-card.green::after { background: #28a745; }
+.kpi-card.purple::after { background: #6f42c1; }
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+/* Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 12px;
+}
+.data-table th {
+  background: #1a3a5c;
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #eee;
+}
+.data-table tr:hover td { background: #f8f9fa; }
+.data-table .amount { text-align: right; font-family: 'Consolas', monospace; }
+
+/* Tags */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 2px;
+}
+.tag-high { background: #fde8ea; color: #dc3545; }
+.tag-medium { background: #fff3e0; color: #e65100; }
+.tag-low { background: #e3f2fd; color: #1565c0; }
+.tag-success { background: #e8f5e9; color: #2e7d32; }
+.tag-info { background: #f3e5f5; color: #7b1fa2; }
+
+/* Bar Chart (CSS) */
+.bar-chart { margin: 12px 0; }
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+.bar-label {
+  min-width: 120px;
+  font-size: 13px;
+  text-align: right;
+  color: #555;
+  flex-shrink: 0;
+}
+.bar-track {
+  flex: 1;
+  height: 24px;
+  background: #f0f2f5;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.8s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+  min-width: fit-content;
+}
+.bar-value {
+  font-size: 13px;
+  min-width: 50px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Risk cards */
+.risk-card {
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 14px;
+  border-left: 4px solid;
+}
+.risk-card.high { background: #fff5f5; border-color: #dc3545; }
+.risk-card.medium { background: #fff8f0; border-color: #fd7e14; }
+.risk-card.low { background: #f0f7ff; border-color: #007bff; }
+.risk-card .risk-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Pie chart (CSS) */
+.pie-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.pie-legend { display: flex; flex-direction: column; gap: 8px; }
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.pie-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Donut via SVG */
+.donut-chart {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+/* Timeline */
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ddd;
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 18px;
+  width: 10px;
+  height: 10px;
+  background: #2c5f8d;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.timeline-date { font-size: 12px; color: #999; margin-bottom: 4px; }
+
+/* Footer */
+.report-footer {
+  background: #1a3a5c;
+  color: rgba(255,255,255,0.8);
+  padding: 30px;
+  border-radius: 12px;
+  margin-top: 30px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.report-footer h3 { color: #fff; margin-bottom: 12px; font-size: 16px; }
+.report-footer a { color: #8bb8e8; text-decoration: none; }
+.report-footer a:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 10px; }
+  .report-header { padding: 24px; }
+  .report-header h1 { font-size: 24px; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .bar-label { min-width: 80px; font-size: 12px; }
+  .nav-tabs { gap: 6px; }
+  .nav-tab { padding: 8px 14px; font-size: 13px; }
+}
+
+/* Summary box */
+.summary-box {
+  background: linear-gradient(135deg, #f8f9fa, #e8edf2);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border-left: 4px solid #2c5f8d;
+}
+.summary-box p {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* Highlight text */
+.text-red { color: #dc3545; font-weight: 600; }
+.text-orange { color: #e65100; font-weight: 600; }
+.text-blue { color: #1565c0; font-weight: 600; }
+.text-green { color: #2e7d32; font-weight: 600; }
+
+/* Link style */
+a.source-link {
+  color: #2c5f8d;
+  text-decoration: none;
+  border-bottom: 1px dashed #2c5f8d;
+  transition: all 0.2s;
+}
+a.source-link:hover {
+  color: #1a3a5c;
+  border-bottom-style: solid;
+}
+
+/* Scrollbar */
+.table-scroll { overflow-x: auto; }
+.table-scroll::-webkit-scrollbar { height: 6px; }
+.table-scroll::-webkit-scrollbar-track { background: #f0f2f5; }
+.table-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="report-header">
+  <h1>🛡️ AI哨兵 · 风控综合分析报告</h1>
+  <div class="subtitle">医疗健康领域政策舆情与诉讼风险综合分析</div>
+  <div class="meta">
+    <span>📅 数据时效：2025-09-10 ~ 2026-06-03</span>
+    <span>📊 舆情数据 5433 条 | 诉讼案件 115 件 | 风险事件 64 件</span>
+    <span>🕐 报告生成：2026-06-05 16:21</span>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" onclick="showTab('overview')">📊 综合总览</div>
+  <div class="nav-tab" onclick="showTab('revenue')">💰 收入利润</div>
+  <div class="nav-tab" onclick="showTab('yuqing')">📰 舆情分析</div>
+  <div class="nav-tab" onclick="showTab('litigation')">⚖️ 诉讼分析</div>
+  <div class="nav-tab" onclick="showTab('risk')">⚠️ 风险事件</div>
+  <div class="nav-tab" onclick="showTab('suggestions')">💡 应对建议</div>
+</div>
+
+<!-- ==================== OVERVIEW TAB ==================== -->
+<div class="tab-content active" id="tab-overview">
+
+<div class="summary-box">
+  <p><strong>核心发现：</strong></p>
+  <p>💰 <strong>收入利润：</strong>26年1月至4月，各链群整体收入完成率偏低，平均收入完成率仅 <span class="text-red">39.9%</span>。其中<strong>浙江血制链群</strong>连续4个月（26年1月-4月）收入完成率平均仅 <span class="text-red">32.6%</span>，利润完成率平均 <span class="text-red">-2202.4%</span>，亏损态势严峻；慢病治疗链群收入完成率仅 0.1%，业务几近停滞；盈海链群平均收入完成率 60.5%，相对较好但仍未达标。各链群利润普遍为负，需重点关注经营效率改善。</p>
+  <p>📰 <strong>舆情态势：</strong>共监测舆情 <span class="text-red">5433</span> 条，其中高风险 <span class="text-red">746</span> 条（13.7%），中风险 <span class="text-orange">4687</span> 条（86.3%），低风险 0 条（0.0%）。高风险舆情主要集中于虞美人事件、诱导贷款、财报相关等领域。</p>
+  <p>⚖️ <strong>诉讼态势：</strong>在诉案件共 <span class="text-blue">115</span> 件，涉案总金额 <span class="text-red">¥656,909万</span>，其中未结清 115 件（100.0%）。高风险诉讼 17 件，中风险 80 件。</p>
+  <p>⚠️ <strong>风险事件：</strong>累计风险事件 <span class="text-orange">64</span> 件，其中高风险 64 件，问题金额合计 ¥149,637,465万。</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-card red">
+    <div class="kpi-label">舆情总量</div>
+    <div class="kpi-value" style="color:#dc3545">5,433</div>
+    <div class="kpi-sub">高风险 746 条</div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">高风险舆情</div>
+    <div class="kpi-value" style="color:#fd7e14">746</div>
+    <div class="kpi-sub">占比 13.7%</div>
+  </div>
+  <div class="kpi-card blue">
+    <div class="kpi-label">诉讼案件</div>
+    <div class="kpi-value" style="color:#2c5f8d">115</div>
+    <div class="kpi-sub">涉案 ¥656,909万</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">未结清案件</div>
+    <div class="kpi-value" style="color:#dc3545">115</div>
+    <div class="kpi-sub">占比 100.0%</div>
+  </div>
+  <div class="kpi-card purple">
+    <div class="kpi-label">风险事件</div>
+    <div class="kpi-value" style="color:#6f42c1">64</div>
+    <div class="kpi-sub">高风险 64 件</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">问题金额</div>
+    <div class="kpi-value" style="color:#28a745;font-size:24px">¥149,637,465万</div>
+    <div class="kpi-sub">风险事件涉及</div>
+  </div>
+</div>
+
+<!-- Risk distribution overview -->
+<div class="grid-2">
+  <div class="card">
+    <h2>📊 舆情风险分布</h2>
+    <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+      <svg class="donut-chart" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="90" r="70" fill="none" stroke="#dc3545" stroke-width="28" stroke-dasharray="60.4 379.4" stroke-dashoffset="0.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#fd7e14" stroke-width="28" stroke-dasharray="379.4 60.4" stroke-dashoffset="-60.4" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#007bff" stroke-width="28" stroke-dasharray="0.0 439.8" stroke-dashoffset="-439.8" transform="rotate(-90 90 90)" /><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333">5,433</text></svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#dc3545"></div> 高风险：746 条（13.7%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#fd7e14"></div> 中风险：4687 条（86.3%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#007bff"></div> 低风险：0 条（0.0%）</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>⚖️ 诉讼风险分布</h2>
+    <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+      <svg class="donut-chart" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="90" r="70" fill="none" stroke="#dc3545" stroke-width="28" stroke-dasharray="65.0 374.8" stroke-dashoffset="0.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#fd7e14" stroke-width="28" stroke-dasharray="306.0 133.9" stroke-dashoffset="-65.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#007bff" stroke-width="28" stroke-dasharray="68.8 371.0" stroke-dashoffset="-371.0" transform="rotate(-90 90 90)" /><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333">115</text></svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#dc3545"></div> 高风险：17 件（14.8%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#fd7e14"></div> 中风险：80 件（69.6%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#007bff"></div> 低风险：18 件（15.7%）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== YUQING TAB ==================== -->
+<div class="tab-content" id="tab-yuqing">
+
+<div class="kpi-row">
+  <div class="kpi-card blue">
+    <div class="kpi-label">舆情总量</div>
+    <div class="kpi-value" style="color:#2c5f8d">5,433</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">高风险</div>
+    <div class="kpi-value" style="color:#dc3545">746</div>
+    <div class="kpi-sub">13.7%</div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">中风险</div>
+    <div class="kpi-value" style="color:#fd7e14">4687</div>
+    <div class="kpi-sub">86.3%</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">低风险</div>
+    <div class="kpi-value" style="color:#28a745">0</div>
+    <div class="kpi-sub">0.0%</div>
+  </div>
+</div>
+
+<!-- Keywords -->
+<div class="card">
+  <h2>🔑 舆情关键词分析</h2>
+  <h3>一级关键词 TOP15</h3>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="虞美人事件">虞美人事件</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2c5f8d">3,335</div></div></div>
+<div class="bar-row"><div class="bar-label" title="诱导贷款">诱导贷款</div><div class="bar-track"><div class="bar-fill" style="width:12.8%;background:#2c5f8d">427</div></div></div>
+<div class="bar-row"><div class="bar-label" title="财报相关">财报相关</div><div class="bar-track"><div class="bar-fill" style="width:10.6%;background:#2c5f8d">354</div></div></div>
+<div class="bar-row"><div class="bar-label" title="合作方纠纷">合作方纠纷</div><div class="bar-track"><div class="bar-fill" style="width:9.0%;background:#2c5f8d">300</div></div></div>
+<div class="bar-row"><div class="bar-label" title="业务经营">业务经营</div><div class="bar-track"><div class="bar-fill" style="width:6.4%;background:#2c5f8d">215</div></div></div>
+<div class="bar-row"><div class="bar-label" title="高利息">高利息</div><div class="bar-track"><div class="bar-fill" style="width:3.5%;background:#2c5f8d">118</div></div></div>
+<div class="bar-row"><div class="bar-label" title="治疗方式问题">治疗方式问题</div><div class="bar-track"><div class="bar-fill" style="width:3.5%;background:#2c5f8d">116</div></div></div>
+<div class="bar-row"><div class="bar-label" title="暴力催收">暴力催收</div><div class="bar-track"><div class="bar-fill" style="width:2.6%;background:#2c5f8d">86</div></div></div>
+<div class="bar-row"><div class="bar-label" title="退课退款">退课退款</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">56</div></div></div>
+<div class="bar-row"><div class="bar-label" title="服务规范性">服务规范性</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">41</div></div></div>
+<div class="bar-row"><div class="bar-label" title="员工个人问题">员工个人问题</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">27</div></div></div>
+<div class="bar-row"><div class="bar-label" title="经营状况问题">经营状况问题</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">27</div></div></div>
+<div class="bar-row"><div class="bar-label" title="被贷款">被贷款</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">23</div></div></div>
+<div class="bar-row"><div class="bar-label" title="取消贷款">取消贷款</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">19</div></div></div>
+<div class="bar-row"><div class="bar-label" title="监管处罚问题">监管处罚问题</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">16</div></div></div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Media Analysis -->
+  <div class="card">
+    <h2>📱 媒体渠道分布 TOP15</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="抖音">抖音</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#6f42c1">1,244</div></div></div>
+<div class="bar-row"><div class="bar-label" title="今日头条">今日头条</div><div class="bar-track"><div class="bar-fill" style="width:52.9%;background:#6f42c1">658</div></div></div>
+<div class="bar-row"><div class="bar-label" title="新浪微博">新浪微博</div><div class="bar-track"><div class="bar-fill" style="width:48.1%;background:#6f42c1">598</div></div></div>
+<div class="bar-row"><div class="bar-label" title="快手">快手</div><div class="bar-track"><div class="bar-fill" style="width:24.8%;background:#6f42c1">308</div></div></div>
+<div class="bar-row"><div class="bar-label" title="黑猫投诉">黑猫投诉</div><div class="bar-track"><div class="bar-fill" style="width:24.1%;background:#6f42c1">300</div></div></div>
+<div class="bar-row"><div class="bar-label" title="微信视频号">微信视频号</div><div class="bar-track"><div class="bar-fill" style="width:18.7%;background:#6f42c1">233</div></div></div>
+<div class="bar-row"><div class="bar-label" title="百度百家">百度百家</div><div class="bar-track"><div class="bar-fill" style="width:16.9%;background:#6f42c1">210</div></div></div>
+<div class="bar-row"><div class="bar-label" title="搜狐新闻">搜狐新闻</div><div class="bar-track"><div class="bar-fill" style="width:16.4%;background:#6f42c1">204</div></div></div>
+<div class="bar-row"><div class="bar-label" title="有驾">有驾</div><div class="bar-track"><div class="bar-fill" style="width:16.3%;background:#6f42c1">203</div></div></div>
+<div class="bar-row"><div class="bar-label" title="微信">微信</div><div class="bar-track"><div class="bar-fill" style="width:12.8%;background:#6f42c1">159</div></div></div>
+<div class="bar-row"><div class="bar-label" title="股吧">股吧</div><div class="bar-track"><div class="bar-fill" style="width:6.8%;background:#6f42c1">85</div></div></div>
+<div class="bar-row"><div class="bar-label" title="网易号">网易号</div><div class="bar-track"><div class="bar-fill" style="width:6.7%;background:#6f42c1">83</div></div></div>
+<div class="bar-row"><div class="bar-label" title="小红书">小红书</div><div class="bar-track"><div class="bar-fill" style="width:6.6%;background:#6f42c1">82</div></div></div>
+<div class="bar-row"><div class="bar-label" title="新浪微博视频">新浪微博视频</div><div class="bar-track"><div class="bar-fill" style="width:5.9%;background:#6f42c1">73</div></div></div>
+<div class="bar-row"><div class="bar-label" title="消费保">消费保</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#6f42c1">62</div></div></div>
+    </div>
+  </div>
+
+  <!-- Client Type -->
+  <div class="card">
+    <h2>💻 客户端类型分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="新闻">新闻</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#17a2b8">2,379</div></div></div>
+<div class="bar-row"><div class="bar-label" title="视频">视频</div><div class="bar-track"><div class="bar-fill" style="width:70.0%;background:#17a2b8">1,666</div></div></div>
+<div class="bar-row"><div class="bar-label" title="社交">社交</div><div class="bar-track"><div class="bar-fill" style="width:32.2%;background:#17a2b8">767</div></div></div>
+<div class="bar-row"><div class="bar-label" title="投诉网站">投诉网站</div><div class="bar-track"><div class="bar-fill" style="width:15.4%;background:#17a2b8">366</div></div></div>
+<div class="bar-row"><div class="bar-label" title="论坛">论坛</div><div class="bar-track"><div class="bar-fill" style="width:10.6%;background:#17a2b8">252</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Type (Node) Analysis -->
+<div class="card">
+  <h2>📌 舆情事件类型分布</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="其他">其他</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#e65100">3,541</div></div></div>
+<div class="bar-row"><div class="bar-label" title="上市相关">上市相关</div><div class="bar-track"><div class="bar-fill" style="width:16.2%;background:#e65100">572</div></div></div>
+<div class="bar-row"><div class="bar-label" title="医美贷">医美贷</div><div class="bar-track"><div class="bar-fill" style="width:9.6%;background:#e65100">339</div></div></div>
+<div class="bar-row"><div class="bar-label" title="业务纠纷">业务纠纷</div><div class="bar-track"><div class="bar-fill" style="width:8.5%;background:#e65100">301</div></div></div>
+<div class="bar-row"><div class="bar-label" title="催收还款">催收还款</div><div class="bar-track"><div class="bar-fill" style="width:6.2%;background:#e65100">218</div></div></div>
+<div class="bar-row"><div class="bar-label" title="医患纠纷">医患纠纷</div><div class="bar-track"><div class="bar-fill" style="width:3.4%;background:#e65100">120</div></div></div>
+<div class="bar-row"><div class="bar-label" title="教育贷">教育贷</div><div class="bar-track"><div class="bar-fill" style="width:3.3%;background:#e65100">116</div></div></div>
+<div class="bar-row"><div class="bar-label" title="业务经营">业务经营</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">56</div></div></div>
+<div class="bar-row"><div class="bar-label" title="服务问题">服务问题</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">49</div></div></div>
+<div class="bar-row"><div class="bar-label" title="培训贷">培训贷</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">46</div></div></div>
+<div class="bar-row"><div class="bar-label" title="劳资关系">劳资关系</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">38</div></div></div>
+<div class="bar-row"><div class="bar-label" title="欺诈问题">欺诈问题</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">26</div></div></div>
+<div class="bar-row"><div class="bar-label" title="产品质量">产品质量</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">5</div></div></div>
+<div class="bar-row"><div class="bar-label" title="征信异议">征信异议</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="贷款审核">贷款审核</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">2</div></div></div>
+  </div>
+</div>
+
+<!-- Time Trend -->
+<div class="card">
+  <h2>📈 舆情时间趋势</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="2025-09">2025-09</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2025-10">2025-10</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">28</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2025-11">2025-11</div><div class="bar-track"><div class="bar-fill" style="width:19.3%;background:#2c5f8d">386</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2025-12">2025-12</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">38</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-01">2026-01</div><div class="bar-track"><div class="bar-fill" style="width:8.9%;background:#2c5f8d">178</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-02">2026-02</div><div class="bar-track"><div class="bar-fill" style="width:17.3%;background:#2c5f8d">347</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-03">2026-03</div><div class="bar-track"><div class="bar-fill" style="width:75.9%;background:#2c5f8d">1,522</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-04">2026-04</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2c5f8d">2,005</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-05">2026-05</div><div class="bar-track"><div class="bar-fill" style="width:45.3%;background:#2c5f8d">909</div></div></div>
+<div class="bar-row"><div class="bar-label" title="2026-06">2026-06</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">19</div></div></div>
+  </div>
+</div>
+
+<!-- Industry Risk -->
+<div class="card">
+  <h2>🏭 一级产业风险分布</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>一级产业</th><th>总量</th><th>高风险</th><th>中风险</th><th>低风险</th><th>高风险占比</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>盈康一生</strong></td>
+          <td>3005</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">3005</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔云贷</strong></td>
+          <td>744</td>
+          <td><span class="tag tag-high">380</span></td>
+          <td><span class="tag tag-medium">364</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">51.1%</td>
+        </tr><tr>
+          <td><strong>盈康生命资本</strong></td>
+          <td>381</td>
+          <td><span class="tag tag-high">26</span></td>
+          <td><span class="tag tag-medium">355</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">6.8%</td>
+        </tr><tr>
+          <td><strong>上海莱士</strong></td>
+          <td>367</td>
+          <td><span class="tag tag-high">119</span></td>
+          <td><span class="tag tag-medium">248</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">32.4%</td>
+        </tr><tr>
+          <td><strong>青信中心</strong></td>
+          <td>246</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">246</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔生物</strong></td>
+          <td>226</td>
+          <td><span class="tag tag-high">209</span></td>
+          <td><span class="tag tag-medium">17</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">92.5%</td>
+        </tr><tr>
+          <td><strong>医疗服务</strong></td>
+          <td>187</td>
+          <td><span class="tag tag-high">9</span></td>
+          <td><span class="tag tag-medium">178</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">4.8%</td>
+        </tr><tr>
+          <td><strong>海尔生物资本</strong></td>
+          <td>128</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">128</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔云能</strong></td>
+          <td>51</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">51</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>上海莱士资本</strong></td>
+          <td>45</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">45</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔产业金融</strong></td>
+          <td>28</td>
+          <td><span class="tag tag-high">2</span></td>
+          <td><span class="tag tag-medium">26</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">7.1%</td>
+        </tr><tr>
+          <td><strong>万链数科</strong></td>
+          <td>24</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">24</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔金盈</strong></td>
+          <td>1</td>
+          <td><span class="tag tag-high">1</span></td>
+          <td><span class="tag tag-medium">0</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">100.0%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Secondary Industry Risk -->
+<div class="card">
+  <h2>🏢 二级产业/机构风险分布 TOP20</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>二级产业/机构</th><th>总量</th><th>高风险</th><th>中风险</th><th>低风险</th><th>高风险占比</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>盈康一生</strong></td>
+          <td>3005</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">3005</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>上海莱士</strong></td>
+          <td>412</td>
+          <td><span class="tag tag-high">119</span></td>
+          <td><span class="tag tag-medium">293</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">28.9%</td>
+        </tr><tr>
+          <td><strong>盈康生命</strong></td>
+          <td>381</td>
+          <td><span class="tag tag-high">26</span></td>
+          <td><span class="tag tag-medium">355</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">6.8%</td>
+        </tr><tr>
+          <td><strong>海尔生物</strong></td>
+          <td>354</td>
+          <td><span class="tag tag-high">209</span></td>
+          <td><span class="tag tag-medium">145</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">59.0%</td>
+        </tr><tr>
+          <td><strong>悦己分期/悦易优享/悦己管家</strong></td>
+          <td>327</td>
+          <td><span class="tag tag-high">254</span></td>
+          <td><span class="tag tag-medium">73</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">77.7%</td>
+        </tr><tr>
+          <td><strong>青岛联合信用资产交易中心有限公司</strong></td>
+          <td>246</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">246</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>学易分期/学易优享</strong></td>
+          <td>149</td>
+          <td><span class="tag tag-high">71</span></td>
+          <td><span class="tag tag-medium">78</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">47.7%</td>
+        </tr><tr>
+          <td><strong>长沙珂信肿瘤医院</strong></td>
+          <td>109</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">109</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海富租赁</strong></td>
+          <td>85</td>
+          <td><span class="tag tag-high">11</span></td>
+          <td><span class="tag tag-medium">74</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">12.9%</td>
+        </tr><tr>
+          <td><strong>陕西海富</strong></td>
+          <td>63</td>
+          <td><span class="tag tag-high">18</span></td>
+          <td><span class="tag tag-medium">45</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">28.6%</td>
+        </tr><tr>
+          <td><strong>云易花/云易优享</strong></td>
+          <td>53</td>
+          <td><span class="tag tag-high">9</span></td>
+          <td><span class="tag tag-medium">44</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">17.0%</td>
+        </tr><tr>
+          <td><strong>海尔云能</strong></td>
+          <td>51</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">51</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>四川友谊医院</strong></td>
+          <td>36</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">36</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔小额贷款</strong></td>
+          <td>28</td>
+          <td><span class="tag tag-high">11</span></td>
+          <td><span class="tag tag-medium">17</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">39.3%</td>
+        </tr><tr>
+          <td><strong>海尔融资租赁</strong></td>
+          <td>28</td>
+          <td><span class="tag tag-high">2</span></td>
+          <td><span class="tag tag-medium">26</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">7.1%</td>
+        </tr><tr>
+          <td><strong>青岛场外（清算）</strong></td>
+          <td>24</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">24</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>海尔小贷</strong></td>
+          <td>19</td>
+          <td><span class="tag tag-high">2</span></td>
+          <td><span class="tag tag-medium">17</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">10.5%</td>
+        </tr><tr>
+          <td><strong>苏州广慈肿瘤医院</strong></td>
+          <td>14</td>
+          <td><span class="tag tag-high">9</span></td>
+          <td><span class="tag tag-medium">5</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">64.3%</td>
+        </tr><tr>
+          <td><strong>海尔云贷</strong></td>
+          <td>13</td>
+          <td><span class="tag tag-high">3</span></td>
+          <td><span class="tag tag-medium">10</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">23.1%</td>
+        </tr><tr>
+          <td><strong>山西盈康一生总医院</strong></td>
+          <td>11</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">11</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Sentiment Level Detail -->
+<div class="card">
+  <h2>📊 舆情等级明细分布</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="三级">三级</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2c5f8d">4,687</div></div></div>
+<div class="bar-row"><div class="bar-label" title="二级">二级</div><div class="bar-track"><div class="bar-fill" style="width:8.9%;background:#2c5f8d">416</div></div></div>
+<div class="bar-row"><div class="bar-label" title="疑似负面">疑似负面</div><div class="bar-track"><div class="bar-fill" style="width:4.4%;background:#2c5f8d">204</div></div></div>
+<div class="bar-row"><div class="bar-label" title="敏感信息">敏感信息</div><div class="bar-track"><div class="bar-fill" style="width:2.7%;background:#2c5f8d">126</div></div></div>
+  </div>
+</div>
+
+<!-- Region -->
+<div class="card">
+  <h2>🌍 地区分布 TOP15</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="中国">中国</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#17a2b8">97</div></div></div>
+<div class="bar-row"><div class="bar-label" title="上海">上海</div><div class="bar-track"><div class="bar-fill" style="width:59.8%;background:#17a2b8">58</div></div></div>
+<div class="bar-row"><div class="bar-label" title="北京">北京</div><div class="bar-track"><div class="bar-fill" style="width:52.6%;background:#17a2b8">51</div></div></div>
+<div class="bar-row"><div class="bar-label" title="广东">广东</div><div class="bar-track"><div class="bar-fill" style="width:46.4%;background:#17a2b8">45</div></div></div>
+<div class="bar-row"><div class="bar-label" title="山东">山东</div><div class="bar-track"><div class="bar-fill" style="width:45.4%;background:#17a2b8">44</div></div></div>
+<div class="bar-row"><div class="bar-label" title="河南">河南</div><div class="bar-track"><div class="bar-fill" style="width:20.6%;background:#17a2b8">20</div></div></div>
+<div class="bar-row"><div class="bar-label" title="江西">江西</div><div class="bar-track"><div class="bar-fill" style="width:17.5%;background:#17a2b8">17</div></div></div>
+<div class="bar-row"><div class="bar-label" title="山西">山西</div><div class="bar-track"><div class="bar-fill" style="width:17.5%;background:#17a2b8">17</div></div></div>
+<div class="bar-row"><div class="bar-label" title="江苏">江苏</div><div class="bar-track"><div class="bar-fill" style="width:17.5%;background:#17a2b8">17</div></div></div>
+<div class="bar-row"><div class="bar-label" title="浙江">浙江</div><div class="bar-track"><div class="bar-fill" style="width:16.5%;background:#17a2b8">16</div></div></div>
+<div class="bar-row"><div class="bar-label" title="湖北">湖北</div><div class="bar-track"><div class="bar-fill" style="width:14.4%;background:#17a2b8">14</div></div></div>
+<div class="bar-row"><div class="bar-label" title="湖南">湖南</div><div class="bar-track"><div class="bar-fill" style="width:11.3%;background:#17a2b8">11</div></div></div>
+<div class="bar-row"><div class="bar-label" title="贵州">贵州</div><div class="bar-track"><div class="bar-fill" style="width:10.3%;background:#17a2b8">10</div></div></div>
+<div class="bar-row"><div class="bar-label" title="四川">四川</div><div class="bar-track"><div class="bar-fill" style="width:9.3%;background:#17a2b8">9</div></div></div>
+<div class="bar-row"><div class="bar-label" title="河北">河北</div><div class="bar-track"><div class="bar-fill" style="width:9.3%;background:#17a2b8">9</div></div></div>
+  </div>
+</div>
+
+<!-- Node Risk -->
+<div class="card">
+  <h2>🎯 事件类型风险矩阵</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>事件类型</th><th>总量</th><th>高风险</th><th>中风险</th><th>低风险</th><th>高风险占比</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>医美贷</strong></td>
+          <td>339</td>
+          <td><span class="tag tag-high">259</span></td>
+          <td><span class="tag tag-medium">80</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">76.4%</td>
+        </tr><tr>
+          <td><strong>其他</strong></td>
+          <td>3541</td>
+          <td><span class="tag tag-high">204</span></td>
+          <td><span class="tag tag-medium">3337</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">5.8%</td>
+        </tr><tr>
+          <td><strong>上市相关</strong></td>
+          <td>572</td>
+          <td><span class="tag tag-high">129</span></td>
+          <td><span class="tag tag-medium">443</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">22.6%</td>
+        </tr><tr>
+          <td><strong>教育贷</strong></td>
+          <td>116</td>
+          <td><span class="tag tag-high">61</span></td>
+          <td><span class="tag tag-medium">55</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">52.6%</td>
+        </tr><tr>
+          <td><strong>催收还款</strong></td>
+          <td>218</td>
+          <td><span class="tag tag-high">36</span></td>
+          <td><span class="tag tag-medium">182</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">16.5%</td>
+        </tr><tr>
+          <td><strong>业务经营</strong></td>
+          <td>56</td>
+          <td><span class="tag tag-high">36</span></td>
+          <td><span class="tag tag-medium">20</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">64.3%</td>
+        </tr><tr>
+          <td><strong>培训贷</strong></td>
+          <td>46</td>
+          <td><span class="tag tag-high">19</span></td>
+          <td><span class="tag tag-medium">27</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">41.3%</td>
+        </tr><tr>
+          <td><strong>服务问题</strong></td>
+          <td>49</td>
+          <td><span class="tag tag-high">1</span></td>
+          <td><span class="tag tag-medium">48</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">2.0%</td>
+        </tr><tr>
+          <td><strong>医患纠纷</strong></td>
+          <td>120</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">120</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>劳资关系</strong></td>
+          <td>38</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">38</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>产品质量</strong></td>
+          <td>5</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">5</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>业务纠纷</strong></td>
+          <td>301</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">301</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr><tr>
+          <td><strong>欺诈问题</strong></td>
+          <td>26</td>
+          <td><span class="tag tag-high">0</span></td>
+          <td><span class="tag tag-medium">26</span></td>
+          <td><span class="tag tag-low">0</span></td>
+          <td class="text-red">0.0%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- High Influence Posts -->
+<div class="card">
+  <h2>🔥 高影响力舆情 TOP10（按粉丝数）</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>标题</th><th>媒体</th><th>粉丝数</th><th>等级</th><th>产业</th><th>链接</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金控辟谣“换血”业务后，于文红起诉海尔...</td>
+          <td>新浪看点</td>
+          <td class="amount">81,800,000</td>
+          <td><span class="tag tag-medium">三级</span></td>
+          <td>盈康一生/盈康一生</td>
+          <td><a class="source-link" href="http://k.sina.cn/article_1784473157_6a5ce64502003ikec.html" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金控辟谣“换血”业务后，于文红起诉海尔...</td>
+          <td>手机新浪网</td>
+          <td class="amount">81,800,000</td>
+          <td><span class="tag tag-medium">三级</span></td>
+          <td>盈康一生/盈康一生</td>
+          <td><a class="source-link" href="http://finance.sina.cn/2026-04-11/detail-inhucwht9248875.d.html" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">于文红起诉海尔...</td>
+          <td>手机新浪网</td>
+          <td class="amount">81,800,000</td>
+          <td><span class="tag tag-medium">三级</span></td>
+          <td>盈康一生/盈康一生</td>
+          <td><a class="source-link" href="http://finance.sina.cn/2026-04-12/detail-inhufean5808571.d.html" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">【#换血风波品牌董事长起诉海尔#】#换血风波品牌与海尔旗下医院有关吗#4月10日晚，于文红的多个社交媒体账号发布视频，视...</td>
+          <td>新浪微博</td>
+          <td class="amount">62,514,955</td>
+          <td><span class="tag tag-medium">三级</span></td>
+          <td>盈康一生/盈康一生</td>
+          <td><a class="source-link" href="http://weibo.com/1642512402/QAjS74CfA" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">#美容机构低价引流连环套#通过低价团购引流，再推销分期支付美容套餐，已成为部分美容院惯用套路，若中途退出则需缴纳违约金，...</td>
+          <td>新浪微博</td>
+          <td class="amount">48,142,157</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://weibo.com/1644114654/Qw4QQuRmm" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">#律师解读美容行业预付费高额违约金##美容机构6元团购变万元分期#截至3月初，李先生已偿还6期账单，期间，他也想解除分期...</td>
+          <td>新浪微博</td>
+          <td class="amount">48,142,154</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://weibo.com/1644114654/Qw58V2w1R" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">美容消费藏陷阱：6元团购变万元分期 高额违约金难解约...</td>
+          <td>新浪微博</td>
+          <td class="amount">48,142,153</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://weibo.com/ttarticle/p/show?id=2309405276448931054104" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">315独家调查丨#美容机构低价引流连环套#，另一边，被这类引流活动吸引进店的消费者，却因分期背上负债，又因退款难而犯愁，...</td>
+          <td>新浪微博</td>
+          <td class="amount">48,142,153</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://weibo.com/1644114654/Qw4MJh4Hw" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">新京报的微博视频...</td>
+          <td>新浪微博视频</td>
+          <td class="amount">48,142,152</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://weibo.com/tv/show/1034:5276464736829485" target="_blank">📎 查看</a></td>
+        </tr><tr>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">美容消费藏陷阱：6元团购变万元分期 高额违约金难解约...</td>
+          <td>抖音</td>
+          <td class="amount">27,309,875</td>
+          <td><span class="tag tag-high">二级</span></td>
+          <td>海尔云贷/悦己分期/悦易优享/悦己管家</td>
+          <td><a class="source-link" href="http://www.douyin.com/share/video/7617047507427806516" target="_blank">📎 查看</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== LITIGATION TAB ==================== -->
+<div class="tab-content" id="tab-litigation">
+
+<div class="kpi-row">
+  <div class="kpi-card blue">
+    <div class="kpi-label">案件总数</div>
+    <div class="kpi-value" style="color:#2c5f8d">115</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">涉案总金额</div>
+    <div class="kpi-value" style="color:#dc3545;font-size:24px">¥656,909万</div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">关键任务金额</div>
+    <div class="kpi-value" style="color:#fd7e14;font-size:24px">¥539,311万</div>
+  </div>
+  <div class="kpi-card purple">
+    <div class="kpi-label">未结清案件</div>
+    <div class="kpi-value" style="color:#6f42c1">115</div>
+    <div class="kpi-sub">100.0%</div>
+  </div>
+</div>
+
+<!-- Case Classification -->
+<div class="grid-2">
+  <div class="card">
+    <h2>⚖️ 是否取得生效判决</h2>
+    <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+      <svg class="donut-chart" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="90" r="70" fill="none" stroke="#28a745" stroke-width="28" stroke-dasharray="237.1 202.7" stroke-dashoffset="0.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#fd7e14" stroke-width="28" stroke-dasharray="202.7 237.1" stroke-dashoffset="-237.1" transform="rotate(-90 90 90)" /><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333">115</text></svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#28a745"></div> 已生效：62 件（53.9%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#fd7e14"></div> 未生效：53 件（46.1%）</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>👤 海尔方身份分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="原告">原告</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2c5f8d">86</div></div></div>
+<div class="bar-row"><div class="bar-label" title="被告">被告</div><div class="bar-track"><div class="bar-fill" style="width:31.4%;background:#2c5f8d">27</div></div></div>
+<div class="bar-row"><div class="bar-label" title="第三人">第三人</div><div class="bar-track"><div class="bar-fill" style="width:2.3%;background:#2c5f8d">2</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>📋 案涉分类（应收/应付）</h2>
+    <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+      <svg class="donut-chart" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="90" r="70" fill="none" stroke="#dc3545" stroke-width="28" stroke-dasharray="336.6 103.3" stroke-dashoffset="0.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#007bff" stroke-width="28" stroke-dasharray="103.3 336.6" stroke-dashoffset="-336.6" transform="rotate(-90 90 90)" /><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333">115</text></svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#dc3545"></div> 应收：88 件，¥618,763万</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#007bff"></div> 应付：27 件，¥38,146万</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📊 是否结清状态</h2>
+    <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+      <svg class="donut-chart" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="90" r="70" fill="none" stroke="#28a745" stroke-width="28" stroke-dasharray="0.0 439.8" stroke-dashoffset="0.0" transform="rotate(-90 90 90)" /><circle cx="90" cy="90" r="70" fill="none" stroke="#dc3545" stroke-width="28" stroke-dasharray="439.8 0.0" stroke-dashoffset="-0.0" transform="rotate(-90 90 90)" /><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333">115</text></svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#28a745"></div> 已结清：0 件（0.0%）</div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#dc3545"></div> 未结清：115 件（100.0%）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>📌 案件性质分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="保理合同纠纷">保理合同纠纷</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#6f42c1">36</div></div></div>
+<div class="bar-row"><div class="bar-label" title="融资租赁合同纠纷">融资租赁合同纠纷</div><div class="bar-track"><div class="bar-fill" style="width:47.2%;background:#6f42c1">17</div></div></div>
+<div class="bar-row"><div class="bar-label" title="医疗损害责任纠纷">医疗损害责任纠纷</div><div class="bar-track"><div class="bar-fill" style="width:33.3%;background:#6f42c1">12</div></div></div>
+<div class="bar-row"><div class="bar-label" title="民事">民事</div><div class="bar-track"><div class="bar-fill" style="width:16.7%;background:#6f42c1">6</div></div></div>
+<div class="bar-row"><div class="bar-label" title="借款合同纠纷">借款合同纠纷</div><div class="bar-track"><div class="bar-fill" style="width:13.9%;background:#6f42c1">5</div></div></div>
+<div class="bar-row"><div class="bar-label" title="合同纠纷">合同纠纷</div><div class="bar-track"><div class="bar-fill" style="width:11.1%;background:#6f42c1">4</div></div></div>
+<div class="bar-row"><div class="bar-label" title="劳动争议">劳动争议</div><div class="bar-track"><div class="bar-fill" style="width:11.1%;background:#6f42c1">4</div></div></div>
+<div class="bar-row"><div class="bar-label" title="买卖合同纠纷">买卖合同纠纷</div><div class="bar-track"><div class="bar-fill" style="width:8.3%;background:#6f42c1">3</div></div></div>
+<div class="bar-row"><div class="bar-label" title="股权转让纠纷">股权转让纠纷</div><div class="bar-track"><div class="bar-fill" style="width:8.3%;background:#6f42c1">3</div></div></div>
+<div class="bar-row"><div class="bar-label" title="股权回购">股权回购</div><div class="bar-track"><div class="bar-fill" style="width:8.3%;background:#6f42c1">3</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>🏛️ 诉讼阶段分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="执行">执行</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#17a2b8">59</div></div></div>
+<div class="bar-row"><div class="bar-label" title="一审">一审</div><div class="bar-track"><div class="bar-fill" style="width:59.3%;background:#17a2b8">35</div></div></div>
+<div class="bar-row"><div class="bar-label" title="二审">二审</div><div class="bar-track"><div class="bar-fill" style="width:20.3%;background:#17a2b8">12</div></div></div>
+<div class="bar-row"><div class="bar-label" title="和解撤诉">和解撤诉</div><div class="bar-track"><div class="bar-fill" style="width:3.4%;background:#17a2b8">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="执行阶段">执行阶段</div><div class="bar-track"><div class="bar-fill" style="width:3.4%;background:#17a2b8">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="庭前调解">庭前调解</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#17a2b8">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="一审结束判决生效已签和解协议">一审结束判决生效已签和解协议</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#17a2b8">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="一审未开庭">一审未开庭</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#17a2b8">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="终审">终审</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#17a2b8">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="仲裁">仲裁</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#17a2b8">1</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Platform Distribution -->
+<div class="card">
+  <h2>🏭 行业平台分布</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>行业平台</th><th>案件数</th><th>涉案金额</th><th>占比</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>保理</strong></td>
+          <td>33</td>
+          <td class="amount">¥322,870.00</td>
+          <td>49.1%</td>
+        </tr><tr>
+          <td><strong>资管</strong></td>
+          <td>13</td>
+          <td class="amount">¥173,061.50</td>
+          <td>26.3%</td>
+        </tr><tr>
+          <td><strong>小贷</strong></td>
+          <td>2</td>
+          <td class="amount">¥46,817.00</td>
+          <td>7.1%</td>
+        </tr><tr>
+          <td><strong>海融易</strong></td>
+          <td>4</td>
+          <td class="amount">¥42,618.00</td>
+          <td>6.5%</td>
+        </tr><tr>
+          <td><strong>生物制药</strong></td>
+          <td>6</td>
+          <td class="amount">¥27,934.28</td>
+          <td>4.3%</td>
+        </tr><tr>
+          <td><strong>融租</strong></td>
+          <td>17</td>
+          <td class="amount">¥22,926.04</td>
+          <td>3.5%</td>
+        </tr><tr>
+          <td><strong>云能</strong></td>
+          <td>6</td>
+          <td class="amount">¥14,809.25</td>
+          <td>2.3%</td>
+        </tr><tr>
+          <td><strong>海尔生物</strong></td>
+          <td>4</td>
+          <td class="amount">¥2,483.00</td>
+          <td>0.4%</td>
+        </tr><tr>
+          <td><strong>医疗服务</strong></td>
+          <td>24</td>
+          <td class="amount">¥2,015.25</td>
+          <td>0.3%</td>
+        </tr><tr>
+          <td><strong>医疗器械</strong></td>
+          <td>6</td>
+          <td class="amount">¥1,374.60</td>
+          <td>0.2%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Top Cases -->
+<div class="card">
+  <h2>💰 涉案金额 TOP10 案件</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>项目</th><th>原告</th><th>被告</th><th>案件性质</th><th>金额</th><th>分类</th><th>阶段</th><th>结清</th><th>平台</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>新崇基项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">天津海立方舟投资管理有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">北京新崇基置业有限公司、新华联文化旅游发展股份有限公司</td>
+          <td>借款合同纠纷</td>
+          <td class="amount text-red">¥52,700.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>资管</td>
+        </tr><tr>
+          <td><strong>世茂项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金融保理（重庆）有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">福建世茂瑞盈房地产开发有限公司、福建三翔幕墙装饰工程有限公司</td>
+          <td>保理合同纠纷</td>
+          <td class="amount text-red">¥50,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>保理</td>
+        </tr><tr>
+          <td><strong>杉杉控股</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">上海海毅供应链管理有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">杉杉集团、杉杉控股、朋泽贸易、鄞州捷伦</td>
+          <td>明股实债</td>
+          <td class="amount text-red">¥50,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>资管</td>
+        </tr><tr>
+          <td><strong>世茂地产</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">重庆海尔小额贷款有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">厦门皓颜企业管理有限公司</td>
+          <td>金融借款合同纠纷</td>
+          <td class="amount text-red">¥31,817.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行阶段</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>小贷</td>
+        </tr><tr>
+          <td><strong>世茂项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金融保理（重庆）有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">石狮世茂新城房地产开发有限公司、福建三翔幕墙装饰工程有限公司</td>
+          <td>保理合同纠纷</td>
+          <td class="amount text-red">¥30,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>保理</td>
+        </tr><tr>
+          <td><strong>天津新华联</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">上海海毅供应链管理有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">天津新华联房地产开发有限公司、新华联文化旅游发展股份有限公司</td>
+          <td>借款合同纠纷</td>
+          <td class="amount text-red">¥30,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>资管</td>
+        </tr><tr>
+          <td><strong>广西莱士股权转让纠纷</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">卢浙晋</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">上海莱士血液制品股份有限公司、广西莱士生物制药有限公司</td>
+          <td>股权转让纠纷</td>
+          <td class="amount text-red">¥27,650.39</td>
+          <td><span class="tag tag-info">应付</span></td>
+          <td>二审</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>生物制药</td>
+        </tr><tr>
+          <td><strong>中南项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金融保理（重庆）有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">南通中昱建材有限公司、江苏中南建筑产业集团有限责任公司、江苏</td>
+          <td>保理合同纠纷</td>
+          <td class="amount text-red">¥22,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>保理</td>
+        </tr><tr>
+          <td><strong>科玛项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金融保理（重庆）有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">张家港福洛瑞物贸有限公司、胡秀珍、徐强、徐友才、赵红艳</td>
+          <td>保理合同纠纷</td>
+          <td class="amount text-red">¥20,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>保理</td>
+        </tr><tr>
+          <td><strong>桑德项目</strong></td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">海尔金融保理（重庆）有限公司</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">北京桑德环境工程有限公司、桑德集团有限公司、文一波、林芝桑德</td>
+          <td>保理合同纠纷</td>
+          <td class="amount text-red">¥20,000.00</td>
+          <td><span class="tag tag-high">应收</span></td>
+          <td>执行</td>
+          <td><span class="tag tag-high">未结清</span></td>
+          <td>保理</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== RISK EVENTS TAB ==================== -->
+<div class="tab-content" id="tab-risk">
+
+<div class="kpi-row">
+  <div class="kpi-card purple">
+    <div class="kpi-label">风险事件总数</div>
+    <div class="kpi-value" style="color:#6f42c1">64</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">高风险事件</div>
+    <div class="kpi-value" style="color:#dc3545">64</div>
+    <div class="kpi-sub">100.0%</div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">中风险事件</div>
+    <div class="kpi-value" style="color:#fd7e14">0</div>
+    <div class="kpi-sub">0.0%</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">问题金额合计</div>
+    <div class="kpi-value" style="color:#28a745;font-size:22px">¥149,637,465万</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>📊 风险等级分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="高风险">高风险</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#dc3545">64</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📋 预警分类分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="科目解析预警">科目解析预警</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#6f42c1">47</div></div></div>
+<div class="bar-row"><div class="bar-label" title="合规预警">合规预警</div><div class="bar-track"><div class="bar-fill" style="width:31.9%;background:#6f42c1">15</div></div></div>
+<div class="bar-row"><div class="bar-label" title="法务预警">法务预警</div><div class="bar-track"><div class="bar-fill" style="width:4.3%;background:#6f42c1">2</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>🔍 风险场景分布</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="销售与收款">销售与收款</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#e65100">61</div></div></div>
+<div class="bar-row"><div class="bar-label" title="相对方风险">相对方风险</div><div class="bar-track"><div class="bar-fill" style="width:3.3%;background:#e65100">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="运营管理">运营管理</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#e65100">1</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📌 风险项分布 TOP10</h2>
+    <div class="bar-chart">
+      <div class="bar-row"><div class="bar-label" title="财务风险/应收回款">财务风险/应收回款</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#17a2b8">47</div></div></div>
+<div class="bar-row"><div class="bar-label" title="运营风险-制造类/销售与回款风险">运营风险-制造类/销售与回款风险</div><div class="bar-track"><div class="bar-fill" style="width:25.5%;background:#17a2b8">12</div></div></div>
+<div class="bar-row"><div class="bar-label" title="财务风险/库存周转风险">财务风险/库存周转风险</div><div class="bar-track"><div class="bar-fill" style="width:6.4%;background:#17a2b8">3</div></div></div>
+<div class="bar-row"><div class="bar-label" title="运营风险-通用类/相对方管理风险">运营风险-通用类/相对方管理风险</div><div class="bar-track"><div class="bar-fill" style="width:4.3%;background:#17a2b8">2</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🏭 行业链群风险分布</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="生命科学平台">生命科学平台</div><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#2c5f8d">20</div></div></div>
+<div class="bar-row"><div class="bar-label" title="海康数智链群">海康数智链群</div><div class="bar-track"><div class="bar-fill" style="width:35.0%;background:#2c5f8d">7</div></div></div>
+<div class="bar-row"><div class="bar-label" title="脑科学链群">脑科学链群</div><div class="bar-track"><div class="bar-fill" style="width:30.0%;background:#2c5f8d">6</div></div></div>
+<div class="bar-row"><div class="bar-label" title="数字公卫">数字公卫</div><div class="bar-track"><div class="bar-fill" style="width:30.0%;background:#2c5f8d">6</div></div></div>
+<div class="bar-row"><div class="bar-label" title="血技链群">血技链群</div><div class="bar-track"><div class="bar-fill" style="width:15.0%;background:#2c5f8d">3</div></div></div>
+<div class="bar-row"><div class="bar-label" title="分析仪器">分析仪器</div><div class="bar-track"><div class="bar-fill" style="width:15.0%;background:#2c5f8d">3</div></div></div>
+<div class="bar-row"><div class="bar-label" title="数智样本库">数智样本库</div><div class="bar-track"><div class="bar-fill" style="width:10.0%;background:#2c5f8d">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="山西盈康一生总医院">山西盈康一生总医院</div><div class="bar-track"><div class="bar-fill" style="width:10.0%;background:#2c5f8d">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="青岛盈海医院">青岛盈海医院</div><div class="bar-track"><div class="bar-fill" style="width:10.0%;background:#2c5f8d">2</div></div></div>
+<div class="bar-row"><div class="bar-label" title="数智医疗">数智医疗</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="细胞科技链群">细胞科技链群</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="低温">低温</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="程序降温仪">程序降温仪</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="冻干机">冻干机</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="安全柜&洁净台">安全柜&洁净台</div><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#2c5f8d">1</div></div></div>
+  </div>
+</div>
+
+<!-- Risk Events with Amounts -->
+<div class="card">
+  <h2>💰 涉及金额风险事件 TOP10</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr><th>事件标题</th><th>问题金额</th><th>风险等级</th><th>行业链群</th><th>状态</th><th>逾期状态</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="max-width:300px">应收账款-健管业务</td>
+          <td class="amount text-red">¥21,920,000.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>青岛盈海医院</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收账款-集团外-医疗器械业务/山东卓康医疗集团有限公司/16126909.08元</td>
+          <td class="amount text-red">¥16,126,909.08</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>脑科学链群</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收帐款-集团外/齐鲁制药有限公司/8180016元</td>
+          <td class="amount text-red">¥8,180,016.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>生命科学平台</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">11220207\应收账款-集团外-技术服务/易联众信息技术股份有限公司/5921078.03元</td>
+          <td class="amount text-red">¥5,921,078.03</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>海康数智链群</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收帐款-集团外/河南省恒之远医疗器械有限公司/5492000元</td>
+          <td class="amount text-red">¥5,492,000.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>生命科学平台</td>
+          <td><span class="tag tag-info">已关闭</span></td>
+          <td>已逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">150003\合同资产-集团外/易联众信息技术股份有限公司/4935840.71元</td>
+          <td class="amount text-red">¥4,935,840.71</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>海康数智链群</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收账款-集团外/青岛荣盛医药有限公司/4651875元</td>
+          <td class="amount text-red">¥4,651,875.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>细胞科技链群</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>已逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收账款-应收医疗款-商业保险/中国人民财产保险股份有限公司/4268852.74元</td>
+          <td class="amount text-red">¥4,268,852.74</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>山西盈康一生总医院</td>
+          <td><span class="tag tag-info">已关闭</span></td>
+          <td>未逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收帐款-集团外/四川利勃冰川信息技术有限公司/4200000元</td>
+          <td class="amount text-red">¥4,200,000.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>数字公卫</td>
+          <td><span class="tag tag-info">已关闭</span></td>
+          <td>已逾期</td>
+        </tr><tr>
+          <td style="max-width:300px">应收账款-集团外-医疗器械业务/北京华光普泰科贸有限公司/4041600元</td>
+          <td class="amount text-red">¥4,041,600.00</td>
+          <td><span class="tag tag-high">高风险</span></td>
+          <td>脑科学链群</td>
+          <td><span class="tag tag-info">关差中</span></td>
+          <td>未逾期</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== REVENUE TAB ==================== -->
+<div class="tab-content" id="tab-revenue">
+
+<div class="card">
+  <h2>💰 各链群收入利润完成情况</h2>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th rowspan="2" style="min-width:70px">年月</th>
+          <th rowspan="2">链群名称</th>
+          <th colspan="4" style="text-align:center;background:#2c5f8d">年累计收入</th>
+          <th colspan="4" style="text-align:center;background:#6f42c1">年累计利润</th>
+          <th rowspan="2">利润率</th>
+        </tr>
+        <tr>
+          <th>目标</th><th>实际</th><th>完成率</th><th>同比</th>
+          <th>目标</th><th>实际</th><th>完成率</th><th>同比</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+<td rowspan="2" style="text-align:center;font-weight:600;background:#f8f9fa;vertical-align:middle;border-right:2px solid #e0e0e0">26年1月</td>
+          <td><strong>生命支持</strong></td>
+          <td class="amount">541.9</td>
+          <td class="amount">365.6</td>
+          <td class="amount ">67.5%</td>
+          <td class="amount text-red">-32.5%</td>
+          <td class="amount">0.4</td>
+          <td class="amount">-55.5</td>
+          <td class="amount text-red">-13885.0%</td>
+          <td class="amount text-red">-282.9%</td>
+          <td class="amount text-red">-15.2%</td>
+        </tr>
+        <tr>
+
+          <td><strong>浙江血制链群</strong></td>
+          <td class="amount">1053.9</td>
+          <td class="amount">134.2</td>
+          <td class="amount text-red">12.7%</td>
+          <td class="amount text-red">-87.0%</td>
+          <td class="amount">-70.9</td>
+          <td class="amount">-126.3</td>
+          <td class="amount text-red">-78.1%</td>
+          <td class="amount text-red">-2958.4%</td>
+          <td class="amount text-red">-94.1%</td>
+        </tr>
+        <tr>
+<td rowspan="2" style="text-align:center;font-weight:600;background:#f8f9fa;vertical-align:middle;border-right:2px solid #e0e0e0">26年2月</td>
+          <td><strong>慢病治疗</strong></td>
+          <td class="amount">860.0</td>
+          <td class="amount">0.6</td>
+          <td class="amount text-red">0.1%</td>
+          <td class="amount text-red">-99.5%</td>
+          <td class="amount">2.7</td>
+          <td class="amount">-110.2</td>
+          <td class="amount text-red">-4020.1%</td>
+          <td class="amount text-green">176.1%</td>
+          <td class="amount text-red">-17210.9%</td>
+        </tr>
+        <tr>
+
+          <td><strong>浙江血制链群</strong></td>
+          <td class="amount">1700.9</td>
+          <td class="amount">159.9</td>
+          <td class="amount text-red">9.4%</td>
+          <td class="amount text-red">-94.2%</td>
+          <td class="amount">-166.0</td>
+          <td class="amount">-309.5</td>
+          <td class="amount text-red">-86.4%</td>
+          <td class="amount text-red">-263.6%</td>
+          <td class="amount text-red">-193.6%</td>
+        </tr>
+        <tr>
+<td rowspan="2" style="text-align:center;font-weight:600;background:#f8f9fa;vertical-align:middle;border-right:2px solid #e0e0e0">26年3月</td>
+          <td><strong>盈海链群</strong></td>
+          <td class="amount">1567.2</td>
+          <td class="amount">1004.8</td>
+          <td class="amount ">64.1%</td>
+          <td class="amount text-red">-32.5%</td>
+          <td class="amount">-416.2</td>
+          <td class="amount">-579.1</td>
+          <td class="amount text-red">-39.2%</td>
+          <td class="amount text-green">34.7%</td>
+          <td class="amount text-red">-57.6%</td>
+        </tr>
+        <tr>
+
+          <td><strong>浙江血制链群</strong></td>
+          <td class="amount">3138.5</td>
+          <td class="amount">1957.8</td>
+          <td class="amount ">62.4%</td>
+          <td class="amount text-red">-51.0%</td>
+          <td class="amount">17.9</td>
+          <td class="amount">-446.2</td>
+          <td class="amount text-red">-2494.4%</td>
+          <td class="amount text-red">-304.7%</td>
+          <td class="amount text-red">-22.8%</td>
+        </tr>
+        <tr>
+<td rowspan="2" style="text-align:center;font-weight:600;background:#f8f9fa;vertical-align:middle;border-right:2px solid #e0e0e0">26年4月</td>
+          <td><strong>盈海链群</strong></td>
+          <td class="amount">2353.7</td>
+          <td class="amount">1339.0</td>
+          <td class="amount ">56.9%</td>
+          <td class="amount text-red">-39.6%</td>
+          <td class="amount">-430.5</td>
+          <td class="amount">-731.8</td>
+          <td class="amount text-red">-70.0%</td>
+          <td class="amount text-green">62.5%</td>
+          <td class="amount text-red">-54.6%</td>
+        </tr>
+        <tr>
+
+          <td><strong>浙江血制链群</strong></td>
+          <td class="amount">4322.6</td>
+          <td class="amount">1983.6</td>
+          <td class="amount text-red">45.9%</td>
+          <td class="amount text-red">-57.1%</td>
+          <td class="amount">-11.8</td>
+          <td class="amount">-738.8</td>
+          <td class="amount text-red">-6150.4%</td>
+          <td class="amount text-red">-771.7%</td>
+          <td class="amount text-red">-37.2%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 收入完成率排名</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="bar-label" title="26年2月-慢病治疗">26年2月-慢病治疗</div><div class="bar-track"><div class="bar-fill" style="width:2.0%;background:#2c5f8d">0.1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年2月-浙江血制链群">26年2月-浙江血制链群</div><div class="bar-track"><div class="bar-fill" style="width:9.4%;background:#2c5f8d">9.4</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年1月-浙江血制链群">26年1月-浙江血制链群</div><div class="bar-track"><div class="bar-fill" style="width:12.7%;background:#2c5f8d">12.7</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年4月-浙江血制链群">26年4月-浙江血制链群</div><div class="bar-track"><div class="bar-fill" style="width:45.9%;background:#2c5f8d">45.9</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年4月-盈海链群">26年4月-盈海链群</div><div class="bar-track"><div class="bar-fill" style="width:56.9%;background:#2c5f8d">56.9</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年3月-浙江血制链群">26年3月-浙江血制链群</div><div class="bar-track"><div class="bar-fill" style="width:62.4%;background:#2c5f8d">62.4</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年3月-盈海链群">26年3月-盈海链群</div><div class="bar-track"><div class="bar-fill" style="width:64.1%;background:#2c5f8d">64.1</div></div></div>
+<div class="bar-row"><div class="bar-label" title="26年1月-生命支持">26年1月-生命支持</div><div class="bar-track"><div class="bar-fill" style="width:67.5%;background:#2c5f8d">67.5</div></div></div>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== SUGGESTIONS TAB ==================== -->
+<div class="tab-content" id="tab-suggestions">
+
+<div class="card">
+  <h2>💡 综合风险应对建议</h2>
+
+  <h3>🔴 高风险领域</h3>
+  <div class="risk-card high">
+    <div class="risk-title">📰 舆情风险 - 高风险舆情集中</div>
+    <p><strong>风险描述：</strong>监测到高风险舆情 746 条，主要集中在虞美人事件, 诱导贷款, 财报相关, 合作方纠纷, 业务经营等关键领域。医患纠纷、服务收费、医疗质量等话题持续引发公众关注。</p>
+    <p><strong>影响评估：</strong>高风险舆情若不及时处置，可能导致品牌形象受损、患者信任度下降，甚至引发监管关注。</p>
+    <p><strong>应对建议：</strong></p>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li>建立7×24小时舆情监控机制，对高风险舆情实现30分钟内响应</li>
+      <li>针对高频负面关键词（虞美人事件, 诱导贷款, 财报相关），提前准备口径统一的回应话术</li>
+      <li>加强与重点媒体沟通，对不实信息及时辟谣</li>
+      <li>对涉事机构开展专项服务质量排查</li>
+    </ul>
+  </div>
+
+  <div class="risk-card high">
+    <div class="risk-title">⚖️ 诉讼风险 - 大额未结清案件</div>
+    <p><strong>风险描述：</strong>未结清案件 115 件，涉案金额 ¥656,909万。其中大额应收案件需重点跟进回款。</p>
+    <p><strong>影响评估：</strong>长期未结清案件导致资金占用，增加坏账风险，影响企业现金流和财务健康。</p>
+    <p><strong>应对建议：</strong></p>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li>对涉案金额超过100万元的未结清案件逐一制定催收方案</li>
+      <li>加强与法院沟通，推动案件执行进度</li>
+      <li>对临近任务截止时间的案件提前制定应对策略</li>
+      <li>完善合同管理，从源头减少诉讼风险</li>
+    </ul>
+  </div>
+
+  <div class="risk-card high">
+    <div class="risk-title">⚠️ 风险事件 - 高风险预警集中</div>
+    <p><strong>风险描述：</strong>高风险事件 64 件，主要涉及财务风险/应收回款, 运营风险-制造类/销售与回款风险, 财务风险/库存周转风险等领域。</p>
+    <p><strong>影响评估：</strong>高风险事件若不及时处置，可能引发财务损失、合规处罚或经营中断。</p>
+    <p><strong>应对建议：</strong></p>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li>对高风险事件逐一落实责任人，限期整改</li>
+      <li>加强库存管理和应收账款管理，降低财务风险</li>
+      <li>建立风险预警常态化机制，实现风险早发现、早处置</li>
+    </ul>
+  </div>
+
+  <h3>🟠 中风险领域</h3>
+  <div class="risk-card medium">
+    <div class="risk-title">📊 财务风险 - 收入利润完成率偏低</div>
+    <p><strong>风险描述：</strong>部分链群收入完成率和利润完成率较低，同比出现下滑趋势。</p>
+    <p><strong>应对建议：</strong></p>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li>对完成率低于50%的链群进行专项经营分析</li>
+      <li>优化收入结构，寻找新的增长点和利润空间</li>
+      <li>加强成本管控，提升运营效率</li>
+    </ul>
+  </div>
+
+  <div class="risk-card medium">
+    <div class="risk-title">🏥 经营风险 - 医疗服务类舆情高频</div>
+    <p><strong>风险描述：</strong>医疗服务板块舆情数量较多，涉及医患纠纷、服务收费、医疗质量等问题。</p>
+    <p><strong>应对建议：</strong></p>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li>开展全系统医疗服务质量专项检查</li>
+      <li>完善患者投诉处理机制，提升服务体验</li>
+      <li>加强医护人员培训，规范诊疗行为</li>
+    </ul>
+  </div>
+
+  <h3>🔵 持续优化建议</h3>
+  <div class="risk-card low">
+    <div class="risk-title">📋 长期风控机制建设</div>
+    <ul style="margin-left:20px;margin-top:5px">
+      <li><strong>舆情监控：</strong>持续升级AI舆情监测系统，扩大监测范围，提升预警准确率</li>
+      <li><strong>诉讼管理：</strong>建立案件全生命周期管理系统，实现从立案到结清的全流程跟踪</li>
+      <li><strong>风险预警：</strong>打通财务、法务、业务数据壁垒，建立统一的风险数据中台</li>
+      <li><strong>合规培训：</strong>定期开展全员合规培训，提升风险防范意识</li>
+      <li><strong>应急预案：</strong>针对不同类型风险事件，制定标准化应急响应预案并定期演练</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <h3>数据来源与免责声明</h3>
+  <p><strong>数据来源：</strong></p>
+  <p>• 舆情数据：AI哨兵-风控日报系统（5433 条）</p>
+  <p>• 诉讼数据：内部法务台账（115 件）</p>
+  <p>• 风险事件：风控预警系统（64 件）</p>
+  <p>• 财务数据：经营管理报表</p>
+  <p style="margin-top:12px"><strong>政策监测数据源：</strong></p>
+  <p>
+    <a href="http://www.nhc.gov.cn/" target="_blank">国家卫健委</a> ·
+    <a href="http://www.nhsa.gov.cn/" target="_blank">国家医保局</a> ·
+    <a href="https://www.nmpa.gov.cn/" target="_blank">国家药监局</a> ·
+    <a href="https://www.gov.cn/" target="_blank">中国政府网</a> ·
+    <a href="http://www.csrc.gov.cn/" target="_blank">中国证监会</a> ·
+    <a href="https://wenshu.court.gov.cn/" target="_blank">中国裁判文书网</a>
+  </p>
+  <p style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.2)">
+    <strong>免责声明：</strong>本报告基于AI哨兵风控系统数据自动生成，仅供内部风控参考使用。报告中的分析和建议不构成法律意见，具体决策请结合实际情况并咨询专业法律顾问。
+  </p>
+  <p style="margin-top:8px;opacity:0.6">报告生成时间：2026-06-05 16:21 | AI哨兵风控分析系统 v1.5</p>
+</div>
+
+</div>
+
+<script>
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
