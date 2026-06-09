@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,user-scalable=yes">
+<title>6月三级舆情报告</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;background:#0f1923;color:#e0e6ed;padding:0;-webkit-text-size-adjust:100%}
+.page{max-width:100%;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#1a2a3a,#0d2137);padding:20px 16px 16px;text-align:center;position:sticky;top:0;z-index:100;border-bottom:1px solid #2a4a6a}
+.header h1{font-size:18px;color:#fff;margin-bottom:4px;font-weight:700}
+.header .sub{font-size:11px;color:#7b8fa3}
+.summary-row{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:10px;padding:14px 16px;scrollbar-width:none}
+.summary-row::-webkit-scrollbar{display:none}
+.s-card{flex:0 0 auto;min-width:90px;background:linear-gradient(135deg,#1a2a3a,#1e3448);border-radius:12px;padding:12px 14px;text-align:center;border:1px solid #2a4a6a}
+.s-card .n{font-size:26px;font-weight:700;color:#4fc3f7;line-height:1.2}
+.s-card .l{font-size:10px;color:#7b8fa3;margin-top:2px;white-space:nowrap}
+.s-card.warn .n{color:#ff7043}
+.s-card.green .n{color:#66bb6a}
+.s-card.yellow .n{color:#fdd835}
+.sec{padding:16px;margin:10px 0;background:#152232;border-top:1px solid #1e3448;border-bottom:1px solid #1e3448}
+.sec-t{font-size:16px;font-weight:700;color:#4fc3f7;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.sec-t .ico{font-size:18px}
+.sec-lbl{font-size:13px;color:#fff;font-weight:600;margin-bottom:10px}
+.bar-item{margin-bottom:10px}
+.bar-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.bar-lbl .nm{color:#e0e6ed}
+.bar-lbl .ct{color:#4fc3f7;font-weight:600;font-size:11px}
+.bar-track{height:18px;background:#1e3448;border-radius:9px;overflow:hidden}
+.bar-fill{height:100%;border-radius:9px}
+.fb{background:linear-gradient(90deg,#4fc3f7,#29b6f6)}
+.fr{background:linear-gradient(90deg,#ff7043,#ff5722)}
+.fg{background:linear-gradient(90deg,#66bb6a,#4caf50)}
+.fy{background:linear-gradient(90deg,#fdd835,#fbc02d)}
+.fp{background:linear-gradient(90deg,#ab47bc,#9c27b0)}
+.fo{background:linear-gradient(90deg,#ffa726,#ff9800)}
+.tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding:0 16px 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:7px 14px;border-radius:20px;background:#1e3448;color:#7b8fa3;font-size:12px;border:1px solid transparent;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.tab.on{background:#4fc3f7;color:#0f1923;font-weight:700;border-color:#4fc3f7}
+.tc{display:none;padding:0 16px 16px}
+.tc.on{display:block}
+.dc{background:#1a2a3a;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid #4fc3f7}
+.dc.fm{border-left-color:#ff7043}
+.dc-t{font-size:13px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:6px}
+.dc-meta{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.b-wd{background:#ff5252;color:#fff}
+.b-yd{background:#ff9800;color:#fff}
+.b-ybh{background:#66bb6a;color:#fff}
+.b-ba{background:#4fc3f7;color:#fff}
+.b-cl{background:#fdd835;color:#333}
+.med{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;background:#263845;color:#90a4ae;white-space:nowrap}
+.dc-c{font-size:12px;color:#90a4ae;line-height:1.5;margin-bottom:6px}
+.dc-f{font-size:11px;color:#546e7a;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.kw{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;background:#1e3448;color:#4fc3f7}
+.trend{display:flex;align-items:flex-end;gap:0;height:140px;padding:0 0 22px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.t-bar{flex:1;min-width:34px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.t-v{font-size:10px;font-weight:600}
+.t-b{width:80%;max-width:36px;border-radius:4px 4px 0 0}
+.t-d{font-size:9px;color:#7b8fa3;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px}
+.ct{width:100%;min-width:340px;border-collapse:collapse;font-size:11px}
+.ct th{background:#1e3448;color:#4fc3f7;padding:6px 4px;text-align:center;font-weight:600;white-space:nowrap;position:sticky;top:0}
+.ct td{padding:5px 4px;border-bottom:1px solid #1a2a3a;text-align:center;color:#e0e6ed;white-space:nowrap}
+.ct tr:nth-child(even){background:rgba(30,52,72,0.3)}
+.ct .hl{background:rgba(255,82,82,0.1)}
+.alert{padding:10px 12px;background:rgba(255,82,82,0.08);border-radius:8px;border:1px solid rgba(255,82,82,0.2);margin-top:10px;font-size:11px;color:#90a4ae;line-height:1.6}
+.alert b{color:#ff5252}
+.alert .at{color:#ff7043;font-weight:600;margin-bottom:3px;font-size:12px}
+.focus{font-size:12px;color:#ff7043;line-height:1.5;margin-bottom:10px;padding:8px 10px;background:rgba(255,112,67,0.06);border-radius:6px;border:1px solid rgba(255,112,67,0.15)}
+.rk{background:#1a2a3a;border-radius:10px;padding:12px;margin-bottom:10px}
+.rk-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.rk-ind{font-size:13px;font-weight:600;color:#fff}
+.rk-desc{font-size:12px;color:#90a4ae;line-height:1.5;margin-bottom:6px}
+.rk-act{font-size:12px;color:#4fc3f7;line-height:1.5}
+.todo{background:#1a2a3a;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.todo-idx{font-size:11px;color:#546e7a;min-width:18px}
+.todo-body{flex:1;min-width:0}
+.todo-t{font-size:12px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-m{font-size:10px;color:#546e7a;margin-top:2px;display:flex;gap:6px;align-items:center}
+.foot{text-align:center;padding:20px 16px;font-size:10px;color:#546e7a;line-height:1.5}
+.src-link{display:inline-block;margin-top:6px;padding:4px 12px;background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);border-radius:6px;color:#4fc3f7;font-size:11px;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.src-link:active{background:rgba(79,195,247,0.2)}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="header">
+<h1>📊 6月三级舆情报告</h1>
+<div class="sub">2026.6.1—6.9 ｜ 三级 ｜ 共33条</div>
+</div>
+
+<div class="summary-row">
+<div class="s-card"><div class="n">33</div><div class="l">总量</div></div>
+<div class="s-card warn"><div class="n">8</div><div class="l">未读/待处理</div></div>
+<div class="s-card yellow"><div class="n">8</div><div class="l">发酵类</div></div>
+<div class="s-card green"><div class="n">17</div><div class="l">已闭环</div></div>
+<div class="s-card"><div class="n">5</div><div class="l">涉及产业</div></div>
+</div>
+
+<div class="sec">
+<div class="sec-t"><span class="ico">🏢</span>产业分布</div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">海尔云贷</span><span class="ct">14条 42.4%</span></div><div class="bar-track"><div class="bar-fill fr" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">医疗服务</span><span class="ct">10条 30.3%</span></div><div class="bar-track"><div class="bar-fill fp" style="width:71.4%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">上海莱士</span><span class="ct">7条 21.2%</span></div><div class="bar-track"><div class="bar-fill fo" style="width:50%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">海尔生物</span><span class="ct">5条 15.2%</span></div><div class="bar-track"><div class="bar-fill fb" style="width:35.7%"></div></div></div>
+<div class="sec-lbl" style="margin-top:14px">关键词分布</div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">股民抱怨/上市</span><span class="ct">12条</span></div><div class="bar-track"><div class="bar-fill fb" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">诱导贷款</span><span class="ct">5条</span></div><div class="bar-track"><div class="bar-fill fr" style="width:41.7%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">治疗方式问题</span><span class="ct">5条</span></div><div class="bar-track"><div class="bar-fill fp" style="width:41.7%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">高利息/砍头息</span><span class="ct">5条</span></div><div class="bar-track"><div class="bar-fill fo" style="width:41.7%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">业务经营/财报</span><span class="ct">6条</span></div><div class="bar-track"><div class="bar-fill fy" style="width:50%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">暴力催收</span><span class="ct">1条</span></div><div class="bar-track"><div class="bar-fill fr" style="width:8.3%"></div></div></div>
+</div>
+
+<div class="sec">
+<div class="sec-t"><span class="ico">📋</span>状态 & 渠道</div>
+<div class="sec-lbl">处理状态</div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">未读</span><span class="ct" style="color:#ff5252">5条</span></div><div class="bar-track"><div class="bar-fill fr" style="width:15.2%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">已读</span><span class="ct" style="color:#ff9800">3条</span></div><div class="bar-track"><div class="bar-fill fy" style="width:9.1%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">已闭环</span><span class="ct" style="color:#66bb6a">13条</span></div><div class="bar-track"><div class="bar-fill fg" style="width:39.4%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">备案闭环</span><span class="ct" style="color:#4fc3f7">10条</span></div><div class="bar-track"><div class="bar-fill fb" style="width:30.3%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">处理中</span><span class="ct" style="color:#ffa726">2条</span></div><div class="bar-track"><div class="bar-fill fo" style="width:6.1%"></div></div></div>
+<div class="sec-lbl" style="margin-top:14px">媒体渠道</div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">黑猫投诉</span><span class="ct">8条</span></div><div class="bar-track"><div class="bar-fill fr" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">雪球</span><span class="ct">5条</span></div><div class="bar-track"><div class="bar-fill fb" style="width:62.5%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">小红书</span><span class="ct">5条</span></div><div class="bar-track"><div class="bar-fill fp" style="width:62.5%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">消费保</span><span class="ct">3条</span></div><div class="bar-track"><div class="bar-fill fo" style="width:37.5%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">新浪微博</span><span class="ct">3条</span></div><div class="bar-track"><div class="bar-fill fy" style="width:37.5%"></div></div></div>
+<div class="bar-item"><div class="bar-lbl"><span class="nm">其他</span><span class="ct">9条</span></div><div class="bar-track"><div class="bar-fill fg" style="width:75%"></div></div></div>
+</div>
+
+<div style="padding:16px 0 0">
+<div style="padding:0 16px 10px"><div class="sec-t"><span class="ico">📝</span>产业舆情明细</div></div>
+<div class="tabs" id="tabs">
+<div class="tab on" data-t="yl">海尔云贷(14)</div>
+<div class="tab" data-t="yl2">医疗服务(10)</div>
+<div class="tab" data-t="ls">上海莱士(7)</div>
+<div class="tab" data-t="sw">海尔生物(5)</div>
+</div>
+
+<div class="tc on" id="tc-yl">
+<div class="focus">⚠ 诱导贷款5条 · 高利息/砍头息5条 · 暴力催收1条 · 退费纠纷3条</div>
+<div class="dc fm"><div class="dc-t">海富金融：高利贷 汽车抵押贷款变融资</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">贷款3万4分期3年，已还4万2还有1万8。没给合同。</div><div class="dc-f"><span>海富租赁</span><span class="kw">高利息</span><span>06-08</span></div></div>
+<div class="dc fm"><div class="dc-t">车E融B贷款高额不明费</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">借款6万分36期总还84606元，年化利率未告知。</div><div class="dc-f"><span>陕西海富</span><span class="kw">高利息</span><span>06-07</span></div></div>
+<div class="dc"><div class="dc-t">美容贷款纠纷及解约争议</div><div class="dc-meta"><span class="med">消费保</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">抖音引流到店体验后办贷款10180元，解约要违约金。</div><div class="dc-f"><span>悦己分期</span><span class="kw">诱导贷款</span><span>06-08</span></div></div>
+<div class="dc"><div class="dc-t">深圳文合教育诱导海尔云分期</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">被诱导办理13960元分期已结清，机构注销拒退学费，6.28截止。</div><div class="dc-f"><span>海尔云贷</span><span class="kw">诱导贷款</span><span>06-05</span></div></div>
+<div class="dc"><div class="dc-t">多次诱导顾客办理美容贷</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ba">备案闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝76</span></div><div class="dc-c">大量类似投诉，医美诱导贷款。</div><div class="dc-f"><span>海尔小贷</span><span class="kw">诱导贷款</span><span>06-04</span></div></div>
+<div class="dc fm"><div class="dc-t">海尔小贷纵容助贷机构收砍头息</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-wd">未读</span></div><div class="dc-c">本金10万被扣11000中介费，到手89000，变相砍头息。</div><div class="dc-f"><span>海尔云贷</span><span class="kw">高利息</span><span>06-04</span></div></div>
+<div class="dc"><div class="dc-t">中腾华夏考编课程退费纠纷</div><div class="dc-meta"><span class="med">消费保</span><span class="badge b-wd">未读</span></div><div class="dc-c">承诺未进面试退费，诱导学易分期8600元，拒退。</div><div class="dc-f"><span>学易分期</span><span class="kw">退课退款</span><span>06-03</span></div></div>
+<div class="dc"><div class="dc-t">刚成年遭医托诱导医美贷款</div><div class="dc-meta"><span class="med">消费保</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">郑州星颜颂联合海尔小贷向无收入刚成年人放贷25000元，术后畸形。</div><div class="dc-f"><span>海尔小额贷款</span><span class="kw">诱导贷款</span><span>06-01</span></div></div>
+<div class="dc"><div class="dc-t">海富租赁高额利息乱收费</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">合同53000到账51000，砍头息2000+GPS费3600。年化26.79%超上限。</div><div class="dc-f"><span>海富租赁</span><span class="kw">高利息</span><span class="kw">砍头息</span><span>06-01</span></div></div>
+<div class="dc"><div class="dc-t">芸逸花利率超上限 APP失联</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-wd">未读</span></div><div class="dc-c">高息放贷且失联。</div><div class="dc-f"><span>云易花</span><span class="kw">高利息</span><span>06-01</span></div></div>
+<div class="dc"><div class="dc-t">海富租赁暴力催收</div><div class="dc-meta"><span class="med">黑猫投诉</span><span class="badge b-wd">未读</span></div><div class="dc-c">暴力催收骚扰辱骂家人，泄漏个人信息。</div><div class="dc-f"><span>海富租赁</span><span class="kw">暴力催收</span><span>06-01</span></div></div>
+<div class="dc"><div class="dc-t">悟空祛痘恶意勒索维权</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ba">备案闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝230</span></div><div class="dc-c">诱导6000元美容贷隐瞒利率，全网投诉超120起。</div><div class="dc-f"><span>江西海纳融资担保</span><span class="kw">诱导贷款</span><span>06-01</span></div></div>
+</div>
+
+<div class="tc" id="tc-yl2">
+<div class="focus">⚠ 盈海医院被执行 · 四川友谊医院多起纠纷 · 珂信肿瘤医院争议</div>
+<div class="dc"><div class="dc-t">长沙珂信肿瘤医院害人性命</div><div class="dc-meta"><span class="med">抖音</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">治疗方式问题。</div><div class="dc-f"><span>珂信肿瘤医院</span><span class="kw">治疗方式</span><span>06-07</span></div></div>
+<div class="dc fm"><div class="dc-t">盈海医院被执行了？#盈康一生</div><div class="dc-meta"><span class="med">抖音</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">被执行信息公开传播，关联盈康一生品牌。</div><div class="dc-f"><span>青岛盈海医院</span><span class="kw">起诉投诉</span><span>06-03</span></div></div>
+<div class="dc fm"><div class="dc-t">海尔旗下？盈海医院是被执行人</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ybh">已闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝162</span></div><div class="dc-c">质疑靠谱程度，关联盈康一生品牌。</div><div class="dc-f"><span>青岛盈海医院</span><span class="kw">起诉投诉</span><span>06-02</span></div></div>
+<div class="dc"><div class="dc-t">盈海医院体检彩超排队半天</div><div class="dc-meta"><span class="med">微博</span><span class="badge b-ybh">已闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝752</span></div><div class="dc-c">排队半天有人插队，系统问题。@盈康一生</div><div class="dc-f"><span>青岛盈海医院</span><span class="kw">服务态度</span><span>06-03</span></div></div>
+<div class="dc"><div class="dc-t">后悔死了 #赵延峰</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ba">备案闭环</span></div><div class="dc-c">四川友谊医院整形治疗方式问题。</div><div class="dc-f"><span>四川友谊医院</span><span class="kw">治疗方式</span><span>06-03</span></div></div>
+<div class="dc"><div class="dc-t">傻逼友谊 傻逼赵延峰 去死</div><div class="dc-meta"><span class="med">微博</span><span class="badge b-ybh">已闭环</span><span style="color:#ff7043;font-size:10px">评论98</span></div><div class="dc-c">四川友谊医院整形纠纷，评论98条传播风险高。</div><div class="dc-f"><span>四川友谊医院</span><span class="kw">治疗方式</span><span>06-03</span></div></div>
+<div class="dc"><div class="dc-t">黑心医院 报告没出就吓唬交高额费用</div><div class="dc-meta"><span class="med">抖音</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">四川友谊医院报告没出就吓唬确诊诱导高额治疗。</div><div class="dc-f"><span>四川友谊医院</span><span class="kw">治疗方式</span><span>06-02</span></div></div>
+<div class="dc"><div class="dc-t">四川友谊医院皮肤性病科争议</div><div class="dc-meta"><span class="med">小红书</span><span class="badge b-ybh">已闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝150</span></div><div class="dc-c">声称一周清理病毒三月转阴，疑似推广帖。</div><div class="dc-f"><span>四川友谊医院</span><span class="kw">治疗方式</span><span>06-01</span></div></div>
+</div>
+
+<div class="tc" id="tc-ls">
+<div class="focus" style="color:#ffa726;border-color:rgba(255,167,38,0.15);background:rgba(255,167,38,0.06)">⚠ 高管降薪超40% · 业绩大幅下滑 · 同稿件5平台扩散</div>
+<div class="dc"><div class="dc-t">上海莱士高管降薪超40%！业绩大幅下滑</div><div class="dc-meta"><span class="med">微信</span><span class="badge b-wd">未读</span></div><div class="dc-c">2025年营收73.48亿降10.13%，归母净利15.77亿降28.10%。Q4净利仅1.06亿暴跌70.1%。</div><div class="dc-f"><span class="kw">财报相关</span><span>06-05</span></div></div>
+<div class="dc"><div class="dc-t">管理层的无牙超过人类极限！</div><div class="dc-meta"><span class="med">雪球</span><span class="badge b-wd">未读</span></div><div class="dc-c">股民对管理层强烈不满。</div><div class="dc-f"><span class="kw">股民抱怨</span><span>06-04</span></div></div>
+<div class="dc fm"><div class="dc-t">5元附近血制品龙头——布局良机还是深坑？</div><div class="dc-meta"><span class="med">多平台5个</span></div><div class="dc-c">同一篇在股吧/微博/百家/有驾/雪球发布。股价5.2元，年跌超25%。Q1环比回暖。</div><div class="dc-f"><span class="kw">业务经营</span><span>06-03</span></div></div>
+</div>
+
+<div class="tc" id="tc-sw">
+<div class="focus" style="color:#ffa726;border-color:rgba(255,167,38,0.15);background:rgba(255,167,38,0.06)">⚠ 股民不满集中(4/5条) · 减持质疑 · 产品质量</div>
+<div class="dc"><div class="dc-t">海尔75L医用冷藏箱发泡问题</div><div class="dc-meta"><span class="med">百度贴吧</span><span class="badge b-yd">已读</span></div><div class="dc-c">使用不到一个月内壁发泡层鼓起，冷藏效果下降。售后返厂等半月。</div><div class="dc-f"><span class="kw">产品故障</span><span>06-06</span></div></div>
+<div class="dc"><div class="dc-t">这股暴雷了 $海尔生物</div><div class="dc-meta"><span class="med">雪球</span><span class="badge b-yd">已读</span></div><div class="dc-c">负面舆论，称海尔生物暴雷。</div><div class="dc-f"><span class="kw">股民抱怨</span><span>06-05</span></div></div>
+<div class="dc"><div class="dc-t">减持均价35.54，找资金给高管高价接盘？</div><div class="dc-meta"><span class="med">雪球</span><span class="badge b-ybh">已闭环</span><span style="color:#7b8fa3;font-size:10px">粉丝386</span></div><div class="dc-c">质疑拉升时减持配合高管。</div><div class="dc-f"><span class="kw">股民抱怨</span><span>06-04</span></div></div>
+<div class="dc"><div class="dc-t">管理层为什么不增持股票？</div><div class="dc-meta"><span class="med">上证e互动</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">质疑管理层言行不一。</div><div class="dc-f"><span class="kw">股民抱怨</span><span>06-04</span></div></div>
+<div class="dc"><div class="dc-t">新CEO天天开会PPT 光搞内斗</div><div class="dc-meta"><span class="med">雪球</span><span class="badge b-ybh">已闭环</span></div><div class="dc-c">股民对新CEO管理方式质疑。</div><div class="dc-f"><span class="kw">股民抱怨</span><span>06-03</span></div></div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-t"><span class="ico">📈</span>时间维度分析</div>
+<div class="sec-lbl">每日舆情趋势</div>
+<div class="trend">
+<div class="t-bar"><div class="t-v" style="color:#4fc3f7">4</div><div class="t-b" style="background:linear-gradient(180deg,#4fc3f7,#0288d1);height:56px"></div><div class="t-d">6/1</div></div>
+<div class="t-bar"><div class="t-v" style="color:#ff7043">8</div><div class="t-b" style="background:linear-gradient(180deg,#ff7043,#e64a19);height:112px"></div><div class="t-d">6/2</div></div>
+<div class="t-bar"><div class="t-v" style="color:#ff5252">10</div><div class="t-b" style="background:linear-gradient(180deg,#ff5252,#c62828);height:140px"></div><div class="t-d">6/3</div></div>
+<div class="t-bar"><div class="t-v" style="color:#ff7043">6</div><div class="t-b" style="background:linear-gradient(180deg,#ff7043,#e64a19);height:84px"></div><div class="t-d">6/4</div></div>
+<div class="t-bar"><div class="t-v" style="color:#fdd835">3</div><div class="t-b" style="background:linear-gradient(180deg,#fdd835,#f9a825);height:42px"></div><div class="t-d">6/5</div></div>
+<div class="t-bar"><div class="t-v" style="color:#66bb6a">2</div><div class="t-b" style="background:linear-gradient(180deg,#66bb6a,#388e3c);height:28px"></div><div class="t-d">6/6</div></div>
+<div class="t-bar"><div class="t-v" style="color:#546e7a">0</div><div class="t-b" style="background:#1e3448;height:4px"></div><div class="t-d">6/7</div></div>
+<div class="t-bar"><div class="t-v" style="color:#546e7a">0</div><div class="t-b" style="background:#1e3448;height:4px"></div><div class="t-d">6/8</div></div>
+<div class="t-bar"><div class="t-v" style="color:#546e7a">0</div><div class="t-b" style="background:#1e3448;height:4px"></div><div class="t-d">6/9</div></div>
+</div>
+<div style="text-align:center;font-size:11px;color:#7b8fa3;margin-top:2px">⚡ <span style="color:#ff5252">6月3日峰值10条</span>，1-4日高发占85%</div>
+
+<div class="sec-lbl" style="margin-top:16px">每日 × 产业</div>
+<div class="tbl-wrap">
+<table class="ct">
+<tr><th>日期</th><th style="color:#ff7043">云贷</th><th style="color:#ab47bc">医疗</th><th style="color:#ffa726">莱士</th><th style="color:#4fc3f7">生物</th><th>合计</th></tr>
+<tr><td>6/1</td><td style="color:#ff7043;font-weight:600">4</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="font-weight:600">4</td></tr>
+<tr class="hl"><td>6/2</td><td style="color:#ff7043;font-weight:600">3</td><td style="color:#ab47bc;font-weight:600">2</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="font-weight:600">5</td></tr>
+<tr class="hl"><td style="font-weight:700">6/3</td><td style="color:#ff5252;font-weight:700">2</td><td style="color:#ab47bc;font-weight:600">3</td><td style="color:#ffa726;font-weight:600">5</td><td style="color:#4fc3f7;font-weight:600">2</td><td style="color:#ff5252;font-weight:700">10🔥</td></tr>
+<tr><td>6/4</td><td style="color:#ff7043;font-weight:600">3</td><td style="color:#546e7a">0</td><td style="color:#ffa726">1</td><td style="color:#4fc3f7;font-weight:600">2</td><td style="font-weight:600">6</td></tr>
+<tr><td>6/5</td><td style="color:#ff7043">2</td><td style="color:#546e7a">0</td><td style="color:#ffa726">1</td><td style="color:#4fc3f7">1</td><td style="font-weight:600">3</td></tr>
+<tr><td>6/6</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#4fc3f7">2</td><td style="font-weight:600">2</td></tr>
+<tr><td>6/7</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/8</td><td style="color:#ff7043">2</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="font-weight:600">2</td></tr>
+<tr><td>6/9</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td></tr>
+<tr style="border-top:2px solid #2a4a6a;font-weight:700"><td style="color:#4fc3f7">合计</td><td style="color:#ff7043;font-size:13px">14</td><td style="color:#ab47bc;font-size:13px">10</td><td style="color:#ffa726;font-size:13px">7</td><td style="color:#4fc3f7;font-size:13px">5</td><td style="font-size:14px">33</td></tr>
+</table>
+</div>
+
+<div class="sec-lbl" style="margin-top:16px">每日 × 处理状态</div>
+<div class="tbl-wrap">
+<table class="ct">
+<tr><th>日期</th><th style="color:#ff5252">未读</th><th style="color:#ff9800">已读</th><th style="color:#66bb6a">已闭环</th><th style="color:#4fc3f7">备案闭环</th><th style="color:#ffa726">处理中</th></tr>
+<tr><td>6/1</td><td style="color:#ff5252">2</td><td style="color:#546e7a">0</td><td style="color:#66bb6a">1</td><td style="color:#4fc3f7">1</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/2</td><td style="color:#546e7a">0</td><td style="color:#ff9800">1</td><td style="color:#66bb6a;font-weight:600">4</td><td style="color:#4fc3f7">1</td><td style="color:#546e7a">0</td></tr>
+<tr><td style="font-weight:600">6/3</td><td style="color:#ff5252;font-weight:600">3</td><td style="color:#546e7a">0</td><td style="color:#66bb6a">3</td><td style="color:#4fc3f7">2</td><td style="color:#ffa726">1</td></tr>
+<tr><td>6/4</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#66bb6a">3</td><td style="color:#4fc3f7">3</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/5</td><td style="color:#546e7a">0</td><td style="color:#ff9800">1</td><td style="color:#546e7a">0</td><td style="color:#4fc3f7">3</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/6</td><td style="color:#546e7a">0</td><td style="color:#ff9800">1</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/7</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#66bb6a">2</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td></tr>
+<tr><td>6/8</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#4fc3f7">3</td><td style="color:#ffa726">1</td></tr>
+<tr style="border-top:2px solid #2a4a6a;font-weight:700"><td style="color:#4fc3f7">合计</td><td style="color:#ff5252;font-size:13px">5</td><td style="color:#ff9800;font-size:13px">3</td><td style="color:#66bb6a;font-size:13px">13</td><td style="color:#4fc3f7;font-size:13px">10</td><td style="color:#ffa726;font-size:13px">2</td></tr>
+</table>
+</div>
+
+<div class="sec-lbl" style="margin-top:16px">处理时效</div>
+<div class="tbl-wrap">
+<table class="ct">
+<tr><th>日期</th><th>总量</th><th style="color:#66bb6a">当日闭环</th><th style="color:#ff5252">未处理</th><th style="color:#4fc3f7">闭环率</th></tr>
+<tr><td>6/1</td><td>4</td><td style="color:#66bb6a">1</td><td style="color:#ff5252;font-weight:600">2</td><td style="color:#ffa726">50%</td></tr>
+<tr><td>6/2</td><td>5</td><td style="color:#66bb6a;font-weight:600">4</td><td style="color:#546e7a">0</td><td style="color:#66bb6a;font-weight:600">100%</td></tr>
+<tr class="hl"><td style="font-weight:600">6/3</td><td style="font-weight:600">10</td><td style="color:#66bb6a">3</td><td style="color:#ff5252;font-weight:700">3</td><td style="color:#ff7043;font-weight:600">70%</td></tr>
+<tr><td>6/4</td><td>6</td><td style="color:#66bb6a">3</td><td style="color:#546e7a">0</td><td style="color:#66bb6a">100%</td></tr>
+<tr class="hl"><td>6/5</td><td>3</td><td style="color:#546e7a">0</td><td style="color:#ff5252;font-weight:600">3</td><td style="color:#ff5252;font-weight:600">0%</td></tr>
+<tr class="hl"><td>6/6</td><td>2</td><td style="color:#546e7a">0</td><td style="color:#ff5252;font-weight:600">2</td><td style="color:#ff5252;font-weight:600">0%</td></tr>
+<tr><td>6/7</td><td>1</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">—</td></tr>
+<tr><td>6/8</td><td>2</td><td style="color:#546e7a">0</td><td style="color:#546e7a">0</td><td style="color:#546e7a">—</td></tr>
+</table>
+</div>
+<div class="alert">
+<div class="at">⚠️ 时效警示</div>
+• 6月5-6日舆情<b>闭环率为0%</b>，需紧急关注<br>
+• 6月3日峰值日有3条仍未处理<br>
+• 6月1-4日高发期整体闭环率仅<span style="color:#ffa726">68%</span>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-t"><span class="ico">🚨</span>风险预警</div>
+<div class="rk" style="border-left:3px solid #ff5252"><div class="rk-h"><span class="badge b-wd">🔴 高风险</span><span class="rk-ind">海尔云贷</span></div><div class="rk-desc">诱导贷款投诉密集5条，涉及医美贷/培训贷/教育贷；砍头息/高利贷5条，海富租赁年化26.79%远超法定上限</div><div class="rk-act">①排查助贷机构收费合规性 ②强化放款资质审核 ③建立助贷机构黑名单</div></div>
+<div class="rk" style="border-left:3px solid #ff5252"><div class="rk-h"><span class="badge b-wd">🔴 高风险</span><span class="rk-ind">海尔云贷</span></div><div class="rk-desc">暴力催收投诉，骚扰辱骂家人、泄漏个人信息，向未成年人违规放贷</div><div class="rk-act">①严查催收外包合规性 ②建立未成年人放贷拦截 ③完善投诉快速响应</div></div>
+<div class="rk mh" style="border-left:3px solid #ff7043"><div class="rk-h"><span class="badge" style="background:#ff7043;color:#fff">🟠 中高风险</span><span class="rk-ind">医疗服务</span></div><div class="rk-desc">盈海医院被执行信息公开传播，影响盈康一生品牌；四川友谊医院多起医患纠纷</div><div class="rk-act">①盈海医院被执行人信息公开回应 ②四川友谊诊疗规范专项检查 ③重点监控</div></div>
+<div class="rk md" style="border-left:3px solid #ffa726"><div class="rk-h"><span class="badge b-cl">🟡 中风险</span><span class="rk-ind">上海莱士</span></div><div class="rk-desc">同一篇分析稿5平台同步扩散，叠加高管降薪业绩大幅下滑，投资者情绪低迷</div><div class="rk-act">①关注多平台同源传播 ②准备Q1回暖正面口径 ③加强投资者关系沟通</div></div>
+<div class="rk md" style="border-left:3px solid #ffa726"><div class="rk-h"><span class="badge b-cl">🟡 中风险</span><span class="rk-ind">海尔生物</span></div><div class="rk-desc">股民对管理层不满集中(4/5条)，涉及减持质疑、CEO能力质疑、增持诉求</div><div class="rk-act">①关注雪球情绪走向 ②回应管理层增持诉求 ③产品售后快速处理</div></div>
+</div>
+
+<div class="sec">
+<div class="sec-t"><span class="ico">📌</span>待处理工单(8条)</div>
+<div class="todo"><div class="todo-idx">1</div><div class="todo-body"><div class="todo-t">湖北纹理肌茵美容贷款纠纷</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-ba">备案闭环</span><span>消费保</span><span>06-08</span></div></div></div>
+<div class="todo"><div class="todo-idx">2</div><div class="todo-body"><div class="todo-t">海富金融高利贷汽车抵押贷款</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-ba">备案闭环</span><span>黑猫投诉</span><span>06-08</span></div></div></div>
+<div class="todo"><div class="todo-idx">3</div><div class="todo-body"><div class="todo-t">车E融B贷款猫腻多</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-ba">备案闭环</span><span>黑猫投诉</span><span>06-07</span></div></div></div>
+<div class="todo"><div class="todo-idx">4</div><div class="todo-body"><div class="todo-t">上海莱士高管降薪超40%</div><div class="todo-m"><span>上海莱士</span><span class="badge b-wd">未读</span><span>微信</span><span>06-05</span></div></div></div>
+<div class="todo"><div class="todo-idx">5</div><div class="todo-body"><div class="todo-t">管理层的无牙超过人类极限</div><div class="todo-m"><span>上海莱士</span><span class="badge b-wd">未读</span><span>雪球</span><span>06-04</span></div></div></div>
+<div class="todo"><div class="todo-idx">6</div><div class="todo-body"><div class="todo-t">海尔云贷砍头息投诉</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-wd">未读</span><span>黑猫投诉</span><span>06-04</span></div></div></div>
+<div class="todo"><div class="todo-idx">7</div><div class="todo-body"><div class="todo-t">中腾华夏考编课程退费纠纷</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-wd">未读</span><span>消费保</span><span>06-03</span></div></div></div>
+<div class="todo"><div class="todo-idx">8</div><div class="todo-body"><div class="todo-t">投诉芸逸花利率超上限</div><div class="todo-m"><span>海尔云贷</span><span class="badge b-wd">未读</span><span>黑猫投诉</span><span>06-01</span></div></div></div>
+</div>
+
+<div class="foot">报告生成时间：2026年6月9日 16:24<br>数据来源：万链聆听系统舆情查询</div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});document.querySelectorAll('.tc').forEach(function(x){x.classList.remove('on')});t.classList.add('on');document.getElementById('tc-'+t.dataset.t).classList.add('on')})});
+
+// Store full data for each card
+var fullData = {
+  'yl': [
+    {title:'海富金融  核心问题 高利贷 汽车抵押贷款变融资，没有贷款合同。',content:'我于2024年6月15号在海富做了汽车抵押贷款，但是一直没给我合同，贷款3万4分期3年前12期每期2400后24期每期1333 后面算了一下已经还款4万2 后面还有1万8 我的诉求发放我的合同 超出正常利率的部分直接抵消贷款 归还绿本',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-08 14:09:14',statusText:'备案闭环',author:'匿名',district:'不详',keywords:'高利息',catLv2Name:'海富租赁',complaintName:'海富租赁'},
+    {title:'车E融B贷款猫腻多，高额不明费引关注，速处理！',content:'投诉标题：车E融B贷款利率不透明，存在高额不明费用，要求平台说明并处理 投诉详情： 本人齐中阳，于2025年9月4日申请「车E融B」贷款，订单编号：XM202***********，借款本金60000元，分36期还款，每期还款2350.19元，已还9期。 按当前还款金额计算，36期总还款额为2350.19×36=84606.84元，远超本金60000元，对贷款的综合年化利率、是否存在服务费/管理费等额外费用，平台从未进行明确告知，合同中也未清晰标注各项费用明细，侵犯了消费者的知情权。 现要求平台： 1. 立即向本人提供完整的贷款合同、费用清单及综合年化利率的详细计算说明； 2. 若存在违规收取的费用，要求平台予以退还或冲抵后续还款； 3. 请平台官方客服在3个工作日内主动联系本人，协商合理的还款方案。',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-07 11:04:05',statusText:'备案闭环',author:'匿名',district:'不详',keywords:'高利息',catLv2Name:'陕西海富',complaintName:'陕西海富融资租赁有限公司'},
+    {title:'湖北纹理肌茵美容贷款纠纷及解约争议',content:'在抖音*台引流到线下门店，店家联系我加的微信，到店68体验后续给我办理贷款签订合同，我说不查征信就办理，没有身份证，商家在支付宝查询电子身份证在悦易优享*台给我办理了贷款，10180分12期还款一个月一千二百多，具体是哪个点放款短信受理成功等信息都没收到，我联系抖音*台，商家那边说这个店不是他们*台的，因为商家这边的服务问题我这边要解约，并不是我的问题商家这边要我赔付违约金',brandName:'万链共享',nodeName:'医美贷',mediaName:'消费保',levelName:'三级',publishAt:'2026-06-08 15:15:18',statusText:'备案闭环',author:'网友保保_adZ0O2JB',district:'不详',keywords:'诱导贷款',catLv2Name:'悦己分期/悦易优享/悦己管家'},
+    {title:'不要放弃维权✊🏻后续',content:'#自考退费[话题]# #教育机构[话题]# 跑路退费#深圳灯火教育[话题]# #深圳[话题]# 文合教育#培训贷[话题]# 维权#被诱导分期[话题]# 报课#自考被骗[话题]# 退费#维护自身权益[话题]# #教育机构退费[话题]# #消费者维权[话题]# #避雷2023年在深圳文合教育（灯火教育）报名专本连读自考，合计缴费13960元，被诱导办理海尔云分期，贷款早已全部结清。 机构招生虚假宣传:谎称3年拿专本双证，后期改口需要3-4年；合同约定2.5年服务期，到期单方面锁停课程，索要专科2980、本科1980高额续费才能解锁。 报名全套专本课程，本科自始至终没有任何课程、教辅、授课服务，从未启用本科资源；专科仅上18节课。现如今关联主体灯火教育正在走注销清算，商家拿格式条款以"个人不学不予退费"恶意拒退剩余学费。 提醒同款遭遇的学员抓紧在6.28债权截止日前申报退费，不要自认吃亏！遇到教育机构诱导培训贷、霸王拒退费，合法投诉维权到底。',brandName:'万链共享',nodeName:'培训贷',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-05 07:21:48',statusText:'备案闭环',author:'是少女.',district:'浙江',keywords:'诱导贷款',catLv2Name:'海尔云贷',fans:11},
+    {title:'多次诱导好几个顾客办理美容贷',content:'太可怕了 全是这种类似投诉😱😱 大家一定要避雷 ❗❗❗❗ 千万别去 #医美[话题]# #护肤美容[话题]# #美容院[话题]# #贷款[话题]# #消费者信任[话题]# #维护消费者合法权益[话题]#',brandName:'万链共享',nodeName:'医美贷',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-04 23:48:12',statusText:'备案闭环',author:'Barbie',district:'南昌',keywords:'诱导贷款',catLv2Name:'海尔小贷',fans:76},
+    {title:'投诉重庆海尔小额贷款（海尔云贷）纵容助贷机构违规收取砍头息',content:'本人201*年在海尔云贷办理借款，合同约定放款本金100****元，资金全额转入本人银行卡后，放款当日被合作助贷机构立东划扣*1*00元中介费，实际可用资金仅*0****元，属于变相砍头息，联系海尔客服推诿不是他们收取的，助贷两头双向收费违规，海尔作为持牌放款主体需兜底退费海尔作为持牌放款主体需兜底退费，要求退还*.1*万元，拒不处理将向属地金融局投诉起诉。',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-04 20:03:50',statusText:'未读',author:'匿名',district:'不详',keywords:'高利息',catLv2Name:'海尔云贷',complaintName:'海尔云贷'},
+    {title:'中腾华夏考编课程退费纠纷',content:'2026年1月21日在抖音直播*台购买考编培训课程服务，该司承诺3月28号贵州省事业编考试成绩进不了面试，可退费，并以课程里有秒题技巧为由诱导在学易分期上分期培训费8600元，现以还款三期，成绩已出，未进面，还司现拒不退费。收款方全称、企业有效联系方式:40******88，企业联系方式、付款凭证、订单截图、合同协议、沟通记录等已截图，希望该机构退还承诺退还的部分费用。投诉主体:其它投诉问题:',brandName:'万链共享',nodeName:'教育贷',mediaName:'消费保',levelName:'三级',publishAt:'2026-06-03 18:06:14',statusText:'未读',author:'网友保保_dzwxuU5X',district:'不详',keywords:'退课退款',catLv2Name:'学易分期/学易优享'},
+    {title:'刚成年遭医托诱导医美贷款，投诉郑州星颜颂违规诊疗与欺诈',content:'被举报人： 郑州星颜颂医疗服务有限公司 重庆海尔小额贷款有限公司 关联机构：成都颜美佳信息技术有限公司（星睿家分期*台） 一、投诉事由 2025 年 1 月 13 日至 14 日，我被医托诱导到郑州星颜颂医疗美容机构做鼻综合手术。该机构利用我刚成年、缺乏社会经验，通过虚假宣传、隐瞒信息、违规诊疗、虚构手术材料等方式实施医疗欺诈；同时联合小贷公司，向无收入、无还款能力的我违规发放医美贷款，未做资质审核、未告知风险，严重侵害我的合法权益。现请求全额退款、解除贷款合同、消除不良征信，并依法处罚涉事企业。 二、事实经过 医托诱导，无正规面诊：我被医托带至该机构，未做专业面诊、未告知手术风险，仅用虚假案例诱导消费。 强制办理贷款：工作人员全程催促贷款，未沟通手术细节，我被迫办理 25000 元医美分期，另付麻醉费 2000 元，合计 27000 元。 违规手术：手术当日我感冒不适，机构仅简单抽血，未做心电图、皮试等必备检查，违规实施手术。 医疗欺诈：术前承诺使用超肋 + 耳软骨 + 膨体材料，术后鼻部畸形、溃烂，经专业医院鉴定，实际使用劣质假冒材料，手术完全失败。 违规放贷：重庆海尔小贷未核实我的还款能力，未告知贷款风险，向无收入刚成年人群违规发放高额贷款，流程违法。 三、投诉诉求 认定郑州星颜颂医疗服务有限公司存在虚假宣传、医疗欺诈、违规诊疗等违法行为； 责令该机构全额退还我 27000 元费用； 解除全部医美贷款合同，终止还款，撤销贷款记录、消除征信不良记录，停止催收； 对涉事企业立案调查并予以行政处罚。 四、法律依据 依据《消费者权益保护法》《民法典》《医疗美容服务管理办法》《个人贷款管理暂行办法》，涉事企业存在欺诈、违约、违规诊疗、违规放贷等行为，应承担全部法律责任。',brandName:'万链共享',nodeName:'医美贷',mediaName:'消费保',levelName:'三级',publishAt:'2026-06-01 17:38:33',statusText:'备案闭环',author:'网友保保_bgJw0sqS',district:'不详',keywords:'诱导贷款',catLv2Name:'海尔小额贷款'},
+    {title:'海富租赁猫腻多，高额利息乱收费，退还砍头息等费用！',content:'本人车辆于2023年5月5日办理车辆二次次贷款，合同借款 53000 元，实际到账仅 51000 元： 陕西海富当场扣除砍头息 2000 元；违规收取 GPS 安装及使用费 3600 元，未提供正规票据； 签约时强行预收 1 期月供 2076.21 元当做还款保证金，称36期结清后退还，现已结清 36 期全款后仅退还 1000 元，私自截留保证金1076.21 元。 分期 36 期，每月还款 2076.21 元，全部款项已按期结清。以实际到手 51000 元本金核算，综合年化 26.79%，远超法定 LPR4 倍保护上限 14.8%，超出利息 11277.69 元不受法律保护。 诉求： 陕西海富退还：砍头息 2000 元、GPS 违规收费 3600 元、剩余截留保证金 1076.21 元、超额高利利息 11277.69 元。',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-01 13:15:21',statusText:'已闭环',author:'匿名',district:'不详',keywords:'高利息',catLv2Name:'海富租赁',complaintName:'海富租赁'},
+    {title:'投诉芸逸花利率超上限，APP失联，望剔除非法利息',content:'投诉云易花高息放贷且失联，要求处理逾期',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-01 10:25:00',statusText:'未读',author:'匿名',district:'不详',keywords:'高利息',catLv2Name:'云易花/云易优享',complaintName:'芸逸花'},
+    {title:'海富租赁暴力催收',content:'暴力催收，骚扰辱骂家人，要求道歉，赔偿，泄漏个人信息',brandName:'万链共享',nodeName:'催收还款',mediaName:'黑猫投诉',levelName:'三级',publishAt:'2026-06-01 10:21:57',statusText:'未读',author:'匿名',district:'不详',keywords:'暴力催收',catLv2Name:'海富租赁',complaintName:'海富租赁'},
+    {title:'重磅曝光，维权惨遭悟空恶意勒索！😡',content:'接上篇悟空祛痘维权！ 我依法要求解除全年6000元美容贷套餐后，悟空祛痘门店非但拒不整改，反而恶意设卡、临时捏造霸王收费规则，强制加价刁难，彻底撕开品牌全国连锁收割消费者的黑幕！全程真实取证，无任何夸大！ 我提出合法解约后，门店赤裸裸胁迫:必须补交1189.7元虚假差价，否则拒不解约、永久挂贷、持续催收！目前我已实付1247.3元，而这笔差价是我维权后商家临时编造，办卡零告知、无任何合同依据，纯属恶意勒索。 全套欺诈套路实锤闭环！门店诱导我办理6000元美容贷时，刻意隐瞒利率、还款日、总费用，全程避重就轻蒙蔽我！直到收到中邮金融短信才得知:月供567.3元，全年实际还款6807.6元，凭空多出800余元隐形利息，金融欺诈证据确凿！ 同时门店存在严重双标宰客行为:美团同款项目680元可做3次（单次仅227元），线下却高价收费。商家谎称线下含专属套盒，强行将单次价格抬至389元。所谓价值590元的WKC墨角藻祛痘乳，根本不是悟空自研产品，是痘博士通用贴牌货，仅普通妆字号、无祛痘特证，市面仅几十元，门店天价虚标、虚假宣传！ 最离谱的是商家前后话术自相矛盾、双向收割:先谎称389元单次费用已包含套盒，维权解约时，又重复计费，按389元/次×3次+590元产品费强行算差价，两头收割、恶意敲诈！ 💥重点:我全程未签订任何纸质合同！商家单方新增收费、设置解约门槛，全部是《消保法》《民法典》明令禁止的无效霸王条款。更恶劣的是，门店为逼我撤诉，将投诉挂靠技师、克扣员工工资，用底层员工薪资道德绑架，恶意阻挠维权。 2026年悟空祛痘全网投诉超120起、多地立案处罚，这是总部统一操盘的全国收割套路！ 本人坚决零妥协！ 诉求:拒交虚假差价、全额退还1247.3元、履行赠品免费承诺、依法退一赔三，赔付本人3741.9元(共计4989.2元)，同时无条件解除美容贷并停止催收、整改违法用工制度！！！ 恳请监管部门顶格严查、没收违法所得、肃清医美乱象！ 最后的最后，我呼吁所有被美容贷、虚假医美坑害的受害者们，大家一定要抱团维权，绝不向无良商家妥协！ 我们的每一次维权发声无疑是在击碎行业黑幕，离光明更近！😱 正义或许会迟到，但绝不缺席！只要万众一心，定能还我们的国家社会一片风清气正！🎉 @中国消费者 @中国新闻网 @中国蓝新闻 @央视网 @中国新闻社 #悟空祛痘骗局[话题]# #美容贷陷阱[话题]# #医美维权[话题]# #违法用工[话题]# #预付式消费避雷[话题]# #消费者维权[话题]# #医美避坑指南[话题]#',brandName:'万链共享',nodeName:'医美贷',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-01 01:39:42',statusText:'备案闭环',author:'矜姎Jinsy',district:'福建',keywords:'诱导贷款',catLv2Name:'江西海纳融资担保',fans:230}
+  ],
+  'yl2': [
+    {title:'#上热门',content:'#上热门',brandName:'万链共享',nodeName:'医患纠纷',mediaName:'抖音',levelName:'三级',publishAt:'2026-06-07 11:24:53',statusText:'已闭环',author:'公平',district:'江西',keywords:'治疗方式问题',catLv2Name:'长沙珂信肿瘤医院',thirdKeywords:'长沙珂信肿瘤医院害人性命',fans:233},
+    {title:'盈海医院。被执行了？!#青岛旅游攻略 #青岛体检 #盈康一生',content:'盈海医院。被执行了？!#青岛旅游攻略 #青岛体检 #盈康一生',brandName:'万链共享',nodeName:'业务经营',mediaName:'抖音',levelName:'三级',publishAt:'2026-06-03 20:29:26',statusText:'已闭环',author:'爱吃的YY',district:'山东',keywords:'起诉、投诉问题',catLv2Name:'青岛盈海医院',fans:25},
+    {title:'说是海尔旗下的，有知道的朋友说说怎么样？',content:'想去做项目，一查怎么是被执行人呢？有知道怎么回事的么？靠不靠谱啊#盈康一生·青岛盈海医院[话题]# #崂山医美[话题]#',brandName:'万链共享',nodeName:'业务经营',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-02 15:53:27',statusText:'已闭环',author:'祈妗（小号）',district:'山东',keywords:'起诉、投诉问题',catLv2Name:'青岛盈海医院',fans:162},
+    {title:'傻逼盈海医院',content:'傻逼盈海医院@盈康一生 体检彩超排队排半天 两次都要到我了前面来人插队，问就是系统问题前面有人来的比我早，系统没排上，这不是纯耽误人时间嘛？随便插队呗。',brandName:'万链共享',nodeName:'服务问题',mediaName:'新浪微博',levelName:'三级',publishAt:'2026-06-03 09:56:09',statusText:'已闭环',author:'要坚持向前走的间歇性精神病',district:'山东',keywords:'服务规范性',catLv2Name:'青岛盈海医院',fans:752},
+    {title:'后悔死了',content:'后悔死了#外轮廓不流畅 #赵延峰',brandName:'万链共享',nodeName:'医患纠纷',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-03 12:26:11',statusText:'备案闭环',author:'阿谀',district:'福建',keywords:'治疗方式问题',catLv2Name:'四川友谊医院',fans:5},
+    {title:'傻逼友谊 傻逼赵延峰 去死',content:'傻逼友谊 傻逼赵延峰 去死',brandName:'万链共享',nodeName:'医患纠纷',mediaName:'新浪微博',levelName:'三级',publishAt:'2026-06-03 04:51:00',statusText:'已闭环',author:'四川友谊切出来的畸形下巴',district:'四川',keywords:'治疗方式问题',catLv2Name:'四川友谊医院',comments:98},
+    {title:'黑心医院啊。四川友谊医院，私立医院，报告结果没出就一系列吓唬我，说我已经确诊感染了，吓唬我交高额费用做治疗还打高额针，报告结果跟其他其他医院的不一样，还把我不痛的地方搞起伤口，已经过了半个多月还在痛，',content:'黑心医院啊。四川友谊医院，私立医院，报告结果没出就一系列吓唬我，说我已经确诊感染了，吓唬我交高额费用做治疗还打高额针，报告结果跟其他其他医院的不一样，还把我不痛的地方搞起伤口，已经过了半个多月还在痛，我都怕她们给我检查治疗的时候把别的病毒植入我身体，你们赚黑钱良心不痛吗#四川友谊医院 #莆田医院 #私立医院 #私立医院退费 #私立医院乱象',brandName:'万链共享',nodeName:'医患纠纷',mediaName:'抖音',levelName:'三级',publishAt:'2026-06-02 08:22:00',statusText:'已闭环',author:'肘子',district:'四川成都',keywords:'治疗方式问题',catLv2Name:'四川友谊医院'},
+    {title:'姐妹们，四川友谊医院皮肤性病科很神奇呀，特别是那个田主任！',content:'姐妹们，四川友谊医院皮肤性病科很神奇呀，特别是那个田主任！一个星期都可以把满pg湿疣连同病毒全清理掉，三个月都可以转阴，如果那些持续不转阴的姐妹可以去这个医院治疗，严重的一个星期就把病毒连同根清理完了#尖锐湿疣[话题]# #hpv感染[话题]# #hpv转阴[话题]# #四川友谊医院[话题]# #四川友谊医院避坑[话题]# #希望能帮助你[话题]#',brandName:'万链共享',nodeName:'医患纠纷',mediaName:'小红书',levelName:'三级',publishAt:'2026-06-01 21:19:18',statusText:'已闭环',author:'困k',district:'四川',keywords:'治疗方式问题',catLv2Name:'四川友谊医院',fans:150}
+  ],
+  'ls': [
+    {title:'上海莱士，高管降薪超40%！',content:'来源：生命科学产业观察 编辑小奇整理自互动平台、企业年报6月5日，上海莱士在互动平台回答投资者提问时表示，公司高管从业阅历深厚，深耕血制品领域多年，丰富的行业经验能够有效把控经营与风控，年龄不影响履职能力。公司高管薪酬严格与业绩挂钩、动态调整，2025年高管薪酬总额同比降幅超40%；叠加高管参与第二期员工持股且以高管身份参与计划的高管还承诺放弃2026-2028年部分薪酬，利益与公司深度绑定。同时公司持续优化人才梯队建设，不断引进年轻化管理人才，赋能企业长效发展。2024年与2025年核心高管薪酬对比2025年报数据显示，2025年上海莱士全年实现营业收入73.48亿元，同比下降10.13%；归母净利润15.77亿元，同比下降28.10%；扣非归母净利润15.60亿元，同比下降24.25%。2025年第四季度，公司实现营业收入12.57亿元，同比下降32.5%；归母净利润仅1.06亿元，同比暴跌70.1%；扣非归母净利润7528万元，同比暴跌76.5%。单季营收规模创近三年新低，业绩下滑幅度远超市场预期。上海莱士上海莱士是中国第一家中外合资的血液制品大型生产企业，自2008年上市以来，不断通过外延并购持续拓展规模，已成功完成了对邦和药业、同路生物等4家血液制品企业的并购和整合，目前全国拥有上海、合肥、郑州、温州、广西5大血液制品生产基地，单采血浆站44家。海尔集团于2024年6月入主上海莱士，宣布上海莱士成为其大健康产业"盈康一生"成员，并支持上海莱士推进"拓浆"和"脱浆"齐步走战略。本次收购南岳生物是上海莱士推进"拓浆"战略的重要举措。❖ 慎重声明：本文内容仅供学习交流，观点仅代表作者本人立场，版权归原作者所有，如有疑问请联系编辑。',brandName:'万链共享',nodeName:'上市相关',mediaName:'微信',levelName:'三级',publishAt:'2026-06-05 19:38:00',statusText:'未读',author:'生命科学产业观察',district:'广东',keywords:'财报相关',catLv2Name:'上海莱士'},
+    {title:'管理层的无牙超过人类极限！',content:'管理层的无牙超过人类极限！',brandName:'万链共享',nodeName:'上市相关',mediaName:'雪球',levelName:'三级',publishAt:'2026-06-04 20:16:00',statusText:'未读',author:'江东子弟123',district:'江苏',keywords:'股民抱怨',catLv2Name:'上海莱士',fans:25},
+    {title:'5元附近的血制品龙头上海莱士（002252）现在是布局良机还是深坑？',content:'近期医药板块震荡分化，血液制品赛道受政策与一季报催化热度攀升，上海莱士（002252）股价回落至5.2元左右，引发股民激烈争论，不少人纠结能否低位布局。从基本面来看，公司作为老牌血制品龙头，手握四十余家合规浆站，白蛋白、凝血因子多款产品持续获批签发，行业牌照壁垒短期难以突破。2026年一季度业绩环比明显回暖，净利润环比大增近200%，经营现金流由负转正，落地拓浆+创新双战略，单抗新药SR604处在临床二期，长线成长有研发支撑 。叠加国家血制品智慧监管政策落地，龙头企业规模优势进一步凸显 。但利空同样不能忽视：2025年全年营收、净利润同比下滑，集采扩围、增值税上调持续压缩利润，近一年股价累计跌超25%，短期基本面仍在磨底阶段 。有人认为低位性价比凸显、刚需属性抗跌适合分批埋伏；也有投资者担忧行业去库存未完，磨底周期拉长不宜入场。有没有长期持有莱士3年以上的老股民？说说当初买入理由，现在被套还扛着吗？ 特别提醒：本文仅为个人观点，不构成任何投资建议。投资有风险，入市需谨慎。 #炒股日记#  $上海莱士(SZ002252)$  ',brandName:'万链共享',nodeName:'上市相关',mediaName:'多平台5个',levelName:'三级',publishAt:'2026-06-03 11:46:10',statusText:'未读',author:'枭阳爵雄',district:'上海',keywords:'业务经营',catLv2Name:'上海莱士',thirdKeywords:'5元附近的血制品龙头上海莱士（002252）现在是布局良机还是深坑？'}
+  ],
+  'sw': [
+    {title:'海尔75l医用冷藏箱发泡问题求助',content:'家里开诊所的，新买了台海尔75l医用冷藏箱，用了不到一个月发现内壁发泡层鼓起来了，冷藏效果明显下降，联系售后说这种情况要返厂维修，得等半个月，诊所里疫苗和药品没地方存放了，急死个人，有懂的大神知道这种情况能自己处理吗，或者有没有临时替代方案，求支招',brandName:'万链共享',nodeName:'产品质量',mediaName:'百度贴吧',levelName:'三级',publishAt:'2026-06-06 10:20:55',statusText:'已读',author:'百度用户#4256013442',district:'山西',keywords:'产品故障',catLv2Name:'海尔生物',secondKeywords:'性能故障'},
+    {title:'这股暴雷了',content:'这股暴雷了，搜虞美人@优秀的股指小狗狗$海尔生物(SH688139)$负面舆论股不看好，多多背调一下，搜虞美人',brandName:'万链共享',nodeName:'上市相关',mediaName:'雪球',levelName:'三级',publishAt:'2026-06-05 23:15:00',statusText:'已读',author:'优秀的股指小狗狗',district:'江西',keywords:'股民抱怨',catLv2Name:'海尔生物',fans:2},
+    {title:'$海尔生物(SH688139)$',content:'$海尔生物(SH688139)$ 减持均价35.54，都是22号大幅拉升时减持的，这不是明显的找资金给海尔高管们高价接盘？裤衩兄弟都堕落成这样了',brandName:'万链共享',nodeName:'上市相关',mediaName:'雪球',levelName:'三级',publishAt:'2026-06-04 11:07:26',statusText:'已闭环',author:'沐雨独行',district:'江苏',keywords:'股民抱怨',catLv2Name:'海尔生物',fans:386},
+    {title:':海尔生物(688139)既然公司认为公司的价值是低估的，公司管理层为什么不增持股票，增加投资者信心，不要口头说说公司价值低估，有句话说的好，不要看他怎么说而是要看他怎么做',content:':海尔生物(688139)既然公司认为公司的价值是低估的，公司管理层为什么不增持股票，增加投资者信心，不要口头说说公司价值低估，有句话说的好，不要看他怎么说而是要看他怎么做',brandName:'万链共享',nodeName:'上市相关',mediaName:'上证e互动',levelName:'三级',publishAt:'2026-06-04 11:01:14',statusText:'已闭环',author:'投资者_1650675112000',district:'不详',keywords:'股民抱怨',catLv2Name:'海尔生物'},
+    {title:'新来的CEO，天天开会PPT，业务不行，光搞内斗也搞不起来股价啊呵呵',content:'新来的CEO，天天开会PPT，业务不行，光搞内斗也搞不起来股价啊呵呵',brandName:'万链共享',nodeName:'上市相关',mediaName:'雪球',levelName:'三级',publishAt:'2026-06-03 11:52:00',statusText:'已闭环',author:'BD11',district:'上海',keywords:'股民抱怨',catLv2Name:'海尔生物',fans:1}
+  ]
+};
+
+// Add click handlers to show full data
+document.querySelectorAll('.tc').forEach(function(tabContent, tabIndex){
+  var tabKeys = ['yl', 'yl2', 'ls', 'sw'];
+  var key = tabKeys[tabIndex];
+  if(!key || !fullData[key]) return;
+
+  var cards = tabContent.querySelectorAll('.dc');
+  cards.forEach(function(card, cardIndex){
+    var data = fullData[key][cardIndex];
+    if(!data) return;
+
+    // Create detail panel
+    var panel = document.createElement('div');
+    panel.className = 'detail-panel';
+    panel.style.cssText = 'display:none;margin-top:10px;padding:10px;background:#0f1923;border-radius:6px;font-size:11px;line-height:1.6;max-height:300px;overflow-y:auto';
+
+    var html = '<div style="color:#4fc3f7;font-weight:600;margin-bottom:6px">📄 原始数据</div>';
+    var fields = [
+      ['标题', data.title],
+      ['内容', data.content],
+      ['品牌', data.brandName],
+      ['场景', data.nodeName],
+      ['媒体', data.mediaName],
+      ['等级', data.levelName],
+      ['发布时间', data.publishAt],
+      ['状态', data.statusText],
+      ['作者', data.author],
+      ['地区', data.district],
+      ['关键词', data.keywords],
+      ['二级产业', data.catLv2Name],
+      ['投诉对象', data.complaintName],
+      ['粉丝数', data.fans],
+      ['评论数', data.comments],
+      ['三级关键词', data.thirdKeywords]
+    ];
+
+    fields.forEach(function(f){
+      if(f[1] !== undefined && f[1] !== null && f[1] !== ''){
+        html += '<div><span style="color:#7b8fa3">' + f[0] + '：</span><span style="color:#e0e6ed">' + f[1] + '</span></div>';
+      }
+    });
+
+    panel.innerHTML = html;
+    card.appendChild(panel);
+
+    // Add toggle link
+    var link = document.createElement('a');
+    link.href = 'javascript:void(0)';
+    link.style.cssText = 'display:inline-block;margin-top:8px;padding:4px 10px;background:rgba(79,195,247,0.15);border-radius:4px;color:#4fc3f7;font-size:11px;text-decoration:none;border:1px solid rgba(79,195,247,0.3)';
+    link.textContent = '📄 查看完整原文';
+    link.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(panel.style.display === 'none'){
+        panel.style.display = 'block';
+        link.textContent = '🔼 收起';
+      } else {
+        panel.style.display = 'none';
+        link.textContent = '📄 查看完整原文';
+      }
+    };
+    card.appendChild(link);
+  });
+});
+</script>
+</body>
+</html>
