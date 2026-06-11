@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>海尔生物(688139) 财务分析报告</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Microsoft YaHei',sans-serif;background:#0f1117;color:#e0e0e0;line-height:1.6}
+.header{background:linear-gradient(135deg,#1a1f3a,#2d1b4e);padding:32px 40px;border-bottom:1px solid #333}
+.header h1{font-size:28px;color:#fff;margin-bottom:4px}
+.header .sub{color:#aaa;font-size:14px}
+.header .tags{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.header .tag{padding:3px 12px;border-radius:12px;font-size:12px;font-weight:600}
+.tag-safe{background:#1a3a2a;color:#4caf50;border:1px solid #2e7d32}
+.tag-warn{background:#3a2a1a;color:#ff9800;border:1px solid #e65100}
+.tag-info{background:#1a2a3a;color:#42a5f5;border:1px solid #1565c0}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.tabs{display:flex;gap:2px;margin-bottom:0;flex-wrap:wrap}
+.tabs button{padding:10px 18px;border:none;background:#1a1d2e;color:#aaa;cursor:pointer;font-size:13px;
+  border-radius:8px 8px 0 0;transition:all .2s}
+.tabs button:hover{color:#fff;background:#252840}
+.tabs button.active{background:#1e2235;color:#64b5f6;border-bottom:2px solid #64b5f6}
+.tab-content{display:none;background:#1e2235;border-radius:0 8px 8px 8px;padding:24px;animation:fadeIn .3s}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#252840;border-radius:10px;padding:18px;border:1px solid #333}
+.card .label{font-size:12px;color:#888;margin-bottom:4px}
+.card .value{font-size:24px;font-weight:700;color:#fff}
+.card .change{font-size:12px;margin-top:4px}
+.g{color:#4caf50!important}
+.r{color:#ef5350!important}
+.y{color:#ffb74d!important}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th,td{padding:10px 14px;text-align:right;border-bottom:1px solid #2a2d40;font-size:13px}
+th{background:#1a1d2e;color:#90caf9;font-weight:600;text-align:center}
+td:first-child,th:first-child{text-align:left}
+tr:hover td{background:#252840}
+.section-title{font-size:16px;color:#90caf9;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #2a2d40}
+.note{font-size:12px;color:#777;margin-top:8px;padding:8px 12px;background:#1a1d2e;border-radius:6px;border-left:3px solid #555}
+.warn-box{background:#3a2a1a;border:1px solid #e65100;border-radius:8px;padding:14px 18px;margin:8px 0}
+.warn-box .title{color:#ff9800;font-weight:600;font-size:14px;margin-bottom:6px}
+.warn-box ul{padding-left:20px;color:#ffcc80;font-size:13px}
+.warn-box ul li{margin:4px 0}
+.good-box{background:#1a3a2a;border:1px solid #2e7d32;border-radius:8px;padding:14px 18px;margin:8px 0}
+.good-box .title{color:#4caf50;font-weight:600;font-size:14px;margin-bottom:6px}
+.good-box ul{padding-left:20px;color:#a5d6a7;font-size:13px}
+.good-box ul li{margin:4px 0}
+.bar-chart{display:flex;align-items:flex-end;gap:12px;height:120px;margin:12px 0;padding:0 10px}
+.bar-group{display:flex;flex-direction:column;align-items:center;flex:1}
+.bar{width:36px;border-radius:4px 4px 0 0;transition:height .5s;min-height:2px}
+.bar-label{font-size:11px;color:#888;margin-top:4px}
+.bar-val{font-size:11px;color:#ccc;margin-bottom:2px}
+.diag-summary{background:linear-gradient(135deg,#1a2a3a,#2a1a3a);border-radius:12px;padding:24px;margin:16px 0;border:1px solid #444}
+.diag-summary h3{color:#fff;font-size:18px;margin-bottom:12px}
+.diag-summary p{color:#ccc;font-size:14px;line-height:1.8}
+.footer{text-align:center;padding:20px;color:#555;font-size:12px;border-top:1px solid #222;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>青岛海尔生物医疗股份有限公司</h1>
+<div class="sub">股票代码: 688139.SH &nbsp;|&nbsp; 报告期: 2026年一季报 (对比2025年报) &nbsp;|&nbsp; 生成日期: 2026-06-11</div>
+<div class="tags">
+  <span class="tag tag-warn">EVA为负: -8,712万</span>
+  <span class="tag tag-info">ROE(2025): 5.73%</span>
+  <span class="tag tag-safe">资产负债率: 19.7%</span>
+</div>
+</div>
+<div class="container">
+<div class="tabs">
+<button onclick="showTab(0)" active>杜邦分析</button>
+<button onclick="showTab(1)">偿债能力</button>
+<button onclick="showTab(2)">营运能力</button>
+<button onclick="showTab(3)">盈利能力</button>
+<button onclick="showTab(4)">现金流分析</button>
+<button onclick="showTab(5)">EVA分析</button>
+<button onclick="showTab(6)">综合诊断</button>
+</div>
+<div class="tab-content active" id="tab0">
+<h3 class="section-title">杜邦分析 — ROE分解 (2025年度)</h3>
+<div class="cards">
+<div class="card"><div class="label">ROE (归母)</div><div class="value">5.73%</div></div>
+<div class="card"><div class="label">净利率</div><div class="value">10.77%</div><div class="change">归母净利润/营业收入</div></div>
+<div class="card"><div class="label">总资产周转率</div><div class="value">0.4021x</div><div class="change">营业收入/总资产</div></div>
+<div class="card"><div class="label">权益乘数</div><div class="value">1.3236x</div><div class="change">总资产/归母权益</div></div>
+</div>
+<table>
+<tr><th>指标</th><th>数值</th><th>说明</th></tr>
+<tr><td>ROE = 净利率 x 资产周转率 x 权益乘数</td><td>10.77% x 0.4021 x 1.3236</td><td>= 5.73%</td></tr>
+<tr><td>归母净利润</td><td>2.51亿</td><td></td></tr>
+<tr><td>营业收入</td><td>23.29亿</td><td></td></tr>
+<tr><td>总资产</td><td>57.92亿</td><td></td></tr>
+<tr><td>归母权益</td><td>43.76亿</td><td></td></tr>
+</table>
+<div class="note">ROE=5.73%，处于中等偏低水平。净利率10.8%是ROE的主要驱动因素，权益乘数1.32x表明财务杠杆较低，公司负债水平保守。提升ROE的关键在于提高资产周转效率或适度利用财务杠杆。</div>
+</div>
+<div class="tab-content" id="tab1">
+<h3 class="section-title">偿债能力分析 (2026Q1期末)</h3>
+<div class="cards">
+<div class="card"><div class="label">流动比率</div><div class="value" class="g">2.57</div><div class="change">基准>1.5</div></div>
+<div class="card"><div class="label">速动比率</div><div class="value" class="g">2.25</div><div class="change">基准>1.0</div></div>
+<div class="card"><div class="label">现金比率</div><div class="value">0.91</div><div class="change">货币资金/流动负债</div></div>
+<div class="card"><div class="label">资产负债率</div><div class="value" class="g">19.7%</div><div class="change">基准<60%</div></div>
+</div>
+<table>
+<tr><th>指标</th><th>2026Q1期末</th><th>参考基准</th><th>评价</th></tr>
+<tr><td>流动比率</td><td>2.57</td><td>>1.5</td><td优秀</td></tr>
+<tr><td>速动比率</td><td>2.25</td><td>>1.0</td><td良好</td></tr>
+<tr><td>现金比率</td><td>0.91</td><td>>0.2</td><td>充裕</td></tr>
+<tr><td>资产负债率</td><td>19.7%</td><td><60%</td><td>极其稳健</td></tr>
+<tr><td>有息负债率</td><td>1.62%</td><td><30%</td><td>极低</td></tr>
+<tr><td>利息保障倍数(Q1年化)</td><td>96.7</td><td>>3.0</td><td>极强</td></tr>
+</table>
+<div class="note">公司资产负债率仅19.7%，远低于行业平均水平，财务结构极其保守。流动比率2.57，速动比率2.25，短期偿债能力充裕。有息负债仅1.62%，利息保障倍数极高，偿债压力几乎为零。</div>
+</div>
+<div class="tab-content" id="tab2">
+<h3 class="section-title">营运能力分析 (2026Q1年化)</h3>
+<div class="cards">
+<div class="card"><div class="label">应收账款周转天数</div><div class="value">63.7天</div></div>
+<div class="card"><div class="label">存货周转天数</div><div class="value">91.1天</div></div>
+<div class="card"><div class="label">应付账款周转天数</div><div class="value">91.7天</div></div>
+<div class="card"><div class="label">现金循环周期</div><div class="value">63.0天</div><div class="change">=应收64+存货91-应付92</div></div>
+</div>
+<table>
+<tr><th>指标</th><th>数值</th><th>说明</th></tr>
+<tr><td>应收账款周转天数</td><td>63.7天</td><td>年均应收4.55亿 / 年化收入26.08亿</td></tr>
+<tr><td>存货周转天数</td><td>91.1天</td><td>年均存货3.41亿 / 年化成本13.68亿</td></tr>
+<tr><td>应付账款周转天数</td><td>91.7天</td><td>年均应付3.44亿</td></tr>
+<tr><td>现金循环周期(CCC)</td><td>63.0天</td><td>越短越好</td></tr>
+<tr><td>总资产周转率(年化)</td><td>0.4479x</td><td>年化收入/年均总资产</td></tr>
+</table>
+<div class="note">现金循环周期63.0天，处于健康水平。应收账款周转64天<span class="r"> (应收账款同比增长25.0%，增速偏快)</span>。存货周转91天，体现医疗器械行业的库存管理特点。</div>
+</div>
+<div class="tab-content" id="tab3">
+<h3 class="section-title">盈利能力分析</h3>
+<div class="cards">
+<div class="card"><div class="label">2026Q1 营收</div><div class="value">6.52亿</div><div class="change r">同比 -5.4%</div></div>
+<div class="card"><div class="label">2026Q1 归母净利润</div><div class="value">0.79亿</div><div class="change r">同比 -27.9%</div></div>
+<div class="card"><div class="label">毛利率(2026Q1)</div><div class="value" class="g">47.5%</div><div class="change">去年Q1: 48.4%</div></div>
+<div class="card"><div class="label">ROA(年化)</div><div class="value">5.49%</div></div>
+</div>
+<table>
+<tr><th>指标</th><th>2025年报</th><th>2026Q1</th><th>2025Q1</th><th>Q1同比变动</th></tr>
+<tr><td>毛利率</td><td>46.8%</td><td>47.5%</td><td>48.4%</td><td>-0.8pp</td></tr>
+<tr><td>净利率</td><td>11.0%</td><td>12.3%</td><td>16.9%</td><td>-4.6pp</td></tr>
+<tr><td>归母净利率</td><td>10.8%</td><td>12.2%</td><td>16.0%</td><td>-3.8pp</td></tr>
+<tr><td>销售费用率</td><td>15.4%</td><td>15.2%</td><td>13.1%</td><td>+2.1pp</td></tr>
+<tr><td>管理费用率</td><td>8.3%</td><td>7.4%</td><td>7.0%</td><td>+0.4pp</td></tr>
+<tr><td>研发费用率</td><td>13.9%</td><td>12.9%</td><td>11.7%</td><td>+1.2pp</td></tr>
+<tr><td>期间费用率</td><td>36.5%</td><td>35.8%</td><td>30.8%</td><td>+5.0pp</td></tr>
+</table>
+<div class="note">2025年毛利率46.8%，2026Q1毛利率47.5%，有所提升。Q1归母净利润同比下降27.9%，主要受收入下滑及费用增加影响。研发投入占比12.9%，体现公司对创新的持续投入。</div>
+</div>
+<div class="tab-content" id="tab4">
+<h3 class="section-title">现金流质量分析</h3>
+<div class="cards">
+<div class="card"><div class="label">2025经营现金流</div><div class="value" class="g">2.68亿</div></div>
+<div class="card"><div class="label">2025自由现金流</div><div class="value" class="g">1.49亿</div><div class="change">OCF-资本支出</div></div>
+<div class="card"><div class="label">现金/净利润比</div><div class="value">1.05x</div><div class="change">基准>1.0x</div></div>
+<div class="card"><div class="label">2026Q1经营现金流</div><div class="value">1,168万</div><div class="change r">同比 -68.6%</div></div>
+</div>
+<table>
+<tr><th>项目</th><th>2025年报</th><th>2026Q1</th><th>2025Q1</th></tr>
+<tr><td>经营活动现金流净额</td><td>26,789万</td><td>1,168万</td><td>3,722万</td></tr>
+<tr><td>投资活动现金流净额</td><td>1,675万</td><td>24,354万</td><td>8,243万</td></tr>
+<tr><td>筹资活动现金流净额</td><td>-26,874万</td><td>-163万</td><td>-1,817万</td></tr>
+<tr><td>资本支出</td><td>11,925万</td><td>1,558万</td><td>-</td></tr>
+</table>
+<div class="note">2025年现金流模式: 收缩型（+ + -）：经营良好但投资回收，筹资偿还。经营现金流/净利润比=1.05x，利润质量较好。自由现金流1.49亿，为正，公司具备自我造血与投资能力。</div>
+</div>
+<div class="tab-content" id="tab5">
+<h3 class="section-title">EVA 经济增加值分析 (2025年度)</h3>
+<div class="cards">
+<div class="card"><div class="label">EVA</div><div class="value" style="color:#ef5350">-8,712万</div><div class="change">价值损耗</div></div>
+<div class="card"><div class="label">NOPAT</div><div class="value">25,666万</div><div class="change">税后净营业利润</div></div>
+<div class="card"><div class="label">投入资本</div><div class="value">42.85亿</div></div>
+<div class="card"><div class="label">WACC</div><div class="value">8.02%</div><div class="change">加权平均资本成本</div></div>
+</div>
+<table>
+<tr><th>计算步骤</th><th>数值</th></tr>
+<tr><td>有效税率</td><td>3.6%</td></tr>
+<tr><td>NOPAT = 营业利润 x (1-税率)</td><td>25,666万</td></tr>
+<tr><td>投入资本 = 权益+有息负债-CIP-超额现金</td><td>42.85亿</td></tr>
+<tr><td>股权成本 = 无风险利率2.5% + 0.8 x 市场溢价7%</td><td>8.1%</td></tr>
+<tr><td>WACC = 权益比重x股权成本 + 债务比重x利率x(1-税率)</td><td>8.02%</td></tr>
+<tr><td>资本成本 = 投入资本 x WACC</td><td>34,378万</td></tr>
+<tr style="font-weight:bold"><td>EVA = NOPAT - 资本成本</td><td style="color:#ef5350">-8,712万</td></tr>
+</table>
+<div class="note">EVA为负值(-8,712万元)，说明公司税后营业利润尚未覆盖全部资本成本(含股权资本的机会成本)。虽然公司会计利润为正，但从经济利润角度，尚未为股东创造超额价值。改善路径包括：提高经营利润率、优化资产周转效率、或调整资本结构。</div>
+</div>
+<div class="tab-content" id="tab6">
+<h3 class="section-title">综合诊断</h3>
+<div class="diag-summary">
+<h3>海尔生物(688139) 财务健康综合评估</h3>
+<p>青岛海尔生物医疗股份有限公司2025年实现营收23.29亿元，归母净利润2.51亿元，ROE为5.73%。2026年一季度营收6.52亿元(同比-5.4%)，归母净利润0.79亿元(同比-27.9%)。资产负债率仅19.7%，财务结构极其稳健。EVA为-8,712万元，尚未覆盖股权资本机会成本，需关注经营效率提升。</p>
+</div>
+<div class="good-box"><div class="title">核心优势</div><ul>
+<li>2025年经营现金流持续为正(26789万元)，造血能力良好</li>
+<li>资产负债率仅19.7%，财务结构极其稳健</li>
+</ul></div>
+<div class="warn-box"><div class="title">风险预警</div><ul>
+<li>应收账款增长25.0%，增速较快，需关注回款效率</li>
+<li>商誉占归母权益17.3%，存在潜在减值风险</li>
+<li>2026Q1归母净利润同比下降27.9%，盈利能力承压</li>
+<li>2026Q1经营现金流同比下降68.6%</li>
+</ul></div>
+<div class="cards" style="margin-top:16px">
+<div class="card"><div class="label">综合评分</div><div class="value" style="color:#4caf50">82/100</div><div class="change">等级: B+</div></div>
+<div class="card"><div class="label">维度评分</div><div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:60px;font-size:12px;color:#aaa">偿债能力</span><div style="flex:1;height:6px;background:#333;border-radius:3px"><div style="width:87%;height:100%;background:#4caf50;border-radius:3px"></div></div><span style="font-size:11px;color:#888;width:28px;text-align:right">87</span></div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:60px;font-size:12px;color:#aaa">盈利能力</span><div style="flex:1;height:6px;background:#333;border-radius:3px"><div style="width:72%;height:100%;background:#4caf50;border-radius:3px"></div></div><span style="font-size:11px;color:#888;width:28px;text-align:right">72</span></div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:60px;font-size:12px;color:#aaa">营运能力</span><div style="flex:1;height:6px;background:#333;border-radius:3px"><div style="width:37%;height:100%;background:#ef5350;border-radius:3px"></div></div><span style="font-size:11px;color:#888;width:28px;text-align:right">37</span></div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:60px;font-size:12px;color:#aaa">成长性</span><div style="flex:1;height:6px;background:#333;border-radius:3px"><div style="width:45%;height:100%;background:#ef5350;border-radius:3px"></div></div><span style="font-size:11px;color:#888;width:28px;text-align:right">45</span></div>
+<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:60px;font-size:12px;color:#aaa">现金流</span><div style="flex:1;height:6px;background:#333;border-radius:3px"><div style="width:52%;height:100%;background:#ff9800;border-radius:3px"></div></div><span style="font-size:11px;color:#888;width:28px;text-align:right">52</span></div>
+</div>
+</div>
+<div class="note" style="margin-top:16px">本分析基于2026年一季报及2025年年报公开财务数据，采用杜邦分析、EVA经济增加值等模型进行量化评估。分析结果仅供参考，不构成投资建议。数据来源：海尔生物2025年年度报告(688139_20260328)、2026年一季度报告(688139_20260430)。</div>
+</div>
+</div>
+<div class="footer">本报告由量化分析模型自动生成 | 数据来源：上市公司定期报告 | 仅供参考，不构成投资建议</div>
+<script>
+function showTab(n){
+  document.querySelectorAll('.tab-content').forEach((el,i)=>{
+    el.classList.toggle('active',i===n);
+  });
+  document.querySelectorAll('.tabs button').forEach((btn,i)=>{
+    btn.classList.toggle('active',i===n);
+  });
+}
+</script>
+</body>
+</html>
