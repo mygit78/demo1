@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日舆情分析报告 - 2026年6月11日</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Microsoft YaHei','PingFang SC',sans-serif; background:#0f1923; color:#e0e6ed; padding:24px; }
+.container { max-width:1400px; margin:0 auto; }
+h1 { text-align:center; font-size:28px; color:#fff; margin-bottom:8px; }
+.subtitle { text-align:center; color:#7b8fa3; font-size:14px; margin-bottom:32px; }
+.summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:32px; }
+.summary-card { background:linear-gradient(135deg,#1a2a3a,#1e3448); border-radius:12px; padding:20px; text-align:center; border:1px solid #2a4a6a; }
+.summary-card .num { font-size:36px; font-weight:700; color:#4fc3f7; }
+.summary-card .label { font-size:13px; color:#7b8fa3; margin-top:4px; }
+.summary-card.warn .num { color:#ff7043; }
+.summary-card.green .num { color:#66bb6a; }
+.summary-card.yellow .num { color:#fdd835; }
+.section { background:#152232; border-radius:12px; padding:24px; margin-bottom:24px; border:1px solid #1e3448; }
+.section-title { font-size:20px; font-weight:700; color:#4fc3f7; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid #1e3448; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#1e3448; color:#4fc3f7; padding:10px 12px; text-align:left; font-weight:600; }
+td { padding:10px 12px; border-bottom:1px solid #1e3448; vertical-align:top; }
+tr:hover { background:rgba(79,195,247,0.05); }
+.badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+.badge-未读 { background:#ff5252; color:#fff; }
+.badge-已读 { background:#ff9800; color:#fff; }
+.badge-已闭环 { background:#66bb6a; color:#fff; }
+.badge-备案闭环 { background:#4fc3f7; color:#fff; }
+.badge-处理中 { background:#fdd835; color:#333; }
+.media { display:inline-block; padding:2px 8px; border-radius:8px; font-size:11px; background:#263845; color:#90a4ae; }
+.nature-ferment { color:#ff7043; font-weight:600; }
+.nature-new { color:#7b8fa3; }
+.kw-tag { display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; margin:1px 2px; background:#1e3448; color:#4fc3f7; }
+.chart-container { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+.bar-group { flex:1; min-width:300px; background:#152232; border-radius:12px; padding:20px; border:1px solid #1e3448; }
+.bar-item { margin-bottom:12px; }
+.bar-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+.bar-label .name { color:#e0e6ed; }
+.bar-label .count { color:#4fc3f7; font-weight:600; }
+.bar-track { height:20px; background:#1e3448; border-radius:10px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:10px; transition:width 0.5s; }
+.fill-blue { background:linear-gradient(90deg,#4fc3f7,#29b6f6); }
+.fill-red { background:linear-gradient(90deg,#ff7043,#ff5722); }
+.fill-green { background:linear-gradient(90deg,#66bb6a,#4caf50); }
+.fill-yellow { background:linear-gradient(90deg,#fdd835,#fbc02d); }
+.fill-purple { background:linear-gradient(90deg,#ab47bc,#9c27b0); }
+.fill-orange { background:linear-gradient(90deg,#ffa726,#ff9800); }
+.detail-card { background:#1a2a3a; border-radius:10px; padding:16px; margin-bottom:12px; border-left:4px solid #4fc3f7; cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; }
+.detail-card:hover { transform:translateX(4px); box-shadow:0 4px 12px rgba(79,195,247,0.15); }
+.detail-card.ferment { border-left-color:#ff7043; }
+.detail-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px; }
+.detail-title { font-size:14px; font-weight:600; color:#fff; flex:1; }
+.detail-meta { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.detail-content { font-size:13px; color:#90a4ae; line-height:1.6; max-height:80px; overflow:hidden; }
+.detail-footer { display:flex; gap:16px; margin-top:8px; font-size:12px; color:#546e7a; }
+.tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.tab { padding:6px 16px; border-radius:8px; background:#1e3448; color:#7b8fa3; cursor:pointer; font-size:13px; border:1px solid transparent; transition:all 0.2s; }
+.tab.active { background:#4fc3f7; color:#0f1923; font-weight:600; }
+.tab:hover:not(.active) { border-color:#4fc3f7; color:#4fc3f7; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
+.modal-overlay.active { display:flex; }
+.modal { background:#1a2a3a; border-radius:16px; padding:32px; max-width:800px; width:90%; max-height:80vh; overflow-y:auto; border:1px solid #2a4a6a; position:relative; }
+.modal-close { position:absolute; top:16px; right:16px; background:none; border:none; color:#7b8fa3; font-size:24px; cursor:pointer; }
+.modal-close:hover { color:#fff; }
+.modal h2 { color:#4fc3f7; font-size:18px; margin-bottom:16px; padding-right:32px; }
+.modal-info { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.modal-info-item { background:#152232; padding:10px 14px; border-radius:8px; }
+.modal-info-item .lbl { font-size:11px; color:#7b8fa3; margin-bottom:2px; }
+.modal-info-item .val { font-size:13px; color:#e0e6ed; }
+.modal-content { background:#152232; padding:16px; border-radius:8px; font-size:13px; color:#90a4ae; line-height:1.8; white-space:pre-wrap; word-wrap:break-word; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📊 每日舆情分析报告</h1>
+<p class="subtitle">数据日期：2026年6月11日 ｜ 舆情等级：二级/三级 ｜ 总计 27 条</p>
+
+<div class="summary-grid">
+  <div class="summary-card"><div class="num">27</div><div class="label">舆情总量</div></div>
+  <div class="summary-card warn"><div class="num">21</div><div class="label">未读/待处理</div></div>
+  <div class="summary-card yellow"><div class="num">7</div><div class="label">发酵类舆情</div></div>
+  <div class="summary-card green"><div class="num">4</div><div class="label">已闭环/备案闭环</div></div>
+  <div class="summary-card"><div class="num">4</div><div class="label">涉及产业数</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">一、产业分布概览</div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按一级产业分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">上海莱士</span><span class="count">19条 (70.4%)</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">海尔云贷</span><span class="count">4条 (14.8%)</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:21%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">海尔生物</span><span class="count">3条 (11.1%)</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:16%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">医疗服务</span><span class="count">1条 (3.7%)</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:5%"></div></div></div>
+
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按品牌分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">万链共享</span><span class="count">27条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:100%"></div></div></div>
+
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按一级关键词分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">业务经营</span><span class="count">13条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">股民抱怨</span><span class="count">8条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:62%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">暴力催收</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:15%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">高利息</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:15%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">治疗方式问题</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">股价分析</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:8%"></div></div></div>
+
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按二级关键词分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">经营状况问题</span><span class="count">12条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">暴力催收</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">治疗方式问题</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">业务经营</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">态度恶劣</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">砍头息</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:8%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">高利息</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:8%"></div></div></div>
+
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按性质分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">新增</span><span class="count">20条 (74.1%)</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">发酵</span><span class="count">7条 (25.9%)</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:35%"></div></div></div>
+
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按舆情等级分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">🟡 二级</span><span class="count" style="color:#ff9800">5条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:19%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">🔵 三级</span><span class="count" style="color:#4fc3f7">22条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:81%"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">二、处理状态分布</div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div class="bar-item"><div class="bar-label"><span class="name">⚪ 未读</span><span class="count" style="color:#ff5252">21条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">🔵 备案闭环</span><span class="count" style="color:#4fc3f7">3条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:14%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">🟡 已读</span><span class="count" style="color:#ff9800">2条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:10%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">🟢 已闭环</span><span class="count" style="color:#66bb6a">1条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:5%"></div></div></div>
+
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按媒体渠道分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">股吧</span><span class="count">8条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">黑猫投诉</span><span class="count">3条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:38%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">有驾</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:25%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">好看视频</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:25%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">百度百家</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:25%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">新浪微博</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:25%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">中华网</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:25%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">抖音</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:12%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">上证 e 互动</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:12%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">新浪看点</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:12%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">消费保</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:12%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">微信</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:12%"></div></div></div>
+<div class="bar-item"><div class="bar-label"><span class="name">深链财经</span><span class="count">1条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:12%"></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">三、时间维度分析</div>
+  <div class="chart-container">
+    <div class="bar-group" style="min-width:100%">
+      <div style="font-size:14px;color:#fff;margin-bottom:16px;font-weight:600;">📈 6月11日各时段舆情分布</div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:180px;padding-bottom:30px;position:relative;">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">2</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:33px;"></div><div style="font-size:11px;color:#7b8fa3;">10:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#ff5252;font-weight:600;">9</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#ff5252,#29b6f6);border-radius:6px 6px 0 0;height:150px;"></div><div style="font-size:11px;color:#7b8fa3;">11:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">12:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">14:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">16:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">19:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">20:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">2</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:33px;"></div><div style="font-size:11px;color:#7b8fa3;">21:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">22:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">1</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:17px;"></div><div style="font-size:11px;color:#7b8fa3;">23:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">2</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:33px;"></div><div style="font-size:11px;color:#7b8fa3;">8:00</div></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="font-size:11px;color:#4fc3f7;font-weight:600;">5</div><div style="width:100%;max-width:60px;background:linear-gradient(180deg,#4fc3f7,#29b6f6);border-radius:6px 6px 0 0;height:83px;"></div><div style="font-size:11px;color:#7b8fa3;">9:00</div></div>
+
+      </div>
+      <div style="text-align:center;font-size:12px;color:#7b8fa3;margin-top:8px;">⚡ 舆情高发时段集中在上午<span style="color:#ff5252;">8-12点</span>及晚间<span style="color:#ff5252;">19-23点</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">四、各产业舆情明细 <span style="font-size:13px;color:#7b8fa3;">（点击卡片查看详情）</span></div>
+  <div class="tabs" id="industryTabs">
+    <div class="tab active" data-tab="ind0">上海莱士 (19)</div>
+<div class="tab " data-tab="ind1">海尔云贷 (4)</div>
+<div class="tab " data-tab="ind2">海尔生物 (3)</div>
+<div class="tab " data-tab="ind3">医疗服务 (1)</div>
+
+  </div>
+  <div class="tab-content active" id="tab-ind0">
+    <div style="margin-bottom:12px;font-size:13px;color:#ff5252;">⚠ 重点关注：发酵类7条，未读17条，二级舆情5条需重点关注</div>
+    <div class="detail-card " onclick="showDetail(3)">
+  <div class="detail-header">
+    <div class="detail-title">$上海莱士 (SZ002252)$ 公司管理层拿公司利润 7 元/股买进，2.3 元/股分给自己做股权</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">$上海莱士 (SZ002252)$ 公司管理层拿公司利润 7 元/股买进，2.3 元/股分给自己做股权激励，这是丧尽天良！</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 19:51:53</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(4)">
+  <div class="detail-header">
+    <div class="detail-title">$上海莱士 (SZ002252)$ 大家齐心协力把股价砸到 2.85，那样大家都能享受莱士高管待</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span><span>粉丝:40</span>
+    </div>
+  </div>
+  <div class="detail-content">$上海莱士 (SZ002252)$ 大家齐心协力把股价砸到 2.85，那样大家都能享受莱士高管待遇。</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 14:08:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(5)">
+  <div class="detail-header">
+    <div class="detail-title">拭目以待上海莱士（002252）:股价击穿 4 元、奔向 3.5 元的深度逻辑。</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-已读">已读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">70.1%，旺季不旺，断崖式下滑 2026Q1:营收，加速下滑中国证券报现金流:2024-2025，造血能力丧失一句话：业绩不是周期波动，是基本面不可逆恶化，渠道去库存，三重杀估值，盈利中枢永久下移血制品全国集采持续扩围，静丙、纤原、白蛋白全面降价，毛利率从，经销商不敢拿货、持续去库存，价格战白热化...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股价分析</span></span>
+    <span>2026-06-11 12:26:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(8)">
+  <div class="detail-header">
+    <div class="detail-title">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+    <div class="detail-meta">
+      <span class="media">有驾</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 11:30:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(9)">
+  <div class="detail-header">
+    <div class="detail-title">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+    <div class="detail-meta">
+      <span class="media">好看视频</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 11:30:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(10)">
+  <div class="detail-header">
+    <div class="detail-title">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+    <div class="detail-meta">
+      <span class="media">百度百家</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 11:30:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(11)">
+  <div class="detail-header">
+    <div class="detail-title">$上海莱士 (SZ002252)$ 今天开始历史最低价开启，莱士 11 万股民心痛</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">$上海莱士 (SZ002252)$ 今天开始历史最低价开启，莱士 11 万股民心痛</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 11:29:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(12)">
+  <div class="detail-header">
+    <div class="detail-title">上海莱士股价跌 3.19%，易方达基金旗下 1 只基金位居十大流通股东，持有 7479.66 万股浮亏损失 1196.7...</div>
+    <div class="detail-meta">
+      <span class="media">新浪看点</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">6 月 11 日，上海莱士跌 3.19%，截至发稿，报 4.85 元/股，成交 1.44 亿元，换手率 0.44%，总市值 319.74 亿元。上海莱士股价已经连续 3 天下跌，区间累计跌幅 3.47%。资料显示，上海莱士血液制品股份有限公司位于上海市奉贤区望园路 2009 号，成立日期 1988 ...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">业务经营</span></span>
+    <span>2026-06-11 11:12:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(14)">
+  <div class="detail-header">
+    <div class="detail-title">$上海莱士 (SZ002252)$ 一直在跌，散户也一直在买，股东人数越来越多。它能的起</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">$上海莱士 (SZ002252)$ 一直在跌，散户也一直在买，股东人数越来越多。它能的起来就怪了。已经被套 50%</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 10:11:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(15)">
+  <div class="detail-header">
+    <div class="detail-title">百亿买了张上海莱士跌停板，海尔的大健康棋局走到哪了？</div>
+    <div class="detail-meta">
+      <span class="media">微信</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">6 月 10 日，上海莱士盘中跌破 5 元，年内已经跌了超过 20%，血制品是核心赛道上海莱士是行业龙头，这笔钱花得有逻辑，距离海尔 9.4 元的入场价，现在已经跌去了将近 47%，更难受的是，这不只是市场情绪的问题，基本面也在同步走弱，2025 年上海莱士营收 73.48 亿，净利润 15.77 ...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 09:38:00</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(17)">
+  <div class="detail-header">
+    <div class="detail-title">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+    <div class="detail-meta">
+      <span class="media">好看视频</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span><span>粉丝:98</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 09:10:13</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(18)">
+  <div class="detail-header">
+    <div class="detail-title">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+    <div class="detail-meta">
+      <span class="media">有驾</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 09:10:13</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(19)">
+  <div class="detail-header">
+    <div class="detail-title">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+    <div class="detail-meta">
+      <span class="media">百度百家</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 09:10:00</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(20)">
+  <div class="detail-header">
+    <div class="detail-title">$上海莱士 (SZ002252)$ 莱士管理层高薪、高龄、近 30 年就没出一个高新技术产品！！</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-已读">已读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">$上海莱士 (SZ002252)$ 莱士管理层高薪、高龄、近 30 年就没出一个高新技术产品！！</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 08:49:00</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(22)">
+  <div class="detail-header">
+    <div class="detail-title">入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</div>
+    <div class="detail-meta">
+      <span class="media">新浪微博</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span><span>粉丝:176</span>
+    </div>
+  </div>
+  <div class="detail-content">来源：环球老虎财经 app 海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 21:20:27</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(23)">
+  <div class="detail-header">
+    <div class="detail-title">发布了头条文章：《入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？》</div>
+    <div class="detail-meta">
+      <span class="media">新浪微博</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span><span>粉丝:176</span>
+    </div>
+  </div>
+  <div class="detail-content">发布了头条文章：《入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？》</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 21:20:27</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(24)">
+  <div class="detail-header">
+    <div class="detail-title">入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</div>
+    <div class="detail-meta">
+      <span class="media">深链财经</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span>
+    </div>
+  </div>
+  <div class="detail-content">6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来第二任大股东，海尔入股的成本并不低...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 16:01:05</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(25)">
+  <div class="detail-header">
+    <div class="detail-title">入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</div>
+    <div class="detail-meta">
+      <span class="media">中华网</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 11:33:26</span>
+  </div>
+</div>
+<div class="detail-card ferment" onclick="showDetail(26)">
+  <div class="detail-header">
+    <div class="detail-title">入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</div>
+    <div class="detail-meta">
+      <span class="media">中华网</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-ferment">发酵</span>
+    </div>
+  </div>
+  <div class="detail-content">海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">业务经营</span><span class="kw-tag">经营状况问题</span></span>
+    <span>2026-06-11 11:04:34</span>
+  </div>
+</div>
+
+  </div>
+<div class="tab-content " id="tab-ind1">
+    <div style="margin-bottom:12px;font-size:13px;color:#ffa726;">⚠ 重点关注：发酵类0条，未读1条</div>
+    <div class="detail-card " onclick="showDetail(0)">
+  <div class="detail-header">
+    <div class="detail-title">投诉对象:陕西海富融资租赁有限公司</div>
+    <div class="detail-meta">
+      <span class="media">黑猫投诉</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">投诉对象：陕西海富融资租赁有限公司 投诉问题：虚假宣传、合同欺诈、套路贷、违规催收、侵占个人财产 投诉内容：本人张洪英，名下全款自有车辆，在办理车辆抵押贷款业务时，被陕西海富融资租赁有限公司业务员以正规车辆抵押贷款名义诱导，仅签署了《居间服务协议》，对方全程未告知会转为融资租赁业务。后续该公司未经本...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">暴力催收</span><span class="kw-tag">暴力催收</span></span>
+    <span>2026-06-11 23:12:11</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(13)">
+  <div class="detail-header">
+    <div class="detail-title">悦易优享暴力催收威胁老人</div>
+    <div class="detail-meta">
+      <span class="media">消费保</span>
+      <span class="badge badge-备案闭环">备案闭环</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">本人资金困难 导致逾期 悦易优享一直暴力催收，给我带来了极大的困扰，昨天还电话说要去户籍地寄函件，户籍地就老人在，他们本来身体不好 发生什么事情 我要悦易优享负全责，本人多次向台反馈，得不到解决，不给处理，要求本人减低催收电话，不要再威胁友好沟通 资金周转过来以后 会还的</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">暴力催收</span><span class="kw-tag">态度恶劣</span></span>
+    <span>2026-06-11 10:27:18</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(16)">
+  <div class="detail-header">
+    <div class="detail-title">陕西海富金融租赁有限公司，高利贷，违法扣车</div>
+    <div class="detail-meta">
+      <span class="media">黑猫投诉</span>
+      <span class="badge badge-备案闭环">备案闭环</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">您好，我要投诉陕西海富融资租赁有限公司违规放贷。2023 年 8 月，我通过车抵贷平台借款，名义金额 80000 元，放款方是陕西海富融资租赁。放款当天就被扣除砍头息 3280 元和 820 元，前 4 个月每月额外收取 1440 元服务费，实际到手只有 70140 元。贷款分 36 期，每月还款 ...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">高利息</span><span class="kw-tag">砍头息</span></span>
+    <span>2026-06-11 09:17:38</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(21)">
+  <div class="detail-header">
+    <div class="detail-title">陕西海富融资租赁名租实贷，利率超标引投诉</div>
+    <div class="detail-meta">
+      <span class="media">黑猫投诉</span>
+      <span class="badge badge-已闭环">已闭环</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">投诉对象 颂车网-SCW 投诉问题 高利贷 投诉要求 退还违法收取利息 涉诉金额 0 元 投诉进度 黑猫消费者服务平台 商家未匹配成功 2026-05-31 13:54:23 您投诉的商家 陕西海富融资租赁有限公司 未匹配成功，我们将尽快帮您寻找商家，推进其处理投诉，请保持手机畅通并留意官方消息推送...</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">高利息</span><span class="kw-tag">高利息</span></span>
+    <span>2026-06-11 08:48:00</span>
+  </div>
+</div>
+
+  </div>
+<div class="tab-content " id="tab-ind2">
+    <div style="margin-bottom:12px;font-size:13px;color:#ffa726;">⚠ 重点关注：发酵类0条，未读3条</div>
+    <div class="detail-card " onclick="showDetail(1)">
+  <div class="detail-header">
+    <div class="detail-title">别家看行情，海尔生物纯看管理层心态。一路非理性下跌毫无动作，拿着高薪却任</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">别家看行情，海尔生物纯看管理层心态。一路非理性下跌毫无动作，拿着高薪却任由市值缩水。</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 22:07:24</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(6)">
+  <div class="detail-header">
+    <div class="detail-title">$海尔生物 (SH688139)$ 新股高溢价上市炒作、题材股疯狂炒作，管理层无动于衷，</div>
+    <div class="detail-meta">
+      <span class="media">股吧</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">$海尔生物 (SH688139)$ 新股高溢价上市炒作、题材股疯狂炒作，管理层无动于衷，把二级市场流动性要抽干了，长期投资、理性投资、耐心投资被打脸</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 11:38:35</span>
+  </div>
+</div>
+<div class="detail-card " onclick="showDetail(7)">
+  <div class="detail-header">
+    <div class="detail-title">:海尔生物 (688139) 请问，面对当前股价持续下跌，公司高管为什么不增持公司股票，以维护投资者信心？</div>
+    <div class="detail-meta">
+      <span class="media">上证 e 互动</span>
+      <span class="badge badge-未读">未读</span>
+      <span class="nature-new">新增</span>
+    </div>
+  </div>
+  <div class="detail-content">:海尔生物 (688139) 请问，面对当前股价持续下跌，公司高管为什么不增持公司股票，以维护投资者信心？</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">股民抱怨</span></span>
+    <span>2026-06-11 11:37:00</span>
+  </div>
+</div>
+
+  </div>
+<div class="tab-content " id="tab-ind3">
+    <div style="margin-bottom:12px;font-size:13px;color:#ffa726;">⚠ 重点关注：发酵类0条，未读0条</div>
+    <div class="detail-card " onclick="showDetail(2)">
+  <div class="detail-header">
+    <div class="detail-title">颧弓颧骨内推后为什么太阳穴下面变凹陷了，做之前还没凹陷#磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院</div>
+    <div class="detail-meta">
+      <span class="media">抖音</span>
+      <span class="badge badge-备案闭环">备案闭环</span>
+      <span class="nature-new">新增</span><span>粉丝:2</span>
+    </div>
+  </div>
+  <div class="detail-content">颧弓颧骨内推后为什么太阳穴下面变凹陷了，做之前还没凹陷#磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院</div>
+  <div class="detail-footer">
+    <span>万链共享</span>
+    <span>关键词：<span class="kw-tag">治疗方式问题</span><span class="kw-tag">治疗方式问题</span></span>
+    <span>2026-06-11 20:44:56</span>
+  </div>
+</div>
+
+  </div>
+
+</div>
+
+<div class="section">
+  <div class="section-title">五、待处理工单清单（23条）</div>
+  <table>
+    <tr><th>#</th><th>标题</th><th>产业</th><th>状态</th><th>渠道</th><th>时间</th></tr>
+    <tr onclick="showDetail(0)" style="cursor:pointer;"><td>1</td><td>投诉对象:陕西海富融资租赁有限公司</td><td>海尔云贷</td><td><span class="badge badge-未读">未读</span></td><td>黑猫投诉</td><td>2026-06-11 23:12:11</td></tr>
+<tr onclick="showDetail(1)" style="cursor:pointer;"><td>2</td><td>别家看行情，海尔生物纯看管理层心态。一路非理性下跌毫无动作，拿着高薪却任</td><td>海尔生物</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 22:07:24</td></tr>
+<tr onclick="showDetail(3)" style="cursor:pointer;"><td>3</td><td>$上海莱士 (SZ002252)$ 公司管理层拿公司利润 7 元/股买进，2.3...</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 19:51:53</td></tr>
+<tr onclick="showDetail(4)" style="cursor:pointer;"><td>4</td><td>$上海莱士 (SZ002252)$ 大家齐心协力把股价砸到 2.85，那样大家都...</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 14:08:00</td></tr>
+<tr onclick="showDetail(5)" style="cursor:pointer;"><td>5</td><td>拭目以待上海莱士（002252）:股价击穿 4 元、奔向 3.5 元的深度逻辑。</td><td>上海莱士</td><td><span class="badge badge-已读">已读</span></td><td>股吧</td><td>2026-06-11 12:26:00</td></tr>
+<tr onclick="showDetail(6)" style="cursor:pointer;"><td>6</td><td>$海尔生物 (SH688139)$ 新股高溢价上市炒作、题材股疯狂炒作，管理层无...</td><td>海尔生物</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 11:38:35</td></tr>
+<tr onclick="showDetail(7)" style="cursor:pointer;"><td>7</td><td>:海尔生物 (688139) 请问，面对当前股价持续下跌，公司高管为什么不增持公...</td><td>海尔生物</td><td><span class="badge badge-未读">未读</span></td><td>上证 e 互动</td><td>2026-06-11 11:37:00</td></tr>
+<tr onclick="showDetail(8)" style="cursor:pointer;"><td>8</td><td>海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>有驾</td><td>2026-06-11 11:30:00</td></tr>
+<tr onclick="showDetail(9)" style="cursor:pointer;"><td>9</td><td>海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>好看视频</td><td>2026-06-11 11:30:00</td></tr>
+<tr onclick="showDetail(10)" style="cursor:pointer;"><td>10</td><td>海尔大健康浮亏 58 亿，三家上市公司为何一起承压？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>百度百家</td><td>2026-06-11 11:30:00</td></tr>
+<tr onclick="showDetail(11)" style="cursor:pointer;"><td>11</td><td>$上海莱士 (SZ002252)$ 今天开始历史最低价开启，莱士 11 万股民心...</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 11:29:00</td></tr>
+<tr onclick="showDetail(12)" style="cursor:pointer;"><td>12</td><td>上海莱士股价跌 3.19%，易方达基金旗下 1 只基金位居十大流通股东，持有 7...</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>新浪看点</td><td>2026-06-11 11:12:00</td></tr>
+<tr onclick="showDetail(14)" style="cursor:pointer;"><td>13</td><td>$上海莱士 (SZ002252)$ 一直在跌，散户也一直在买，股东人数越来越多。...</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>股吧</td><td>2026-06-11 10:11:00</td></tr>
+<tr onclick="showDetail(15)" style="cursor:pointer;"><td>14</td><td>百亿买了张上海莱士跌停板，海尔的大健康棋局走到哪了？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>微信</td><td>2026-06-11 09:38:00</td></tr>
+<tr onclick="showDetail(17)" style="cursor:pointer;"><td>15</td><td>海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>好看视频</td><td>2026-06-11 09:10:13</td></tr>
+<tr onclick="showDetail(18)" style="cursor:pointer;"><td>16</td><td>海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>有驾</td><td>2026-06-11 09:10:13</td></tr>
+<tr onclick="showDetail(19)" style="cursor:pointer;"><td>17</td><td>海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>百度百家</td><td>2026-06-11 09:10:00</td></tr>
+<tr onclick="showDetail(20)" style="cursor:pointer;"><td>18</td><td>$上海莱士 (SZ002252)$ 莱士管理层高薪、高龄、近 30 年就没出一个...</td><td>上海莱士</td><td><span class="badge badge-已读">已读</span></td><td>股吧</td><td>2026-06-11 08:49:00</td></tr>
+<tr onclick="showDetail(22)" style="cursor:pointer;"><td>19</td><td>入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>新浪微博</td><td>2026-06-11 21:20:27</td></tr>
+<tr onclick="showDetail(23)" style="cursor:pointer;"><td>20</td><td>发布了头条文章：《入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？》</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>新浪微博</td><td>2026-06-11 21:20:27</td></tr>
+<tr onclick="showDetail(24)" style="cursor:pointer;"><td>21</td><td>入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>深链财经</td><td>2026-06-11 16:01:05</td></tr>
+<tr onclick="showDetail(25)" style="cursor:pointer;"><td>22</td><td>入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>中华网</td><td>2026-06-11 11:33:26</td></tr>
+<tr onclick="showDetail(26)" style="cursor:pointer;"><td>23</td><td>入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</td><td>上海莱士</td><td><span class="badge badge-未读">未读</span></td><td>中华网</td><td>2026-06-11 11:04:34</td></tr>
+
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">六、风险预警与建议</div>
+  <table>
+    <tr><th style="width:15%">风险等级</th><th style="width:20%">涉及品牌</th><th style="width:40%">风险描述</th><th style="width:25%">建议措施</th></tr>
+    <tr>
+      <td><span class="badge" style="background:#ff7043;color:#fff">🟠 中高</span></td>
+      <td>上海莱士</td>
+      <td>“百亿浮亏”“入股腰斩”等发酵类深度报道在多个主流平台（微博、中华网、深链财经）密集传播，176粉丝大V发文，传播面广</td>
+      <td>建议尽快协调品牌传播团队进行正面回应，加强与投资者沟通</td>
+    </tr>
+    <tr>
+      <td><span class="badge" style="background:#ff7043;color:#fff">🟠 中高</span></td>
+      <td>海尔生物</td>
+      <td>股价持续下跌引发投资者集中不满，多条舆情涉及管理层质疑和增持呼吁</td>
+      <td>关注股价走势，评估增持或回购方案的可行性</td>
+    </tr>
+    <tr>
+      <td><span class="badge" style="background:#ffa726;color:#fff">🟡 中</span></td>
+      <td>海尔云贷/陕西海富</td>
+      <td>黑猫投诉、消费保平台出现多条暴力催收、高利贷投诉，涉及合同欺诈、砍头息等问题</td>
+      <td>加强合作方管理，排查合规风险，及时回应消费者投诉</td>
+    </tr>
+    <tr>
+      <td><span class="badge" style="background:#66bb6a;color:#fff">🟢 低</span></td>
+      <td>医疗服务</td>
+      <td>抖音出现磨骨手术失败相关负面内容，涉及四川友谊医院</td>
+      <td>持续监测，已备案闭环处理</td>
+    </tr>
+  </table>
+</div>
+
+<p style="text-align:center;color:#546e7a;font-size:12px;margin-top:24px;">报告生成时间：2026年6月12日 18:37 ｜ 数据来源：万链Online 每日舆情多维表格</p>
+
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2 id="modalTitle"></h2>
+    <div class="modal-info" id="modalInfo"></div>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+var allRecords = [{"标题": "投诉对象:陕西海富融资租赁有限公司", "二级关键词": "暴力催收", "媒体名": "黑猫投诉", "舆情节点": "催收还款", "一级关键词": "暴力催收", "内容": "投诉对象：陕西海富融资租赁有限公司 投诉问题：虚假宣传、合同欺诈、套路贷、违规催收、侵占个人财产 投诉内容：本人张洪英，名下全款自有车辆，在办理车辆抵押贷款业务时，被陕西海富融资租赁有限公司业务员以正规车辆抵押贷款名义诱导，仅签署了《居间服务协议》，对方全程未告知会转为融资租赁业务。后续该公司未经本人同意，私自将抵押贷款变更为以租代购，伪造/替换合同，将本人全款车辆的所有权登记在其公司名下，单方面要求本人支付高额租金，涉嫌合同欺诈、套路贷与侵占个人财产。目前该公司已开始违规催收，严重影响本人正常生活。本人从未签署过真实的融资租赁合同，对该公司的欺诈行为坚决不认可。投诉诉求：1. 立即停止所有违规催收、骚扰行为，否则将向公安机关报案；2. 撤销无效的融资租赁合同，确认该合同对本人无法律约束力；3. 恢复本人全款车辆的所有权登记，退还本人已支付的不合理费用；4. 要求市场监管、金融监管部门对该公司的违规行为进行查处。", "发布时间": "2026-06-11 23:12:11", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "海尔云贷", "品牌名": "万链共享", "作者": "匿名", "二级产业": "陕西海富"}, {"标题": "别家看行情，海尔生物纯看管理层心态。一路非理性下跌毫无动作，拿着高薪却任", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "别家看行情，海尔生物纯看管理层心态。一路非理性下跌毫无动作，拿着高薪却任由市值缩水。", "发布时间": "2026-06-11 22:07:24", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "海尔生物", "品牌名": "万链共享", "作者": "挖掘最小阻力线", "二级产业": "海尔生物"}, {"标题": "颧弓颧骨内推后为什么太阳穴下面变凹陷了，做之前还没凹陷#磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院", "二级关键词": "治疗方式问题", "媒体名": "抖音", "舆情节点": "医患纠纷", "一级关键词": "治疗方式问题", "内容": "颧弓颧骨内推后为什么太阳穴下面变凹陷了，做之前还没凹陷#磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院", "发布时间": "2026-06-11 20:44:56", "性质": "新增", "粉丝数": 2, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "备案闭环", "文章类型": "文章", "一级产业": "医疗服务", "品牌名": "万链共享", "作者": "海哥 G", "二级产业": "四川友谊医院"}, {"标题": "$上海莱士 (SZ002252)$ 公司管理层拿公司利润 7 元/股买进，2.3 元/股分给自己做股权", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$上海莱士 (SZ002252)$ 公司管理层拿公司利润 7 元/股买进，2.3 元/股分给自己做股权激励，这是丧尽天良！", "发布时间": "2026-06-11 19:51:53", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "年年高雅地老顽童", "二级产业": "上海莱士"}, {"标题": "$上海莱士 (SZ002252)$ 大家齐心协力把股价砸到 2.85，那样大家都能享受莱士高管待", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$上海莱士 (SZ002252)$ 大家齐心协力把股价砸到 2.85，那样大家都能享受莱士高管待遇。", "发布时间": "2026-06-11 14:08:00", "性质": "新增", "粉丝数": 40, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "猴哥 3536", "二级产业": "上海莱士"}, {"标题": "拭目以待上海莱士（002252）:股价击穿 4 元、奔向 3.5 元的深度逻辑。", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股价分析", "内容": "70.1%，旺季不旺，断崖式下滑 2026Q1:营收，加速下滑中国证券报现金流:2024-2025，造血能力丧失一句话：业绩不是周期波动，是基本面不可逆恶化，渠道去库存，三重杀估值，盈利中枢永久下移血制品全国集采持续扩围，静丙、纤原、白蛋白全面降价，毛利率从，经销商不敢拿货、持续去库存，价格战白热化，短期无解行业不再是躺着赚钱，价格长期向下、增长归零，估值必须重估 2.，亿商誉悬顶，减值雷随时爆，一次计提就能归零全年利润商誉 81.99。", "发布时间": "2026-06-11 12:26:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "已读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "大学 516888", "二级产业": "上海莱士"}, {"标题": "$海尔生物 (SH688139)$ 新股高溢价上市炒作、题材股疯狂炒作，管理层无动于衷，", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$海尔生物 (SH688139)$ 新股高溢价上市炒作、题材股疯狂炒作，管理层无动于衷，把二级市场流动性要抽干了，长期投资、理性投资、耐心投资被打脸", "发布时间": "2026-06-11 11:38:35", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "海尔生物", "品牌名": "万链共享", "作者": "不懂医疗谭 XX", "二级产业": "海尔生物"}, {"标题": ":海尔生物 (688139) 请问，面对当前股价持续下跌，公司高管为什么不增持公司股票，以维护投资者信心？", "二级关键词": null, "媒体名": "上证 e 互动", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": ":海尔生物 (688139) 请问，面对当前股价持续下跌，公司高管为什么不增持公司股票，以维护投资者信心？", "发布时间": "2026-06-11 11:37:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "海尔生物", "品牌名": "万链共享", "作者": "投资者_1635305934000", "二级产业": "海尔生物"}, {"标题": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "二级关键词": "经营状况问题", "媒体名": "有驾", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "发布时间": "2026-06-11 11:30:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "上官向阳奔赴晴光", "二级产业": "上海莱士"}, {"标题": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "二级关键词": "经营状况问题", "媒体名": "好看视频", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "发布时间": "2026-06-11 11:30:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "上官向阳奔赴晴光", "二级产业": "上海莱士"}, {"标题": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "二级关键词": "经营状况问题", "媒体名": "百度百家", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔大健康浮亏 58 亿，三家上市公司为何一起承压？", "发布时间": "2026-06-11 11:30:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "上官向阳奔赴晴光", "二级产业": "上海莱士"}, {"标题": "$上海莱士 (SZ002252)$ 今天开始历史最低价开启，莱士 11 万股民心痛", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$上海莱士 (SZ002252)$ 今天开始历史最低价开启，莱士 11 万股民心痛", "发布时间": "2026-06-11 11:29:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "鲨鱼辣椒 123", "二级产业": "上海莱士"}, {"标题": "上海莱士股价跌 3.19%，易方达基金旗下 1 只基金位居十大流通股东，持有 7479.66 万股浮亏损失 1196.75 万元", "二级关键词": "业务经营", "媒体名": "新浪看点", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "6 月 11 日，上海莱士跌 3.19%，截至发稿，报 4.85 元/股，成交 1.44 亿元，换手率 0.44%，总市值 319.74 亿元。上海莱士股价已经连续 3 天下跌，区间累计跌幅 3.47%。资料显示，上海莱士血液制品股份有限公司位于上海市奉贤区望园路 2009 号，成立日期 1988 年 10 月 29 日，上市日期 2008 年 6 月 23 日，公司主营业务涉及生产和销售血液制品。", "发布时间": "2026-06-11 11:12:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "新浪看点", "二级产业": "上海莱士"}, {"标题": "悦易优享暴力催收威胁老人", "二级关键词": "态度恶劣", "媒体名": "消费保", "舆情节点": "催收还款", "一级关键词": "暴力催收", "内容": "本人资金困难 导致逾期 悦易优享一直暴力催收，给我带来了极大的困扰，昨天还电话说要去户籍地寄函件，户籍地就老人在，他们本来身体不好 发生什么事情 我要悦易优享负全责，本人多次向台反馈，得不到解决，不给处理，要求本人减低催收电话，不要再威胁友好沟通 资金周转过来以后 会还的", "发布时间": "2026-06-11 10:27:18", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "备案闭环", "文章类型": "文章", "一级产业": "海尔云贷", "品牌名": "万链共享", "作者": "网友保保_1ao4jX3Q", "二级产业": "悦己分期/悦易优享/悦己管家"}, {"标题": "$上海莱士 (SZ002252)$ 一直在跌，散户也一直在买，股东人数越来越多。它能的起", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$上海莱士 (SZ002252)$ 一直在跌，散户也一直在买，股东人数越来越多。它能的起来就怪了。已经被套 50%", "发布时间": "2026-06-11 10:11:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "才情出众的汤圆", "二级产业": "上海莱士"}, {"标题": "百亿买了张上海莱士跌停板，海尔的大健康棋局走到哪了？", "二级关键词": "经营状况问题", "媒体名": "微信", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "6 月 10 日，上海莱士盘中跌破 5 元，年内已经跌了超过 20%，血制品是核心赛道上海莱士是行业龙头，这笔钱花得有逻辑，距离海尔 9.4 元的入场价，现在已经跌去了将近 47%，更难受的是，这不只是市场情绪的问题，基本面也在同步走弱，2025 年上海莱士营收 73.48 亿，净利润 15.77 亿，跟 2024 年比又掉了一截，基本回到了四五年前的利润水平。", "发布时间": "2026-06-11 09:38:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "阿毛洞察", "二级产业": "上海莱士"}, {"标题": "陕西海富金融租赁有限公司，高利贷，违法扣车", "二级关键词": "砍头息", "媒体名": "黑猫投诉", "舆情节点": "催收还款", "一级关键词": "高利息", "内容": "您好，我要投诉陕西海富融资租赁有限公司违规放贷。2023 年 8 月，我通过车抵贷平台借款，名义金额 80000 元，放款方是陕西海富融资租赁。放款当天就被扣除砍头息 3280 元和 820 元，前 4 个月每月额外收取 1440 元服务费，实际到手只有 70140 元。贷款分 36 期，每月还款 3182.75 元，核算下来真实年化利率高达 35.25%，远超法律保护的 24% 上限。", "发布时间": "2026-06-11 09:17:38", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "备案闭环", "文章类型": "文章", "一级产业": "海尔云贷", "品牌名": "万链共享", "作者": "匿名", "二级产业": "海富租赁"}, {"标题": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "二级关键词": "经营状况问题", "媒体名": "好看视频", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "发布时间": "2026-06-11 09:10:13", "性质": "发酵", "粉丝数": 98, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "不确定性管理", "二级产业": "上海莱士"}, {"标题": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "二级关键词": "经营状况问题", "媒体名": "有驾", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "发布时间": "2026-06-11 09:10:13", "性质": "发酵", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "不确定性管理", "二级产业": "上海莱士"}, {"标题": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "二级关键词": "经营状况问题", "媒体名": "百度百家", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？", "发布时间": "2026-06-11 09:10:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "不确定性管理", "二级产业": "上海莱士"}, {"标题": "$上海莱士 (SZ002252)$ 莱士管理层高薪、高龄、近 30 年就没出一个高新技术产品！！", "二级关键词": null, "媒体名": "股吧", "舆情节点": "上市相关", "一级关键词": "股民抱怨", "内容": "$上海莱士 (SZ002252)$ 莱士管理层高薪、高龄、近 30 年就没出一个高新技术产品！！", "发布时间": "2026-06-11 08:49:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "已读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "年年高雅地老顽童", "二级产业": "上海莱士"}, {"标题": "陕西海富融资租赁名租实贷，利率超标引投诉", "二级关键词": "高利息", "媒体名": "黑猫投诉", "舆情节点": "催收还款", "一级关键词": "高利息", "内容": "投诉对象 颂车网-SCW 投诉问题 高利贷 投诉要求 退还违法收取利息 涉诉金额 0 元 投诉进度 黑猫消费者服务平台 商家未匹配成功 2026-05-31 13:54:23 您投诉的商家 陕西海富融资租赁有限公司 未匹配成功，我们将尽快帮您寻找商家，推进其处理投诉，请保持手机畅通并留意官方消息推送。", "发布时间": "2026-06-11 08:48:00", "性质": "新增", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["三级"], "工单状态": "已闭环", "文章类型": "文章", "一级产业": "海尔云贷", "品牌名": "万链共享", "作者": "匿名", "二级产业": "海富租赁"}, {"标题": "入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？", "二级关键词": "经营状况问题", "媒体名": "新浪微博", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "来源：环球老虎财经 app 海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来第二任大股东，海尔入股的成本并不低，2024 年海尔以 9.4 元/股的价格受让前任大股东 Grifols 基立福的 20% 上海莱士股份，交易总价高达 125 亿元。然而随着业绩滑坡，这笔巨额投资目前账面浮亏已扩大至 58 亿元。", "发布时间": "2026-06-11 21:20:27", "性质": "发酵", "粉丝数": 176, "分析报告链接": null, "舆情等级": ["二级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "瞰见精彩", "二级产业": "上海莱士"}, {"标题": "发布了头条文章：《入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？》", "二级关键词": "经营状况问题", "媒体名": "新浪微博", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "发布了头条文章：《入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？》", "发布时间": "2026-06-11 21:20:27", "性质": "发酵", "粉丝数": 176, "分析报告链接": null, "舆情等级": ["二级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "瞰见精彩", "二级产业": "上海莱士"}, {"标题": "入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？", "二级关键词": "经营状况问题", "媒体名": "深链财经", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来第二任大股东，海尔入股的成本并不低，2024 年海尔以 9.4 元/股的价格受让前任大股东 Grifols 基立福的 20% 上海莱士股份，交易总价高达 125 亿元。", "发布时间": "2026-06-11 16:01:05", "性质": "发酵", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["二级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "访客", "二级产业": "上海莱士"}, {"标题": "入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？", "二级关键词": "经营状况问题", "媒体名": "中华网", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来第二任大股东，海尔入股的成本并不低，2024 年海尔以 9.4 元/股的价格受让前任大股东 Grifols 基立福的 20% 上海莱士股份，交易总价高达 125 亿元。然而随着业绩滑坡，这笔巨额投资目前账面浮亏已扩大至 58 亿元。", "发布时间": "2026-06-11 11:33:26", "性质": "发酵", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["二级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "中华网", "二级产业": "上海莱士"}, {"标题": "入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？", "二级关键词": "经营状况问题", "媒体名": "中华网", "舆情节点": "上市相关", "一级关键词": "业务经营", "内容": "海尔集团的大健康业务近年频现波折。6 月 10 日，旗下核心上市平台上海莱士再度探底，收跌 0.99% 并刷新年内低点。自 2026 年以来，该股累计跌幅已达 20.85%，年线大概率将连续第三年收阴。颇为巧合的是，上海莱士的跌势始于 2024 年，而这一年恰好是海尔入主之时。作为上海莱士 6 年来第二任大股东，海尔入股的成本并不低，2024 年海尔以 9.4 元/股的价格受让前任大股东 Grifols 基立福的 20% 上海莱士股份，交易总价高达 125 亿元。然而随着业绩滑坡，这笔巨额投资目前账面浮亏已扩大至 58 亿元。", "发布时间": "2026-06-11 11:04:34", "性质": "发酵", "粉丝数": 0, "分析报告链接": null, "舆情等级": ["二级"], "工单状态": "未读", "文章类型": "文章", "一级产业": "上海莱士", "品牌名": "万链共享", "作者": "中华网", "二级产业": "上海莱士"}];
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+function showDetail(idx) {
+  var r = allRecords[idx];
+  if (!r) return;
+  document.getElementById('modalTitle').textContent = r['标题'] || r['内容'] || '';
+
+  var infoHtml = '';
+  var fields = [
+    ['品牌名', r['品牌名']], ['一级产业', r['一级产业']], ['二级产业', r['二级产业']],
+    ['媒体名', r['媒体名']], ['作者', r['作者']], ['发布时间', r['发布时间']],
+    ['舆情等级', (r['舆情等级']||[])[0] || ''], ['工单状态', r['工单状态']],
+    ['性质', r['性质']], ['粉丝数', r['粉丝数']],
+    ['一级关键词', r['一级关键词']], ['二级关键词', r['二级关键词']],
+    ['舆情节点', r['舆情节点']], ['文章类型', r['文章类型']]
+  ];
+  fields.forEach(function(f) {
+    if (f[1] !== null && f[1] !== '' && f[1] !== 0) {
+      infoHtml += '<div class="modal-info-item"><div class="lbl">' + f[0] + '</div><div class="val">' + f[1] + '</div></div>';
+    }
+  });
+  document.getElementById('modalInfo').innerHTML = infoHtml;
+  document.getElementById('modalContent').textContent = r['内容'] || '';
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
