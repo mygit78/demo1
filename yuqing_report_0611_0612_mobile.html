@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>每日舆情分析报告（6月11日-12日）</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system,'PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif; background:#0f1923; color:#e0e6ed; padding:16px; -webkit-text-size-adjust:100%; }
+.container { max-width:1400px; margin:0 auto; }
+h1 { text-align:center; font-size:22px; color:#fff; margin-bottom:6px; }
+.subtitle { text-align:center; color:#7b8fa3; font-size:12px; margin-bottom:24px; line-height:1.6; }
+
+/* Summary Cards */
+.summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+.summary-card { background:linear-gradient(135deg,#1a2a3a,#1e3448); border-radius:10px; padding:14px 8px; text-align:center; border:1px solid #2a4a6a; cursor:pointer; transition:transform .2s,box-shadow .2s; -webkit-tap-highlight-color:rgba(79,195,247,0.2); }
+.summary-card:active { transform:scale(0.97); }
+.summary-card .num { font-size:28px; font-weight:700; color:#4fc3f7; }
+.summary-card .label { font-size:11px; color:#7b8fa3; margin-top:2px; }
+.summary-card.warn .num { color:#ff7043; }
+.summary-card.green .num { color:#66bb6a; }
+.summary-card.yellow .num { color:#fdd835; }
+
+/* Section */
+.section { background:#152232; border-radius:10px; padding:16px; margin-bottom:20px; border:1px solid #1e3448; }
+.section-title { font-size:17px; font-weight:700; color:#4fc3f7; margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid #1e3448; }
+
+/* Table */
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th { background:#1e3448; color:#4fc3f7; padding:8px 10px; text-align:left; font-weight:600; }
+td { padding:8px 10px; border-bottom:1px solid #1e3448; vertical-align:top; }
+tr:hover { background:rgba(79,195,247,0.05); }
+
+/* Badge */
+.badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+.badge-level2 { background:#ffa726; color:#333; }
+.badge-level3 { background:#78909c; color:#fff; }
+
+/* Media Badge */
+.media { display:inline-block; padding:2px 8px; border-radius:8px; font-size:11px; background:#263845; color:#90a4ae; }
+
+/* Nature */
+.nature-ferment { color:#ff7043; font-weight:600; }
+.nature-new { color:#7b8fa3; }
+
+/* Keyword tag */
+.kw-tag { display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; margin:1px 2px; background:#1e3448; color:#4fc3f7; }
+
+/* Bar Chart */
+.chart-container { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
+.bar-group { background:#152232; border-radius:10px; padding:16px; border:1px solid #1e3448; }
+.bar-item { margin-bottom:10px; }
+.bar-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; }
+.bar-label .name { color:#e0e6ed; }
+.bar-label .count { color:#4fc3f7; font-weight:600; }
+.bar-track { height:16px; background:#1e3448; border-radius:8px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:8px; transition:width 0.5s; }
+.fill-blue { background:linear-gradient(90deg,#4fc3f7,#29b6f6); }
+.fill-red { background:linear-gradient(90deg,#ff7043,#ff5722); }
+.fill-green { background:linear-gradient(90deg,#66bb6a,#4caf50); }
+.fill-yellow { background:linear-gradient(90deg,#fdd835,#fbc02d); }
+.fill-purple { background:linear-gradient(90deg,#ab47bc,#9c27b0); }
+.fill-orange { background:linear-gradient(90deg,#ffa726,#ff9800); }
+
+/* Detail Cards */
+.detail-card { background:#1a2a3a; border-radius:10px; padding:14px; margin-bottom:10px; border-left:4px solid #4fc3f7; }
+.detail-card.ferment { border-left-color:#ff7043; }
+.detail-header { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+.detail-title { font-size:14px; font-weight:600; color:#fff; line-height:1.5; }
+.detail-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.detail-content { font-size:13px; color:#90a4ae; line-height:1.6; max-height:80px; overflow:hidden; position:relative; }
+.detail-content.expanded { max-height:none; }
+.detail-footer { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:11px; color:#546e7a; }
+.expand-btn { background:none; border:1px solid #2a4a6a; color:#4fc3f7; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; margin-top:6px; min-height:36px; -webkit-tap-highlight-color:rgba(79,195,247,0.2); }
+.expand-btn:active { background:#2a4a6a; }
+
+/* Tabs */
+.tabs { display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab { padding:8px 14px; border-radius:8px; background:#1e3448; color:#7b8fa3; cursor:pointer; font-size:13px; border:1px solid transparent; transition:all 0.2s; white-space:nowrap; flex-shrink:0; -webkit-tap-highlight-color:rgba(79,195,247,0.2); min-height:40px; display:flex; align-items:center; }
+.tab.active { background:#4fc3f7; color:#0f1923; font-weight:600; }
+.tab:active:not(.active) { border-color:#4fc3f7; color:#4fc3f7; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* Clickable */
+.clickable { cursor:pointer; -webkit-tap-highlight-color:rgba(79,195,247,0.2); }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.85); z-index:1000; justify-content:center; align-items:flex-end; padding:0; }
+.modal-overlay.show { display:flex; }
+.modal { background:#152232; border-radius:16px 16px 0 0; width:100%; max-height:90vh; overflow-y:auto; padding:20px 16px; position:relative; border:1px solid #2a4a6a; border-bottom:none; -webkit-overflow-scrolling:touch; }
+.modal-close { position:absolute; top:12px; right:12px; background:#1e3448; border:none; color:#90a4ae; font-size:18px; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:10; -webkit-tap-highlight-color:rgba(255,82,82,0.2); }
+.modal-close:active { background:#ff5252; color:#fff; }
+.modal h2 { color:#4fc3f7; font-size:17px; margin-bottom:14px; padding-right:44px; line-height:1.4; }
+.modal .detail-item { background:#1a2a3a; border-radius:8px; padding:12px; margin-bottom:8px; border-left:3px solid #4fc3f7; cursor:pointer; -webkit-tap-highlight-color:rgba(79,195,247,0.15); }
+.modal .detail-item:active { background:#1e3448; }
+.modal .detail-item.ferment { border-left-color:#ff7043; }
+.modal .detail-item .di-title { font-size:13px; font-weight:600; color:#e0e6ed; margin-bottom:6px; line-height:1.4; }
+.modal .detail-item .di-body { font-size:12px; color:#90a4ae; line-height:1.5; margin-bottom:8px; }
+.modal .detail-item .di-meta { font-size:11px; color:#546e7a; display:flex; gap:8px; flex-wrap:wrap; }
+.stat-row { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
+.stat-box { background:#1a2a3a; border-radius:8px; padding:12px; text-align:center; }
+.stat-box .sv { font-size:22px; font-weight:700; color:#4fc3f7; }
+.stat-box .sl { font-size:11px; color:#7b8fa3; margin-top:4px; }
+
+/* Mobile table wrapper */
+.table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -16px; padding:0 16px; }
+
+/* Pending items mobile cards */
+.pending-card { background:#1a2a3a; border-radius:8px; padding:12px; margin-bottom:8px; border-left:3px solid #4fc3f7; }
+.pending-card .pc-num { display:inline-block; width:22px; height:22px; background:#1e3448; border-radius:50%; text-align:center; line-height:22px; font-size:11px; color:#4fc3f7; font-weight:600; margin-right:8px; }
+.pending-card .pc-title { font-size:13px; color:#e0e6ed; font-weight:500; line-height:1.4; }
+.pending-card .pc-meta { display:flex; gap:8px; flex-wrap:wrap; font-size:11px; color:#546e7a; margin-top:6px; }
+
+/* Time chart mobile */
+.time-chart { display:flex; align-items:flex-end; gap:8px; height:160px; padding-bottom:28px; position:relative; padding-left:36px; }
+.time-chart .y-axis { position:absolute; left:0; top:0; bottom:28px; display:flex; flex-direction:column; justify-content:space-between; font-size:10px; color:#546e7a; width:30px; }
+.time-chart .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.time-chart .bar-val { font-size:11px; font-weight:600; }
+.time-chart .bar-rect { width:100%; max-width:50px; border-radius:6px 6px 0 0; }
+.time-chart .bar-lbl { font-size:11px; color:#7b8fa3; }
+
+/* Risk cards mobile */
+.risk-card { background:#1a2a3a; border-radius:8px; padding:14px; margin-bottom:10px; border-left:4px solid #ff5252; }
+.risk-card.mid-high { border-left-color:#ff7043; }
+.risk-card.mid { border-left-color:#ffa726; }
+.risk-card.low { border-left-color:#66bb6a; }
+.risk-card .rc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.risk-card .rc-industry { font-size:14px; font-weight:600; color:#fff; }
+.risk-card .rc-desc { font-size:12px; color:#90a4ae; line-height:1.6; margin-bottom:8px; }
+.risk-card .rc-action { font-size:12px; color:#4fc3f7; line-height:1.5; padding:8px 10px; background:#1e3448; border-radius:6px; }
+.risk-card .rc-label { font-size:10px; color:#546e7a; margin-bottom:2px; }
+
+/* Cross table mobile */
+.cross-table { font-size:11px; }
+.cross-table th, .cross-table td { padding:6px 6px; text-align:center; }
+
+/* Pull-down hint */
+.pull-hint { text-align:center; font-size:11px; color:#546e7a; padding:4px 0; display:none; }
+
+/* ====== DESKTOP ENHANCEMENTS ====== */
+@media (min-width:768px) {
+  body { padding:24px; }
+  h1 { font-size:28px; }
+  .subtitle { font-size:14px; }
+  .summary-grid { grid-template-columns:repeat(5,1fr); gap:16px; }
+  .summary-card { padding:20px; }
+  .summary-card .num { font-size:36px; }
+  .summary-card .label { font-size:13px; }
+  .section { padding:24px; }
+  .section-title { font-size:20px; }
+  table { font-size:13px; }
+  th { padding:10px 12px; }
+  td { padding:10px 12px; }
+  .chart-container { flex-direction:row; flex-wrap:wrap; }
+  .bar-group { flex:1; min-width:300px; padding:20px; }
+  .bar-label { font-size:13px; }
+  .bar-track { height:20px; }
+  .detail-header { flex-direction:row; align-items:center; }
+  .detail-footer { font-size:12px; }
+  .tabs { overflow-x:visible; }
+  .tab { min-height:auto; }
+  .modal-overlay { align-items:center; padding:24px; }
+  .modal { border-radius:16px; max-width:860px; max-height:85vh; padding:32px; border-bottom:1px solid #2a4a6a; }
+  .stat-row { display:flex; }
+  .stat-box .sv { font-size:24px; }
+  .pending-card { display:none; }
+  .risk-card { display:none; }
+  .risk-table { display:table !important; }
+  .pending-table { display:table !important; }
+  .mobile-only { display:none !important; }
+  .desktop-only { display:block !important; }
+  .cross-table { font-size:12px; }
+  .cross-table th, .cross-table td { padding:6px 8px; }
+}
+
+/* ====== SMALL PHONE ====== */
+@media (max-width:380px) {
+  body { padding:10px; }
+  .summary-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .summary-card .num { font-size:24px; }
+  .summary-card .label { font-size:10px; }
+  .section { padding:12px; }
+  .section-title { font-size:15px; }
+  .stat-row { grid-template-columns:1fr 1fr; gap:8px; }
+}
+
+/* Landscape phone */
+@media (max-height:500px) and (orientation:landscape) {
+  .modal { max-height:95vh; }
+  .summary-grid { grid-template-columns:repeat(5,1fr); }
+}
+
+/* Safe area for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .modal { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}
+
+/* Hide desktop risk/pending tables on mobile */
+@media (max-width:767px) {
+  .risk-table, .pending-table { display:none !important; }
+  .mobile-only { display:block !important; }
+  .desktop-only { display:none !important; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📊 每日舆情分析报告</h1>
+<p class="subtitle">数据周期：2026年6月11日 — 6月12日<br>舆情等级：三级/二级 ｜ 总计 34 条</p>
+
+<!-- Summary Cards -->
+<div class="summary-grid">
+  <div class="summary-card" onclick="showModal('total')"><div class="num">34</div><div class="label">舆情总量</div></div>
+  <div class="summary-card warn" onclick="showModal('unread')"><div class="num">26</div><div class="label">未读/待处理</div></div>
+  <div class="summary-card yellow" onclick="showModal('ferment')"><div class="num">13</div><div class="label">发酵类舆情</div></div>
+  <div class="summary-card green" onclick="showModal('closed')"><div class="num">5</div><div class="label">已闭环</div></div>
+  <div class="summary-card" onclick="showModal('industry')"><div class="num">4</div><div class="label">涉及产业数</div></div>
+</div>
+
+<!-- Section 1: Industry Distribution -->
+<div class="section">
+  <div class="section-title">一、产业分布概览</div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按一级产业分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('ind-上海莱士')">上海莱士</span><span class="count">24条 (70.6%)</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('ind-海尔云贷')">海尔云贷</span><span class="count">5条 (14.7%)</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:20.8%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('ind-海尔生物')">海尔生物</span><span class="count">4条 (11.8%)</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:16.7%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('ind-医疗服务')">医疗服务</span><span class="count">1条 (2.9%)</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:4.2%"></div></div></div>
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按关键词类型分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('kw-业务经营')">业务经营</span><span class="count">16条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('kw-股民抱怨')">股民抱怨</span><span class="count">9条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:56.3%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('kw-暴力催收')">暴力催收</span><span class="count">3条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:18.8%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('kw-高利息')">高利息</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:12.5%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">其他</span><span class="count">4条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:25%"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: Nature & Channel -->
+<div class="section">
+  <div class="section-title">二、舆情性质与渠道分布</div>
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按舆情性质分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('nature-新增')">新增</span><span class="count" style="color:#7b8fa3">21条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name clickable" onclick="showModal('nature-发酵')">发酵</span><span class="count" style="color:#ff7043">13条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:61.9%"></div></div></div>
+    </div>
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">按媒体渠道分布</div>
+      <div class="bar-item"><div class="bar-label"><span class="name">股吧</span><span class="count">9条</span></div><div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">百度百家</span><span class="count">4条</span></div><div class="bar-track"><div class="bar-fill fill-green" style="width:44.4%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">黑猫投诉</span><span class="count">4条</span></div><div class="bar-track"><div class="bar-fill fill-orange" style="width:44.4%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">好看视频</span><span class="count">3条</span></div><div class="bar-track"><div class="bar-fill fill-purple" style="width:33.3%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">新浪微博</span><span class="count">2条</span></div><div class="bar-track"><div class="bar-fill fill-yellow" style="width:22.2%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span class="name">其他（10+渠道）</span><span class="count">10条</span></div><div class="bar-track"><div class="bar-fill fill-red" style="width:66.7%"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Industry Details (Tabs) -->
+<div class="section">
+  <div class="section-title">三、各产业舆情明细</div>
+  <div class="tabs">
+    <div class="tab active" data-tab="shls">上海莱士 (24)</div>
+    <div class="tab" data-tab="hlyd">海尔云贷 (5)</div>
+    <div class="tab" data-tab="hlsw">海尔生物 (4)</div>
+    <div class="tab" data-tab="ylfw">医疗服务 (1)</div>
+  </div>
+
+  <!-- 上海莱士 -->
+  <div class="tab-content active" id="tab-shls">
+    <div style="margin-bottom:12px;font-size:12px;color:#ff7043;line-height:1.5;">⚠ 重点关注：「百亿聘礼腰斩」话题在8+平台大面积发酵，二级舆情8条，浮亏58亿成核心敏感点</div>
+
+    <div class="detail-card ferment">
+      <div class="detail-header">
+        <div class="detail-title">入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？</div>
+        <div class="detail-meta">
+          <span class="media">微博/中华网/微信/百度/好看等8+</span>
+          <span class="badge badge-level2">二级</span>
+          <span class="nature-ferment">发酵</span>
+        </div>
+      </div>
+      <div class="detail-content">海尔集团的大健康业务近年频现波折。6月10日，旗下核心上市平台上海莱士再度探底，收跌0.99%并刷新年内低点。自2026年以来累计跌幅已达20.85%，年线大概率将连续第三年收阴。海尔以9.4元/股受让20%股份，交易总价125亿元，账面浮亏已扩大至58亿元。与此同时，旗下盈康生命与海尔生物的股价与业绩也双双承压。</div>
+      <div class="detail-footer">
+        <span>上海莱士</span>
+        <span><span class="kw-tag">业务经营</span></span>
+        <span>6月11日-12日</span>
+      </div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">海尔大健康浮亏58亿，三家上市公司为何一起承压？</div>
+        <div class="detail-meta"><span class="media">百度百家/好看视频/有驾</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">海尔大健康浮亏58亿，三家上市公司为何一起承压？</div>
+      <div class="detail-footer"><span>上海莱士</span><span><span class="kw-tag">业务经营</span></span><span>6月11日 11:30</span></div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">百亿买了张上海莱士跌停板，海尔的大健康棋局走到哪了？</div>
+        <div class="detail-meta"><span class="media">微信</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">6月10日，上海莱士盘中跌破5元，年内已跌超20%。距离海尔9.4元入场价已跌去近47%。2025年上海莱士营收73.48亿，净利润15.77亿，基本回到四五年前的利润水平。</div>
+      <div class="detail-footer"><span>上海莱士</span><span><span class="kw-tag">业务经营</span></span><span>6月11日 09:38</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card ferment">
+      <div class="detail-header">
+        <div class="detail-title">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+        <div class="detail-meta"><span class="media">百度百家/好看视频/有驾</span><span class="badge badge-level3">三级</span><span class="nature-ferment">发酵</span></div>
+      </div>
+      <div class="detail-content">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</div>
+      <div class="detail-footer"><span>上海莱士</span><span><span class="kw-tag">业务经营</span></span><span>6月11日 09:10</span></div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">拭目以待上海莱士（002252）：股价击穿4元、奔向3.5元的深度逻辑</div>
+        <div class="detail-meta"><span class="media">股吧</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">营收加速下滑，造血能力丧失。血制品全国集采持续扩围，静丙、纤原、白蛋白全面降价，毛利率下降。81.99亿商誉悬顶，减值雷随时爆，一次计提就能归零全年利润。</div>
+      <div class="detail-footer"><span>上海莱士</span><span><span class="kw-tag">股价分析</span></span><span>6月11日 12:26</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">上海莱士股价跌3.19%，易方达基金持有7479.66万股浮亏1196.75万元</div>
+        <div class="detail-meta"><span class="media">新浪看点</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">6月11日，上海莱士跌3.19%，报4.85元/股，成交1.44亿元，换手率0.44%，总市值319.74亿元。股价已连续3天下跌，区间累计跌幅3.47%。</div>
+      <div class="detail-footer"><span>上海莱士</span><span><span class="kw-tag">业务经营</span></span><span>6月11日 11:12</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">股民抱怨集锦（6条）：股权激励不公 / 散户被套50% / 历史最低价 / 管理层高薪高龄</div>
+        <div class="detail-meta"><span class="media">股吧</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">①管理层拿公司利润7元/股买进，2.3元/股分给自己做股权激励，丧尽天良 ②齐心协力把股价砸到2.85 ③今天开始历史最低价开启，11万股民心痛 ④一直在跌散户一直在买，已被套50% ⑤管理层高薪高龄近30年没出高新技术产品 ⑥别家看行情海尔生物纯看管理层心态，一路非理性下跌毫无动作</div>
+      <div class="detail-footer"><span>上海莱士/海尔生物</span><span><span class="kw-tag">股民抱怨</span></span><span>6月11日 多时段</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">投资者质疑海尔生物：股价持续下跌，高管为何不增持维护信心？</div>
+        <div class="detail-meta"><span class="media">上证e互动/股吧</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">科创板综合指数2025年涨46%、2026年涨24%，海尔生物2025年跌8%、2026年跌12%。新股高溢价上市炒作、题材股疯狂炒作，管理层无动于衷，把二级市场流动性要抽干了。</div>
+      <div class="detail-footer"><span>海尔生物</span><span><span class="kw-tag">股民抱怨</span></span><span>6月11日 多时段</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+  </div>
+
+  <!-- 海尔云贷 -->
+  <div class="tab-content" id="tab-hlyd">
+    <div style="margin-bottom:12px;font-size:12px;color:#ff7043;line-height:1.5;">⚠ 重点关注：陕西海富融资租赁相关投诉密集，涉及暴力催收、高利贷（年化35.25%）、名租实贷等合规风险</div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">投诉陕西海富融资租赁：虚假宣传、合同欺诈、套路贷、违规催收、侵占个人财产</div>
+        <div class="detail-meta"><span class="media">黑猫投诉</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">业务员以正规车抵贷名义诱导签署《居间服务协议》，私自将抵押贷款变更为以租代购，伪造/替换合同，将全款车辆所有权登记在公司名下。涉嫌合同欺诈、套路贷与侵占个人财产。</div>
+      <div class="detail-footer"><span>陕西海富</span><span><span class="kw-tag">暴力催收</span></span><span>6月11日 23:12</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">陕西海富金融租赁：高利贷、违法扣车，砍头息+年化35.25%</div>
+        <div class="detail-meta"><span class="media">黑猫投诉</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">名义借款80000元，放款当天扣除砍头息3280元和820元，实际到手70140元。36期每月还3182.75元，真实年化利率35.25%，远超法律保护24%上限。</div>
+      <div class="detail-footer"><span>海富租赁</span><span><span class="kw-tag">高利息</span><span class="kw-tag">砍头息</span></span><span>6月11日 09:17</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">陕西海富融资租赁名租实贷，利率超标引投诉</div>
+        <div class="detail-meta"><span class="media">黑猫投诉</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">投诉陕西海富融资租赁有限公司高利贷，要求退还违法收取利息。商家未匹配成功。</div>
+      <div class="detail-footer"><span>海富租赁</span><span><span class="kw-tag">高利息</span></span><span>6月11日 08:48</span></div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">悦易优享暴力催收威胁老人</div>
+        <div class="detail-meta"><span class="media">消费保</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">资金困难导致逾期，悦易优享暴力催收，电话威胁要去户籍地寄函件，户籍地只有老人在，身体不好。要求减低催收电话，不要再威胁，友好沟通。</div>
+      <div class="detail-footer"><span>悦己分期/悦易优享</span><span><span class="kw-tag">暴力催收</span></span><span>6月11日 10:27</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">湖北砚席予光文化传播：无办学许可虚假宣传，退费苛刻，诱导学易分期贷款</div>
+        <div class="detail-meta"><span class="media">黑猫投诉</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span></div>
+      </div>
+      <div class="detail-content">无办学许可违规办学，销售虚假宣传保过、快速拿证、内部押题。协商退款只退20%，要求还清分期再等90个工作日。机构多次更名（登科状元→砚席予光）规避纠纷。诉求：全额退还4980元。</div>
+      <div class="detail-footer"><span>学易分期/学易优享</span><span><span class="kw-tag">诱导贷款</span></span><span>6月12日 10:46</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+  </div>
+
+  <!-- 海尔生物 -->
+  <div class="tab-content" id="tab-hlsw">
+    <div style="margin-bottom:12px;font-size:12px;color:#ff7043;line-height:1.5;">⚠ 重点关注：投资者对股价下跌的抱怨密集；小红书出现员工吐槽领导被开除的帖子</div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">小红书员工吐槽海尔生物医疗：领导骂人、无培训、关系户公司，因冲突被开除</div>
+        <div class="detail-meta"><span class="media">小红书</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span><span>粉丝:21</span></div>
+      </div>
+      <div class="detail-content">新人入职无培训，领导对技术问题回复"能干就干，不能干滚蛋"，强制要求出差搞接线电路工作，有问题就骂。因与领导发生冲突被开除。建议大家避雷。</div>
+      <div class="detail-footer"><span>海尔生物</span><span><span class="kw-tag">员工抱怨</span></span><span>6月12日 13:11</span></div>
+      <button class="expand-btn">展开</button>
+    </div>
+  </div>
+
+  <!-- 医疗服务 -->
+  <div class="tab-content" id="tab-ylfw">
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-title">颧弓颧骨内推后太阳穴下面变凹陷了，做之前还没凹陷 #磨骨失败 #四川友谊医院</div>
+        <div class="detail-meta"><span class="media">抖音</span><span class="badge badge-level3">三级</span><span class="nature-new">新增</span><span>粉丝:2</span></div>
+      </div>
+      <div class="detail-content">颧弓颧骨内推后为什么太阳穴下面变凹陷了，做之前还没凹陷 #磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院</div>
+      <div class="detail-footer"><span>四川友谊医院</span><span><span class="kw-tag">治疗方式问题</span></span><span>6月11日 20:44</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 4: Time Dimension -->
+<div class="section">
+  <div class="section-title">时间维度分析</div>
+
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:16px;font-weight:600;">📈 每日舆情趋势</div>
+      <div class="time-chart">
+        <div class="y-axis"><span>28</span><span>21</span><span>14</span><span>7</span><span>0</span></div>
+        <div class="bar-col">
+          <div class="bar-val" style="color:#ff5252;">28</div>
+          <div class="bar-rect" style="background:linear-gradient(180deg,#4fc3f7,#29b6f6);height:140px;"></div>
+          <div class="bar-lbl">6月11日</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-val" style="color:#4fc3f7;">6</div>
+          <div class="bar-rect" style="background:linear-gradient(180deg,#4fc3f7,#29b6f6);height:30px;"></div>
+          <div class="bar-lbl">6月12日</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#7b8fa3;margin-top:8px;">⚡ <span style="color:#ff5252;">6月11日为舆情爆发日（28条）</span></div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">🏭 每日舆情 × 产业交叉</div>
+      <div class="table-scroll">
+        <table class="cross-table">
+          <tr><th style="background:transparent;color:#7b8fa3;">日期</th><th style="background:transparent;color:#4fc3f7;">上海莱士</th><th style="background:transparent;color:#ffa726;">海尔云贷</th><th style="background:transparent;color:#66bb6a;">海尔生物</th><th style="background:transparent;color:#ab47bc;">医疗</th><th style="background:transparent;color:#7b8fa3;">合计</th></tr>
+          <tr style="background:rgba(255,82,82,0.15);"><td style="text-align:center;color:#e0e6ed;">6月11日</td><td style="text-align:center;background:rgba(255,82,82,0.3);color:#ff5252;font-weight:600;">20</td><td style="text-align:center;">4</td><td style="text-align:center;">3</td><td style="text-align:center;">1</td><td style="text-align:center;color:#ff5252;font-weight:700;">28</td></tr>
+          <tr><td style="text-align:center;color:#e0e6ed;">6月12日</td><td style="text-align:center;">4</td><td style="text-align:center;">1</td><td style="text-align:center;">1</td><td style="text-align:center;color:#546e7a;">0</td><td style="text-align:center;">6</td></tr>
+          <tr style="border-top:2px solid #2a4a6a;"><td style="text-align:center;color:#4fc3f7;font-weight:700;">合计</td><td style="text-align:center;color:#4fc3f7;font-weight:700;font-size:14px;">24</td><td style="text-align:center;color:#ffa726;font-weight:700;font-size:14px;">5</td><td style="text-align:center;color:#66bb6a;font-weight:700;font-size:14px;">4</td><td style="text-align:center;color:#ab47bc;font-weight:700;font-size:14px;">1</td><td style="text-align:center;color:#fff;font-weight:700;font-size:16px;">34</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:600;">🌡️ 每日舆情性质热力图</div>
+      <div class="table-scroll">
+        <table class="cross-table">
+          <tr><th style="background:transparent;color:#7b8fa3;">日期</th><th style="background:transparent;color:#7b8fa3;">新增</th><th style="background:transparent;color:#ff7043;">发酵</th></tr>
+          <tr><td style="text-align:center;color:#e0e6ed;">6月11日</td><td style="text-align:center;background:rgba(255,112,67,0.5);color:#ff7043;font-weight:600;">18</td><td style="text-align:center;background:rgba(255,167,38,0.5);color:#ffa726;font-weight:600;">10</td></tr>
+          <tr><td style="text-align:center;color:#e0e6ed;">6月12日</td><td style="text-align:center;background:rgba(255,112,67,0.15);color:#ff7043;">3</td><td style="text-align:center;background:rgba(255,167,38,0.3);color:#ffa726;">3</td></tr>
+          <tr style="border-top:2px solid #2a4a6a;"><td style="text-align:center;color:#4fc3f7;font-weight:700;">合计</td><td style="text-align:center;color:#ff7043;font-weight:700;font-size:14px;">21</td><td style="text-align:center;color:#ffa726;font-weight:700;font-size:14px;">13</td></tr>
+        </table>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:#7b8fa3;line-height:1.5;">
+        <span style="color:#ff7043;">■</span> 新增类占61.8%&nbsp;&nbsp;
+        <span style="color:#ffa726;">■</span> 发酵类占38.2%
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 5: Risk Warnings -->
+<div class="section">
+  <div class="section-title">四、风险预警与建议</div>
+
+  <!-- Desktop table -->
+  <div class="table-scroll desktop-only">
+    <table class="risk-table">
+      <tr><th style="width:15%">风险等级</th><th style="width:20%">涉及产业</th><th style="width:40%">风险描述</th><th style="width:25%">建议措施</th></tr>
+      <tr>
+        <td><span class="badge" style="background:#ff5252;color:#fff">🔴 高风险</span></td>
+        <td>上海莱士</td>
+        <td>「百亿聘礼腰斩」话题在8+平台大面积发酵，二级舆情8条，浮亏58亿、9.4元入场价腰斩等数字反复被引用，6月12日仍在持续扩散至腾讯自选股等新媒体</td>
+        <td>建议品牌/IR团队尽快准备口径回应，关注后续是否有传统财经媒体转载；持续监控传播链路</td>
+      </tr>
+      <tr>
+        <td><span class="badge" style="background:#ff7043;color:#fff">🟠 中高风险</span></td>
+        <td>海尔云贷</td>
+        <td>陕西海富融资租赁投诉密集（暴力催收/高利贷35.25%/名租实贷/合同欺诈），涉及法律合规风险，黑猫投诉为主要渠道</td>
+        <td>核查海富租赁业务合规性，评估法律风险敞口；关注是否有监管介入或媒体深度报道</td>
+      </tr>
+      <tr>
+        <td><span class="badge" style="background:#ffa726;color:#333">🟡 中风险</span></td>
+        <td>海尔生物</td>
+        <td>投资者对股价下跌的抱怨密集（4条/日），且出现员工劳资关系吐槽帖（小红书21粉丝），负面口碑可能在员工社群扩散</td>
+        <td>关注投资者关系维护策略；小红书帖子需持续观察是否发酵；内部排查劳资管理问题</td>
+      </tr>
+      <tr>
+        <td><span class="badge" style="background:#66bb6a;color:#fff">🟢 低风险</span></td>
+        <td>医疗服务</td>
+        <td>四川友谊医院磨骨失败投诉（抖音2粉丝），影响面有限</td>
+        <td>已关注，持续监控是否出现更多同类投诉</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Mobile risk cards -->
+  <div class="mobile-only">
+    <div class="risk-card">
+      <div class="rc-header">
+        <span class="rc-industry">上海莱士</span>
+        <span class="badge" style="background:#ff5252;color:#fff">🔴 高风险</span>
+      </div>
+      <div class="rc-desc">「百亿聘礼腰斩」话题在8+平台大面积发酵，二级舆情8条，浮亏58亿、9.4元入场价腰斩等数字反复被引用，6月12日仍在持续扩散至腾讯自选股等新媒体</div>
+      <div class="rc-label">建议措施</div>
+      <div class="rc-action">建议品牌/IR团队尽快准备口径回应，关注后续是否有传统财经媒体转载；持续监控传播链路</div>
+    </div>
+
+    <div class="risk-card mid-high">
+      <div class="rc-header">
+        <span class="rc-industry">海尔云贷</span>
+        <span class="badge" style="background:#ff7043;color:#fff">🟠 中高风险</span>
+      </div>
+      <div class="rc-desc">陕西海富融资租赁投诉密集（暴力催收/高利贷35.25%/名租实贷/合同欺诈），涉及法律合规风险，黑猫投诉为主要渠道</div>
+      <div class="rc-label">建议措施</div>
+      <div class="rc-action">核查海富租赁业务合规性，评估法律风险敞口；关注是否有监管介入或媒体深度报道</div>
+    </div>
+
+    <div class="risk-card mid">
+      <div class="rc-header">
+        <span class="rc-industry">海尔生物</span>
+        <span class="badge" style="background:#ffa726;color:#333">🟡 中风险</span>
+      </div>
+      <div class="rc-desc">投资者对股价下跌的抱怨密集（4条/日），且出现员工劳资关系吐槽帖（小红书21粉丝），负面口碑可能在员工社群扩散</div>
+      <div class="rc-label">建议措施</div>
+      <div class="rc-action">关注投资者关系维护策略；小红书帖子需持续观察是否发酵；内部排查劳资管理问题</div>
+    </div>
+
+    <div class="risk-card low">
+      <div class="rc-header">
+        <span class="rc-industry">医疗服务</span>
+        <span class="badge" style="background:#66bb6a;color:#fff">🟢 低风险</span>
+      </div>
+      <div class="rc-desc">四川友谊医院磨骨失败投诉（抖音2粉丝），影响面有限</div>
+      <div class="rc-label">建议措施</div>
+      <div class="rc-action">已关注，持续监控是否出现更多同类投诉</div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 6: Pending Items -->
+<div class="section">
+  <div class="section-title">五、待处理舆情清单（26条未读）</div>
+
+  <!-- Desktop table -->
+  <div class="table-scroll desktop-only">
+    <table class="pending-table">
+      <tr><th>#</th><th>标题</th><th>产业</th><th>性质</th><th>渠道</th><th>时间</th></tr>
+      <tr><td>1</td><td>入股上海莱士百亿聘礼几近腰斩（微博）</td><td>上海莱士</td><td><span class="nature-ferment">发酵</span></td><td>新浪微博</td><td>6/11 21:20</td></tr>
+      <tr><td>2</td><td>入股上海莱士百亿聘礼几近腰斩（中华网×2）</td><td>上海莱士</td><td><span class="nature-ferment">发酵</span></td><td>中华网</td><td>6/11 11:04</td></tr>
+      <tr><td>3</td><td>入股上海莱士百亿聘礼几近腰斩（深链财经）</td><td>上海莱士</td><td><span class="nature-ferment">发酵</span></td><td>深链财经</td><td>6/11 16:01</td></tr>
+      <tr><td>4</td><td>入股上海莱士百亿聘礼几近腰斩（腾讯/微信/好看/百度/有驾）</td><td>上海莱士</td><td><span class="nature-ferment">发酵</span></td><td>多平台</td><td>6/12 06:38</td></tr>
+      <tr><td>5</td><td>海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</td><td>上海莱士</td><td><span class="nature-ferment">发酵</span></td><td>百度百家/好看视频/有驾</td><td>6/11 09:10</td></tr>
+      <tr><td>6</td><td>海尔大健康浮亏58亿，三家上市公司为何一起承压？</td><td>上海莱士</td><td><span class="nature-new">新增</span></td><td>百度百家/好看视频/有驾</td><td>6/11 11:30</td></tr>
+      <tr><td>7</td><td>百亿买了张上海莱士跌停板</td><td>上海莱士</td><td><span class="nature-new">新增</span></td><td>微信</td><td>6/11 09:38</td></tr>
+      <tr><td>8</td><td>投诉陕西海富融资租赁：合同欺诈、套路贷</td><td>海尔云贷</td><td><span class="nature-new">新增</span></td><td>黑猫投诉</td><td>6/11 23:12</td></tr>
+      <tr><td>9</td><td>湖北砚席予光文化传播：虚假宣传、诱导贷款</td><td>海尔云贷</td><td><span class="nature-new">新增</span></td><td>黑猫投诉</td><td>6/12 10:46</td></tr>
+      <tr><td>10</td><td>投资者质疑海尔生物股价持续下跌（多条）</td><td>海尔生物</td><td><span class="nature-new">新增</span></td><td>股吧/上证e互动</td><td>6/11 多时段</td></tr>
+    </table>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="mobile-only">
+    <div class="pending-card" style="border-left-color:#ff7043"><span class="pc-num">1</span><span class="pc-title">入股上海莱士百亿聘礼几近腰斩（微博）</span><div class="pc-meta"><span>上海莱士</span><span class="nature-ferment">发酵</span><span>新浪微博</span><span>6/11 21:20</span></div></div>
+    <div class="pending-card" style="border-left-color:#ff7043"><span class="pc-num">2</span><span class="pc-title">入股上海莱士百亿聘礼几近腰斩（中华网×2）</span><div class="pc-meta"><span>上海莱士</span><span class="nature-ferment">发酵</span><span>中华网</span><span>6/11 11:04</span></div></div>
+    <div class="pending-card" style="border-left-color:#ff7043"><span class="pc-num">3</span><span class="pc-title">入股上海莱士百亿聘礼几近腰斩（深链财经）</span><div class="pc-meta"><span>上海莱士</span><span class="nature-ferment">发酵</span><span>深链财经</span><span>6/11 16:01</span></div></div>
+    <div class="pending-card" style="border-left-color:#ff7043"><span class="pc-num">4</span><span class="pc-title">入股上海莱士百亿聘礼几近腰斩（腾讯/微信/好看/百度/有驾）</span><div class="pc-meta"><span>上海莱士</span><span class="nature-ferment">发酵</span><span>多平台</span><span>6/12 06:38</span></div></div>
+    <div class="pending-card" style="border-left-color:#ff7043"><span class="pc-num">5</span><span class="pc-title">海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？</span><div class="pc-meta"><span>上海莱士</span><span class="nature-ferment">发酵</span><span>百度百家</span><span>6/11 09:10</span></div></div>
+    <div class="pending-card"><span class="pc-num">6</span><span class="pc-title">海尔大健康浮亏58亿，三家上市公司为何一起承压？</span><div class="pc-meta"><span>上海莱士</span><span class="nature-new">新增</span><span>百度百家</span><span>6/11 11:30</span></div></div>
+    <div class="pending-card"><span class="pc-num">7</span><span class="pc-title">百亿买了张上海莱士跌停板</span><div class="pc-meta"><span>上海莱士</span><span class="nature-new">新增</span><span>微信</span><span>6/11 09:38</span></div></div>
+    <div class="pending-card"><span class="pc-num">8</span><span class="pc-title">投诉陕西海富融资租赁：合同欺诈、套路贷</span><div class="pc-meta"><span>海尔云贷</span><span class="nature-new">新增</span><span>黑猫投诉</span><span>6/11 23:12</span></div></div>
+    <div class="pending-card"><span class="pc-num">9</span><span class="pc-title">湖北砚席予光文化传播：虚假宣传、诱导贷款</span><div class="pc-meta"><span>海尔云贷</span><span class="nature-new">新增</span><span>黑猫投诉</span><span>6/12 10:46</span></div></div>
+    <div class="pending-card"><span class="pc-num">10</span><span class="pc-title">投资者质疑海尔生物股价持续下跌（多条）</span><div class="pc-meta"><span>海尔生物</span><span class="nature-new">新增</span><span>股吧/上证e互动</span><span>6/11 多时段</span></div></div>
+  </div>
+</div>
+
+<p style="text-align:center;color:#546e7a;font-size:11px;margin-top:20px;padding-bottom:12px;">报告生成时间：2026年6月12日 20:21<br>数据来源：万链聆听系统舆情查询</p>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Expand / collapse
+document.querySelectorAll('.expand-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const content = btn.closest('.detail-card').querySelector('.detail-content');
+    content.classList.toggle('expanded');
+    btn.textContent = content.classList.contains('expanded') ? '收起' : '展开';
+  });
+});
+
+// All records data
+const allItems = [
+  {title:"入股上海莱士百亿聘礼几近腰斩，海尔折戟大健康领域？",content:"海尔集团的大健康业务近年频现波折。上海莱士再度探底，收跌0.99%并刷新年内低点。自2026年以来累计跌幅已达20.85%。海尔以9.4元/股受让20%股份，交易总价125亿元，账面浮亏已扩大至58亿元。",media:"新浪微博/中华网/深链财经/微信/腾讯自选股/好看视频/百度百家/有驾",nature:"发酵",level:"二级",time:"6月11日-12日",industry:"上海莱士",author:"瞰见精彩/中华网/访客/并购菁英汇/深思理财策等",fans:"176+147",kw:"业务经营"},
+  {title:"海尔大健康浮亏58亿，三家上市公司为何一起承压？",content:"海尔大健康浮亏58亿，三家上市公司为何一起承压？",media:"百度百家/好看视频/有驾",nature:"新增",level:"三级",time:"6月11日 11:30",industry:"上海莱士",author:"上官向阳奔赴晴光",kw:"业务经营"},
+  {title:"百亿买了张上海莱士跌停板，海尔的大健康棋局走到哪了？",content:"上海莱士盘中跌破5元，年内已跌超20%。距离海尔9.4元入场价已跌去近47%。2025年营收73.48亿，净利润15.77亿，基本回到四五年前的利润水平。",media:"微信",nature:"新增",level:"三级",time:"6月11日 09:38",industry:"上海莱士",author:"阿毛洞察",kw:"业务经营"},
+  {title:"海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？",content:"海尔医疗百亿浮亏背后：家电巨头正在下一盘怎样的大棋？",media:"百度百家/好看视频/有驾",nature:"发酵",level:"三级",time:"6月11日 09:10",industry:"上海莱士",author:"不确定性管理",fans:"98",kw:"业务经营"},
+  {title:"拭目以待上海莱士：股价击穿4元、奔向3.5元的深度逻辑",content:"营收加速下滑，造血能力丧失。血制品全国集采持续扩围，静丙、纤原、白蛋白全面降价。81.99亿商誉悬顶，减值雷随时爆。",media:"股吧",nature:"新增",level:"三级",time:"6月11日 12:26",industry:"上海莱士",author:"大学516888",kw:"股价分析"},
+  {title:"上海莱士股价跌3.19%，易方达基金持有7479万股浮亏1196万",content:"上海莱士跌3.19%，报4.85元/股，成交1.44亿元。股价已连续3天下跌，区间累计跌幅3.47%。",media:"新浪看点",nature:"新增",level:"三级",time:"6月11日 11:12",industry:"上海莱士",author:"新浪看点",kw:"业务经营"},
+  {title:"股民抱怨集锦（6条）：股权激励不公/散户被套50%/历史最低价/管理层高薪高龄",content:"①管理层拿公司利润7元/股买进，2.3元/股分给自己做股权激励 ②齐心协力把股价砸到2.85 ③今天开始历史最低价开启 ④一直在跌散户一直在买，已被套50% ⑤管理层高薪高龄近30年没出高新技术产品 ⑥一路非理性下跌毫无动作",media:"股吧",nature:"新增",level:"三级",time:"6月11日 多时段",industry:"上海莱士/海尔生物",author:"多位投资者",fans:"40",kw:"股民抱怨"},
+  {title:"投诉陕西海富融资租赁：虚假宣传、合同欺诈、套路贷、违规催收",content:"业务员以正规车抵贷名义诱导签署居间协议，私自变更为以租代购，伪造/替换合同，将全款车辆所有权登记在公司名下。涉嫌合同欺诈、套路贷与侵占个人财产。",media:"黑猫投诉",nature:"新增",level:"三级",time:"6月11日 23:12",industry:"海尔云贷",author:"匿名",kw:"暴力催收"},
+  {title:"陕西海富金融租赁：高利贷、违法扣车，砍头息+年化35.25%",content:"名义借款80000元，放款当天扣除砍头息3280元和820元，实际到手70140元。36期每月还3182.75元，真实年化利率35.25%，远超法律保护24%上限。",media:"黑猫投诉",nature:"新增",level:"三级",time:"6月11日 09:17",industry:"海尔云贷",author:"匿名",kw:"高利息"},
+  {title:"陕西海富融资租赁名租实贷，利率超标引投诉",content:"投诉陕西海富融资租赁有限公司高利贷，商家未匹配成功。",media:"黑猫投诉",nature:"新增",level:"三级",time:"6月11日 08:48",industry:"海尔云贷",author:"匿名",kw:"高利息"},
+  {title:"悦易优享暴力催收威胁老人",content:"资金困难导致逾期，悦易优享暴力催收，电话威胁要去户籍地寄函件，户籍地只有老人在。",media:"消费保",nature:"新增",level:"三级",time:"6月11日 10:27",industry:"海尔云贷",author:"网友保保",kw:"暴力催收"},
+  {title:"湖北砚席予光文化传播：无办学许可虚假宣传，诱导学易分期贷款",content:"无办学许可违规办学，销售虚假宣传保过、快速拿证。协商退款只退20%，要求还清分期再等90个工作日。机构多次更名规避纠纷。",media:"黑猫投诉",nature:"新增",level:"三级",time:"6月12日 10:46",industry:"海尔云贷",author:"匿名",kw:"诱导贷款"},
+  {title:"投资者质疑海尔生物股价持续下跌（多条）",content:"①科创板涨46%/24%，海尔生物跌8%/12% ②新股高溢价炒作，长期投资被打脸 ③高管为何不增持维护信心 ④一路非理性下跌毫无动作，拿着高薪任由市值缩水",media:"股吧/上证e互动",nature:"新增",level:"三级",time:"6月11日 多时段",industry:"海尔生物",author:"多位投资者",kw:"股民抱怨"},
+  {title:"小红书员工吐槽海尔生物医疗：领导骂人、无培训、关系户",content:"新人入职无培训，领导回复'能干就干不能干滚蛋'，强制出差，有问题就骂。因与领导冲突被开除。建议避雷。",media:"小红书",nature:"新增",level:"三级",time:"6月12日 13:11",industry:"海尔生物",author:"be",fans:"21",kw:"员工抱怨"},
+  {title:"颧弓颧骨内推后太阳穴凹陷，投诉四川友谊医院磨骨失败",content:"颧弓颧骨内推后太阳穴下面变凹陷，做之前还没凹陷。#磨骨 #磨骨改脸型 #磨骨失败 #四川友谊医院",media:"抖音",nature:"新增",level:"三级",time:"6月11日 20:44",industry:"医疗服务",author:"海哥G",fans:"2",kw:"治疗方式问题"}
+];
+
+function showModal(type) {
+  const overlay = document.getElementById('modalOverlay');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  let items = [], html = '';
+
+  if (type === 'total') {
+    title.textContent = '舆情总量明细（34条）';
+    html = '<div class="stat-row"><div class="stat-box"><div class="sv">34</div><div class="sl">总舆情数</div></div><div class="stat-box"><div class="sv">28</div><div class="sl">6月11日</div></div><div class="stat-box"><div class="sv">6</div><div class="sl">6月12日</div></div><div class="stat-box"><div class="sv">4</div><div class="sl">涉及产业</div></div></div><div>'+allItems.map((it,i)=>renderItem(it,i)).join('')+'</div>';
+  } else if (type === 'unread') {
+    title.textContent = '未读/待处理舆情（26条）';
+    html = '<div>'+allItems.map((it,i)=>renderItem(it,i)).join('')+'</div>';
+  } else if (type === 'ferment') {
+    items = allItems.filter(it => it.nature === '发酵');
+    title.textContent = '发酵类舆情（'+items.length+'条）';
+    html = '<div>'+items.map((it,i)=>renderItem(it,allItems.indexOf(it))).join('')+'</div>';
+  } else if (type === 'closed') {
+    title.textContent = '已闭环/备案闭环（5条）';
+    html = '<div style="color:#90a4ae;font-size:13px;line-height:1.8;">陕西海富融资租赁高利贷投诉（已闭环）<br>陕西海富名租实贷投诉（已闭环）<br>悦易优享暴力催收投诉（备案闭环）<br>颧弓颧骨内推投诉（备案闭环）<br>陕西海富合同欺诈投诉（已闭环）</div>';
+  } else if (type === 'industry') {
+    title.textContent = '涉及产业分布';
+    html = '<div class="stat-row"><div class="stat-box" style="cursor:pointer" onclick="closeModalDirect();setTimeout(()=>showModal(\'ind-上海莱士\'),200)"><div class="sv">24</div><div class="sl">上海莱士</div></div><div class="stat-box" style="cursor:pointer" onclick="closeModalDirect();setTimeout(()=>showModal(\'ind-海尔云贷\'),200)"><div class="sv">5</div><div class="sl">海尔云贷</div></div><div class="stat-box" style="cursor:pointer" onclick="closeModalDirect();setTimeout(()=>showModal(\'ind-海尔生物\'),200)"><div class="sv">4</div><div class="sl">海尔生物</div></div><div class="stat-box" style="cursor:pointer" onclick="closeModalDirect();setTimeout(()=>showModal(\'ind-医疗服务\'),200)"><div class="sv">1</div><div class="sl">医疗服务</div></div></div><p style="color:#90a4ae;font-size:13px;margin-top:12px">点击上方产业卡片查看明细</p>';
+  } else if (type.startsWith('ind-')) {
+    const name = type.replace('ind-','');
+    items = allItems.filter(it => it.industry.includes(name));
+    title.textContent = name+' 舆情明细（'+items.length+'条相关）';
+    html = '<div>'+items.map((it,i)=>renderItem(it,allItems.indexOf(it))).join('')+'</div>';
+  } else if (type.startsWith('kw-')) {
+    const name = type.replace('kw-','');
+    items = allItems.filter(it => it.kw === name);
+    title.textContent = '关键词「'+name+'」相关舆情（'+items.length+'条）';
+    html = '<div>'+items.map((it,i)=>renderItem(it,allItems.indexOf(it))).join('')+'</div>';
+  } else if (type.startsWith('nature-')) {
+    const name = type.replace('nature-','');
+    items = allItems.filter(it => it.nature === name);
+    title.textContent = '性质「'+name+'」舆情（'+items.length+'条）';
+    html = '<div>'+items.map((it,i)=>renderItem(it,allItems.indexOf(it))).join('')+'</div>';
+  }
+
+  body.innerHTML = html;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderItem(it, idx) {
+  return '<div class="detail-item '+(it.nature==='发酵'?'ferment':'')+'" onclick="showItemDetail('+idx+')" style="cursor:pointer"><div class="di-title">'+it.title+'</div><div class="di-meta"><span class="badge '+(it.level==='二级'?'badge-level2':'badge-level3')+'">'+it.level+'</span><span style="color:'+(it.nature==='发酵'?'#ff7043':'#7b8fa3')+'">'+it.nature+'</span><span>📺 '+it.media+'</span><span>⏰ '+it.time+'</span></div></div>';
+}
+
+function showItemDetail(index) {
+  const it = allItems[index];
+  document.getElementById('modalTitle').textContent = it.title;
+  document.getElementById('modalBody').innerHTML = '<div class="detail-item '+(it.nature==='发酵'?'ferment':'')+'"><div class="di-meta" style="margin-bottom:12px"><span class="badge '+(it.level==='二级'?'badge-level2':'badge-level3')+'">'+it.level+'</span><span style="color:'+(it.nature==='发酵'?'#ff7043':'#7b8fa3')+';font-weight:600">'+it.nature+'</span></div><div class="di-body">'+it.content+'</div><div class="di-meta"><span>📺 '+it.media+'</span><span>⏰ '+it.time+'</span><span>🏭 '+it.industry+'</span><span>👤 '+it.author+'</span>'+(it.fans?'<span>👥 粉丝'+it.fans+'</span>':'')+'<span>🏷 '+it.kw+'</span></div></div>';
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Prevent body scroll when modal is open on iOS
+document.querySelector('.modal').addEventListener('touchmove', function(e) {
+  e.stopPropagation();
+}, { passive: true });
+</script>
+</body>
+</html>
