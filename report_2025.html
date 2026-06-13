@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务分析报告 - 2025年度</title>
+<style>
+:root {
+  --primary: #3b82f6;
+  --secondary: #8b5cf6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  color: var(--text);
+  line-height: 1.6;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.header {
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.header h1 {
+  font-size: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.header .sub { color: var(--text-dim); font-size: 14px; }
+.tab-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 12px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+.tab-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-color: transparent;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card h2 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.card h3 {
+  font-size: 16px;
+  color: var(--secondary);
+  margin: 16px 0 12px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  background: rgba(59,130,246,0.1);
+  color: var(--primary);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+tr:hover { background: rgba(59,130,246,0.05); }
+.num { text-align: right; font-family: 'Consolas', monospace; }
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.metric-card {
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.metric-card .label { color: var(--text-dim); font-size: 12px; margin-bottom: 8px; }
+.metric-card .value { font-size: 28px; font-weight: 700; color: var(--primary); }
+.metric-card .change { font-size: 13px; margin-top: 8px; }
+.flow-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.flow-item {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 20px;
+  text-align: center;
+}
+.flow-item .title { font-size: 11px; color: var(--text-dim); }
+.flow-item .val { font-size: 14px; font-weight: 600; }
+.flow-arrow { color: var(--primary); font-size: 24px; }
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-success { background: rgba(16,185,129,0.2); color: var(--success); }
+.badge-danger { background: rgba(239,68,68,0.2); color: var(--danger); }
+.badge-warning { background: rgba(245,158,11,0.2); color: var(--warning); }
+.formula {
+  background: rgba(59,130,246,0.05);
+  border-left: 3px solid var(--primary);
+  padding: 12px 16px;
+  margin: 12px 0;
+  border-radius: 0 8px 8px 0;
+  font-family: 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.warning-list {
+  background: rgba(239,68,68,0.05);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.warning-list h4 { color: var(--danger); margin-bottom: 12px; }
+.warning-list li { margin: 8px 0; color: var(--text); }
+.strength-list {
+  background: rgba(16,185,129,0.05);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.strength-list h4 { color: var(--success); margin-bottom: 12px; }
+.strength-list li { margin: 8px 0; color: var(--text); }
+/* DuPont Tree */
+.duPont-tree {
+  padding: 20px 0;
+  overflow-x: auto;
+}
+.tree-level {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  margin-bottom: 0;
+}
+.tree-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+}
+.tree-node .node-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.tree-node .node-value {
+  background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2));
+  border: 1px solid rgba(59,130,246,0.4);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+  text-align: center;
+}
+.tree-node .node-value.teal {
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.2));
+  border-color: rgba(16,185,129,0.4);
+  color: #10b981;
+}
+.tree-node .node-value.purple {
+  background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(168,85,247,0.2));
+  border-color: rgba(139,92,246,0.4);
+  color: #a855f7;
+}
+.tree-node .node-value.orange {
+  background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,146,60,0.2));
+  border-color: rgba(245,158,11,0.4);
+  color: #f59e0b;
+}
+.tree-node .node-value.red {
+  background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(248,113,113,0.15));
+  border-color: rgba(239,68,68,0.3);
+  color: #f87171;
+}
+.tree-operator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding-top: 28px;
+  min-width: 30px;
+}
+.tree-row-connector-wide {
+  display: flex;
+  justify-content: center;
+  height: 28px;
+  position: relative;
+}
+.tree-row-connector-wide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: rgba(148,163,184,0.3);
+}
+.tree-row-connector-wide::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: rgba(148,163,184,0.3);
+}
+.tree-node .node-label-small {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 6px 12px;
+  background: rgba(30,41,59,0.8);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.tree-node .node-label-small .lv {
+  font-weight: 700;
+  font-size: 13px;
+}
+.tree-node .node-label-small.blue .lv { color: var(--primary); }
+.tree-node .node-label-small.teal .lv { color: #10b981; }
+.tree-node .node-label-small.purple .lv { color: #a855f7; }
+.tree-node .node-label-small.orange .lv { color: #f59e0b; }
+.tree-node .node-label-small.red .lv { color: #f87171; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>企业财务分析报告</h1>
+    <div class="sub">2025年度 | 基于SKILL七步分析法 | 数据来源：合并财务报表 | 688139 海尔生物</div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab(0)">分析框架</button>
+    <button class="tab-btn" onclick="switchTab(1)">核心指标</button>
+    <button class="tab-btn" onclick="switchTab(2)">杜邦分析</button>
+    <button class="tab-btn" onclick="switchTab(3)">偿债能力</button>
+    <button class="tab-btn" onclick="switchTab(4)">运营能力</button>
+    <button class="tab-btn" onclick="switchTab(5)">盈利能力</button>
+    <button class="tab-btn" onclick="switchTab(6)">现金流质量</button>
+    <button class="tab-btn" onclick="switchTab(7)">EVA分析</button>
+    <button class="tab-btn" onclick="switchTab(8)">综合诊断</button>
+  </div>
+
+  <!-- TAB 0: 分析框架 -->
+  <div class="tab-content active" id="tab0">
+    <div class="card">
+      <h2>财务分析框架 — SKILL七步分析法</h2>
+      <p style="color:var(--text-dim);margin-bottom:20px">本报告严格遵循SKILL.md定义的财务分析框架，对企业进行七维度全面分析。</p>
+
+      <div class="flow-box">
+        <div class="flow-item"><div class="title">第一步</div><div class="val">数据提取</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第二步</div><div class="val">杜邦分析</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第三步</div><div class="val">偿债能力</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第四步</div><div class="val">运营能力</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第五步</div><div class="val">盈利能力</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第六步</div><div class="val">现金流质量</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item"><div class="title">第七步</div><div class="val">EVA分析</div></div>
+      </div>
+
+      <h3>核心公式速查</h3>
+      <div class="formula">
+        ROE = 净利率 × 资产周转率 × 权益乘数 = (净利润/收入) × (收入/总资产) × (总资产/净资产)
+      </div>
+      <div class="formula">
+        EVA = NOPAT - 资本成本 = 税后净营业利润 - (投入资本 × WACC)
+      </div>
+      <div class="formula">
+        现金周转天数 = 应收周转天数 + 存货周转天数 - 应付周转天数
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: 核心指标 -->
+  <div class="tab-content" id="tab1">
+    <div class="card">
+      <h2>核心财务指标速览</h2>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="label">营业收入</div>
+          <div class="value">23.29亿</div>
+          <div class="change" style="color:#16a34a">同比 +1.96%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">归母净利润</div>
+          <div class="value">2.51亿</div>
+          <div class="change" style="color:#dc2626">同比 -31.61%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">ROE</div>
+          <div class="value">5.78%</div>
+          <div class="change" style="color:#dc2626">上年 8.52%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">经营现金流</div>
+          <div class="value">2.68亿</div>
+          <div class="change" style="color:#dc2626">同比 -8.19%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">毛利率</div>
+          <div class="value">46.81%</div>
+          <div class="change" style="color:#dc2626">上年 47.99%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">资产负债率</div>
+          <div class="value">20.16%</div>
+          <div class="change" style="color:#10b981">财务稳健</div>
+        </div>
+      </div>
+
+      <h3>利润表核心数据</h3>
+      <table>
+        <tr><th>项目</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th></tr>
+        <tr><td>营业收入</td><td class="num">23.29亿</td><td class="num">22.84亿</td><td class="num" style="color:#16a34a">+1.96%</td></tr>
+        <tr><td>营业成本</td><td class="num">12.39亿</td><td class="num">11.88亿</td><td class="num" style="color:#dc2626">+4.30%</td></tr>
+        <tr><td>销售费用</td><td class="num">3.59亿</td><td class="num">2.90亿</td><td class="num" style="color:#dc2626">+23.78%</td></tr>
+        <tr><td>管理费用</td><td class="num">1.93亿</td><td class="num">1.81亿</td><td class="num" style="color:#dc2626">+6.31%</td></tr>
+        <tr><td>研发费用</td><td class="num">3.23亿</td><td class="num">3.06亿</td><td class="num" style="color:#dc2626">+5.58%</td></tr>
+        <tr><td>归母净利润</td><td class="num">2.51亿</td><td class="num">3.67亿</td><td class="num" style="color:#dc2626">-31.61%</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2: 杜邦分析 -->
+  <div class="tab-content" id="tab2">
+    <div class="card">
+      <h2>第二步：杜邦分析（ROE驱动因子拆解）</h2>
+      <div class="formula">
+        ROE = 净利率 × 资产周转率 × 权益乘数<br>
+        5.61% = 10.96% × 0.4021 × 1.2542
+      </div>
+
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">变动</th><th>驱动因子</th></tr>
+        <tr><td>ROE</td><td class="num">5.61%</td><td class="num">8.25%</td><td class="num" style="color:#dc2626">-2.64pp</td><td>综合结果</td></tr>
+        <tr><td>净利率</td><td class="num">10.96%</td><td class="num">16.68%</td><td class="num" style="color:#dc2626">-5.72pp</td><td>盈利能力</td></tr>
+        <tr><td>资产周转率</td><td class="num">0.4021</td><td class="num">0.3947</td><td class="num" style="color:#16a34a">+0.0074</td><td>运营效率</td></tr>
+        <tr><td>权益乘数</td><td class="num">1.2542</td><td class="num">1.2532</td><td class="num">+0.0010</td><td>财务杠杆</td></tr>
+      </table>
+
+      <h3>ROE变动归因分析</h3>
+      <div class="card" style="background:rgba(59,130,246,0.05);border-color:var(--primary)">
+        <p><strong>核心发现：</strong>ROE从8.25%大幅下降至5.61%，下降2.64个百分点。</p>
+        <p style="margin-top:12px"><strong>主要原因：</strong></p>
+        <ul style="margin-left:20px;margin-top:8px">
+          <li>净利率大幅下降5.72个百分点（净利润下滑33.04%，收入仅增1.96%）</li>
+          <li>销售费用大幅增长23.78%（+0.69亿），侵蚀利润空间</li>
+          <li>资产周转率微升0.0074，资产利用效率略有改善</li>
+          <li>权益乘数基本持平，杠杆策略依然保守</li>
+        </ul>
+      </div>
+
+      <!-- ===== 杜邦分析树形图 ===== -->
+      <h3 style="margin-top:24px">杜邦分析树形图</h3>
+      <div class="duPont-tree">
+
+        <!-- Level 0: 净资产收益率 -->
+        <div class="tree-level">
+          <div class="tree-node">
+            <div class="node-label">净资产收益率</div>
+            <div class="node-value">5.61%</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="tree-row-connector-wide"></div>
+
+        <!-- Level 1: 资产净利率 × 权益乘数 -->
+        <div class="tree-level">
+          <div class="tree-node">
+            <div class="node-label">资产净利率</div>
+            <div class="node-value teal">4.40%</div>
+          </div>
+          <div class="tree-operator">×</div>
+          <div class="tree-node">
+            <div class="node-label">权益乘数</div>
+            <div class="node-value purple">1.2542</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="tree-row-connector-wide"></div>
+
+        <!-- Level 2: 销售净利率 × 资产周转率 -->
+        <div class="tree-level">
+          <div class="tree-node">
+            <div class="node-label">销售净利率</div>
+            <div class="node-value teal">10.96%</div>
+          </div>
+          <div class="tree-operator">×</div>
+          <div class="tree-node">
+            <div class="node-label">资产周转率</div>
+            <div class="node-value teal">40.21%</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="tree-row-connector-wide"></div>
+
+        <!-- Level 3: 净利润/营业收入 和 营业收入/总资产 -->
+        <div class="tree-level">
+          <div class="tree-node">
+            <div class="node-label">净利润</div>
+            <div class="node-value">2.55亿</div>
+          </div>
+          <div class="tree-operator" style="font-size:18px">÷</div>
+          <div class="tree-node">
+            <div class="node-label">营业收入</div>
+            <div class="node-value">23.29亿</div>
+          </div>
+          <div style="width:60px"></div>
+          <div class="tree-node">
+            <div class="node-label">营业收入</div>
+            <div class="node-value">23.29亿</div>
+          </div>
+          <div class="tree-operator" style="font-size:18px">÷</div>
+          <div class="tree-node">
+            <div class="node-label">总资产</div>
+            <div class="node-value">57.92亿</div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="tree-row-connector-wide"></div>
+
+        <!-- Level 4: 净利润分解 和 资产分解 -->
+        <div class="tree-level" style="gap:12px">
+          <!-- 净利润分解 -->
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">营业收入</div>
+            <div class="node-label-small blue"><span class="lv">23.29亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:16px;padding-top:20px">−</div>
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">全部成本</div>
+            <div class="node-label-small red"><span class="lv">20.89亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:16px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">其他利润</div>
+            <div class="node-label-small orange"><span class="lv">0.13亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:16px;padding-top:20px">−</div>
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">所得税费用</div>
+            <div class="node-label-small orange"><span class="lv">0.96亿</span></div>
+          </div>
+
+          <div style="width:40px"></div>
+
+          <!-- 资产分解 -->
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">长期投资</div>
+            <div class="node-label-small purple"><span class="lv">1.88亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:16px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">非流动资产</div>
+            <div class="node-label-small purple"><span class="lv">31.33亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:16px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:110px">
+            <div class="node-label">流动资产</div>
+            <div class="node-label-small blue"><span class="lv">26.59亿</span></div>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="tree-row-connector-wide"></div>
+
+        <!-- Level 5: 全部成本明细 和 流动资产明细 -->
+        <div class="tree-level" style="gap:8px; flex-wrap:wrap">
+          <!-- 成本明细 -->
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">营业成本</div>
+            <div class="node-label-small red"><span class="lv">12.39亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">销售费用</div>
+            <div class="node-label-small orange"><span class="lv">3.59亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">管理费用</div>
+            <div class="node-label-small orange"><span class="lv">1.93亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">研发费用</div>
+            <div class="node-label-small orange"><span class="lv">3.23亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">财务费用</div>
+            <div class="node-label-small orange"><span class="lv">-0.26亿</span></div>
+          </div>
+
+          <div style="width:30px"></div>
+
+          <!-- 流动资产明细 -->
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">货币资金</div>
+            <div class="node-label-small blue"><span class="lv">8.44亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">应收账款</div>
+            <div class="node-label-small blue"><span class="lv">4.04亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">存货</div>
+            <div class="node-label-small blue"><span class="lv">3.45亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">预付款项</div>
+            <div class="node-label-small blue"><span class="lv">0.30亿</span></div>
+          </div>
+          <div class="tree-operator" style="font-size:14px;padding-top:20px">+</div>
+          <div class="tree-node" style="min-width:100px">
+            <div class="node-label">其他流动资产</div>
+            <div class="node-label-small blue"><span class="lv">10.36亿</span></div>
+          </div>
+        </div>
+
+      </div>
+      <!-- ===== 杜邦分析树形图 END ===== -->
+    </div>
+  </div>
+
+  <!-- TAB 3: 偿债能力 -->
+  <div class="tab-content" id="tab3">
+    <div class="card">
+      <h2>第三步：偿债能力分析</h2>
+
+      <h3>短期偿债能力</h3>
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th>参考基准</th><th>评价</th></tr>
+        <tr><td>流动比率</td><td class="num">2.45</td><td class="num">2.59</td><td>≥2.0</td><td><span class="badge badge-success">优秀</span></td></tr>
+        <tr><td>速动比率</td><td class="num">2.13</td><td class="num">2.27</td><td>≥1.0</td><td><span class="badge badge-success">优秀</span></td></tr>
+        <tr><td>现金比率</td><td class="num">0.78</td><td class="num">0.88</td><td>≥0.2</td><td><span class="badge badge-success">充裕</span></td></tr>
+      </table>
+
+      <h3>长期偿债能力</h3>
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th>参考基准</th><th>评价</th></tr>
+        <tr><td>资产负债率</td><td class="num">20.16%</td><td class="num">20.20%</td><td>&lt;60%</td><td><span class="badge badge-success">非常稳健</span></td></tr>
+        <tr><td>有息负债率</td><td class="num">2.78%</td><td class="num">0.53%</td><td>&lt;30%</td><td><span class="badge badge-warning">略有上升</span></td></tr>
+        <tr><td>利息保障倍数</td><td class="num">68.7</td><td class="num">118.9</td><td>≥3</td><td><span class="badge badge-success">安全</span></td></tr>
+      </table>
+
+      <div class="card" style="background:rgba(16,185,129,0.05);border-color:var(--success)">
+        <p><strong>偿债能力评价：</strong>企业偿债能力依然极强，资产负债率20.16%与上年持平，远低于行业平均水平。流动比率2.45、速动比率2.13均大幅超越安全线。有息负债率从0.53%上升至2.78%，主要因一年内到期非流动负债增加（1.32亿→0.81亿），但整体仍处于极低水平，偿债风险完全可控。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: 运营能力 -->
+  <div class="tab-content" id="tab4">
+    <div class="card">
+      <h2>第四步：运营能力分析</h2>
+
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th>参考区间</th><th>评价</th></tr>
+        <tr><td>应收账款周转天数</td><td class="num">48.2天</td><td class="num">40.9天</td><td>30-60天</td><td><span class="badge badge-warning">回款变慢</span></td></tr>
+        <tr><td>存货周转天数</td><td class="num">100.9天</td><td class="num">89.5天</td><td>60-90天</td><td><span class="badge badge-danger">偏慢</span></td></tr>
+        <tr><td>应付账款周转天数</td><td class="num">99.1天</td><td class="num">95.7天</td><td>-</td><td>议价能力较强</td></tr>
+        <tr><td><strong>现金周转天数(CCC)</strong></td><td class="num"><strong>50.0天</strong></td><td class="num">34.7天</td><td>&lt;90天</td><td><span class="badge badge-warning">延长15.3天</span></td></tr>
+        <tr><td>总资产周转率</td><td class="num">0.402</td><td class="num">0.395</td><td>-</td><td>略有改善</td></tr>
+      </table>
+
+      <div class="formula">
+        现金周转天数 = 应收天数(48.2) + 存货天数(100.9) - 应付天数(99.1) = 50.0天
+      </div>
+
+      <div class="card" style="background:rgba(245,158,11,0.05);border-color:var(--warning)">
+        <p><strong>运营效率评价：</strong>现金周转天数从34.7天延长至50.0天，仍处优秀区间（&lt;90天），但恶化趋势需关注。应收账款周转天数延长7.3天（40.9→48.2），回款速度变慢，与应收账款大幅增长（3.24亿→4.04亿，+24.7%）一致；存货周转天数延长11.4天（89.5→100.9），存货管理效率下降，需关注滞销风险。应付账款周转天数略延长3.4天，对上游议价能力保持稳定。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: 盈利能力 -->
+  <div class="tab-content" id="tab5">
+    <div class="card">
+      <h2>第五步：盈利能力分析</h2>
+
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">变动</th><th>评价</th></tr>
+        <tr><td>毛利率</td><td class="num">46.81%</td><td class="num">47.99%</td><td class="num" style="color:#dc2626">-1.18pp</td><td>定价能力强</td></tr>
+        <tr><td>净利率</td><td class="num">10.96%</td><td class="num">16.05%</td><td class="num" style="color:#dc2626">-5.09pp</td><td><span class="badge badge-danger">大幅下滑</span></td></tr>
+        <tr><td>ROE</td><td class="num">5.78%</td><td class="num">8.52%</td><td class="num" style="color:#dc2626">-2.74pp</td><td><span class="badge badge-danger">股东回报下降</span></td></tr>
+        <tr><td>ROA</td><td class="num">4.31%</td><td class="num">6.48%</td><td class="num" style="color:#dc2626">-2.17pp</td><td>资产回报下降</td></tr>
+        <tr><td>期间费用率</td><td class="num">38.66%</td><td class="num">31.99%</td><td class="num" style="color:#dc2626">+6.67pp</td><td><span class="badge badge-danger">费用激增</span></td></tr>
+        <tr><td>研发费用率</td><td class="num">13.88%</td><td class="num">13.41%</td><td class="num" style="color:#16a34a">+0.47pp</td><td>研发投入稳定</td></tr>
+      </table>
+
+      <h3>费用结构分析</h3>
+      <div class="card" style="background:rgba(139,92,246,0.05);border-color:var(--secondary)">
+        <p>销售费用3.59亿元（<span style="color:#dc2626">同比+23.78%</span>）—— 最大费用增长项</p>
+        <p>管理费用1.93亿元（同比+6.31%）</p>
+        <p>研发费用3.23亿元（同比+5.58%）</p>
+        <p>财务费用-0.26亿元（利息收入0.35亿元，较上年0.48亿减少）</p>
+      </div>
+
+      <div class="card" style="background:rgba(239,68,68,0.05);border-color:var(--danger)">
+        <p><strong>盈利能力评价：</strong>毛利率46.81%略有下降但仍处高位。净利率从16.05%大幅下降至10.96%，核心原因是销售费用激增23.78%（+0.69亿），叠加管理费用、研发费用同步增长，期间费用率从31.99%飙升至38.66%（+6.67pp）。ROE降至5.78%，低于制造业参考基准8-15%下限，股东回报显著承压。需重点关注销售费用大幅增长的合理性和投入产出效率。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: 现金流质量 -->
+  <div class="tab-content" id="tab6">
+    <div class="card">
+      <h2>第六步：现金流质量分析</h2>
+
+      <h3>现金流组合模式</h3>
+      <div class="flow-box">
+        <div class="flow-item" style="border-color:var(--success)"><div class="title">经营活动</div><div class="val" style="color:var(--success)">+2.68亿</div></div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-item" style="border-color:var(--success)"><div class="title">投资活动</div><div class="val" style="color:var(--success)">+0.17亿</div></div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-item" style="border-color:var(--danger)"><div class="title">筹资活动</div><div class="val" style="color:var(--danger)">-2.69亿</div></div>
+      </div>
+      <div class="formula">
+        组合模式：经营(+) + 投资(+) + 筹资(-) → <strong>成熟期向回收型过渡</strong><br>
+        经营造血持续，投资活动现金净流入（理财产品到期回收），筹资端偿还债务+分配股利
+      </div>
+
+      <h3>现金流质量指标</h3>
+      <table>
+        <tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th>评价标准</th><th>评价</th></tr>
+        <tr><td>经营现金流/净利润</td><td class="num">1.05</td><td class="num">0.80</td><td>≥1.0</td><td><span class="badge badge-success">改善</span></td></tr>
+        <tr><td>自由现金流</td><td class="num">1.49亿</td><td class="num">1.65亿</td><td>&gt;0</td><td><span class="badge badge-success">充裕</span></td></tr>
+        <tr><td>资本开支</td><td class="num">1.19亿</td><td class="num">1.27亿</td><td>-</td><td>投资强度稳定</td></tr>
+        <tr><td>期末现金余额</td><td class="num">5.54亿</td><td class="num">5.35亿</td><td>-</td><td>资金充裕</td></tr>
+      </table>
+
+      <div class="card" style="background:rgba(16,185,129,0.05);border-color:var(--success)">
+        <p><strong>现金流质量评价：</strong>经营现金流2.68亿元，经营现金流/净利润比率从0.80改善至1.05（>1.0），盈利质量显著提升，说明利润有充足的现金支撑。投资活动现金净流入0.17亿元（上年-7.91亿），主要因理财产品大规模到期回收（收回投资39.56亿 vs 投资37.86亿）。自由现金流1.49亿元为正，造血能力可覆盖投资支出。期末现金余额5.54亿元，资金储备充裕。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 7: EVA分析 -->
+  <div class="tab-content" id="tab7">
+    <div class="card">
+      <h2>第七步：EVA经济增加值分析</h2>
+
+      <div class="formula">
+        EVA = NOPAT - 资本成本 = 税后净营业利润 - (投入资本 × WACC)
+      </div>
+
+      <table>
+        <tr><th>计算项目</th><th class="num">金额/比率</th><th>说明</th></tr>
+        <tr><td>税后净营业利润 NOPAT</td><td class="num">2.69亿</td><td>营业利润×(1-税率)+少数股东损益调整</td></tr>
+        <tr><td>投入资本</td><td class="num">458.61亿</td><td>所有者权益+有息负债-超额现金</td></tr>
+        <tr><td>WACC</td><td class="num">9.53%</td><td>加权平均资本成本</td></tr>
+        <tr><td>资本成本</td><td class="num">4.37亿</td><td>投入资本×WACC</td></tr>
+        <tr style="background:rgba(139,92,246,0.1)"><td><strong>EVA</strong></td><td class="num" style="color:#dc2626;font-size:18px;font-weight:700"><strong>-1.68亿</strong></td><td><span class="badge badge-danger">⚠ 价值毁损</span></td></tr>
+      </table>
+
+      <h3>EVA计算说明</h3>
+      <div class="card" style="background:rgba(139,92,246,0.05);border-color:var(--secondary)">
+        <p><strong>WACC假设：</strong></p>
+        <ul style="margin-left:20px;margin-top:8px">
+          <li>无风险利率：2.75%（10年期国债收益率）</li>
+          <li>Beta系数：1.0（市场平均风险）</li>
+          <li>市场风险溢价：7%（A股市场长期平均）</li>
+          <li>股权成本：2.75% + 1.0 × 7% = 9.75%</li>
+          <li>债务成本：4%（税前）</li>
+          <li>实际税率：6.23%（所得税/利润总额）</li>
+          <li>股权占比：96.6%，债权占比：3.4%</li>
+        </ul>
+      </div>
+
+      <div class="card" style="background:rgba(239,68,68,0.05);border-color:var(--danger)">
+        <p><strong>EVA评价：</strong>EVA为负（-1.68亿元），较上年（-0.95亿）进一步恶化，说明企业未能覆盖资本成本，价值毁损加剧。ROE 5.78% 远低于 WACC 9.53%，资本回报缺口扩大。核心原因：净利润大幅下滑33%，而资本规模基本不变，导致资本效率显著下降。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 8: 综合诊断 -->
+  <div class="tab-content" id="tab8">
+    <div class="card">
+      <h2>第八步：综合诊断与建议</h2>
+
+      <div class="strength-list">
+        <h4>✓ 优势指标</h4>
+        <ul>
+          <li>毛利率高达46.81%，产品/服务具有显著定价优势</li>
+          <li>资产负债率仅20.16%，财务结构极其稳健，零偿债压力</li>
+          <li>流动比率2.45，现金充裕（8.44亿元），流动性无忧</li>
+          <li>经营现金流/净利润比率改善至1.05，盈利质量显著提升</li>
+          <li>自由现金流1.49亿元为正，造血能力可覆盖投资支出</li>
+          <li>资产周转率微升，资产利用效率略有改善</li>
+          <li>研发投入占收入13.88%，持续创新能力有保障</li>
+        </ul>
+      </div>
+
+      <div class="warning-list">
+        <h4>⚠ 预警指标</h4>
+        <ul>
+          <li>⚠ 归母净利润同比大幅下降31.61%，盈利能力严重承压</li>
+          <li>⚠ 销售费用激增23.78%（+0.69亿），侵蚀利润空间</li>
+          <li>⚠ 净利率从16.05%骤降至10.96%，下降5.09个百分点</li>
+          <li>⚠ ROE从8.52%降至5.78%，低于制造业基准下限8%</li>
+          <li>⚠ 应收账款增长24.7%，周转天数延长7.3天，回款恶化</li>
+          <li>⚠ 存货周转天数延长11.4天，存货管理效率下降</li>
+          <li>⚠ EVA为负且扩大（-1.68亿 vs -0.95亿），价值毁损加剧</li>
+          <li>⚠ 商誉7.58亿元，占净资产16.4%，存在减值风险</li>
+        </ul>
+      </div>
+
+      <h3>建议关注</h3>
+      <div class="card" style="background:rgba(245,158,11,0.05);border-color:var(--warning)">
+        <ul style="margin-left:20px">
+          <li><strong>销售费用管控（紧急）：</strong>销售费用激增23.78%是利润下滑的首要原因，需深入分析费用投向（市场推广/人员扩张/渠道建设），评估投入产出效率，建立费用增长与收入增长的联动约束机制</li>
+          <li><strong>应收账款管理：</strong>应收账款增长24.7%远超收入增速1.96%，需加强客户信用管理、缩短回款周期、加大催收力度，防止坏账风险</li>
+          <li><strong>存货管理优化：</strong>存货周转天数延长至100.9天，需分析存货结构（原材料/在产品/产成品），关注滞销品处理和跌价准备计提</li>
+          <li><strong>提升资本效率：</strong>低杠杆+低ROE=资本利用不足，可考虑增加分红/回购回馈股东，提升EVA</li>
+          <li><strong>商誉减值监控：</strong>商誉7.58亿占净资产16.4%，需定期评估被收购资产盈利表现，做好减值测试预案</li>
+          <li><strong>研发投入转化：</strong>研发投入占比13.88%保持高位，需关注研发成果商业化效率，加速技术转化为收入和利润</li>
+        </ul>
+      </div>
+
+      <h3>综合评级</h3>
+      <div class="card" style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1));border-color:var(--primary);text-align:center;padding:32px">
+        <div style="font-size:48px;font-weight:700;color:var(--warning);margin-bottom:16px">B</div>
+        <div style="font-size:18px;color:var(--text);margin-bottom:8px">综合评级：良好（较上年B+下调）</div>
+        <div style="color:var(--text-dim);margin-top:16px;text-align:left">
+          <p>企业财务基本面依然扎实——毛利率高企、杠杆极低、现金流充裕、偿债能力无忧。但2025年度出现明显的盈利恶化信号：归母净利润下滑31.61%、销售费用激增23.78%、ROE降至5.78%、EVA负值扩大至-1.68亿。从B+下调至B，核心原因在于资本利用效率和盈利增长动力显著恶化。</p>
+          <p style="margin-top:12px"><strong>关键行动建议：</strong>短期内重点管控销售费用增长、改善应收账款回款；中期需优化存货管理、提升研发投入产出效率；长期应重新审视资本配置策略，在保持财务稳健的同时提升股东回报。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(idx) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + idx).classList.add('active');
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+</script>
+</body>
+</html>

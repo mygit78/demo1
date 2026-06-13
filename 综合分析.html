@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务智能分析助手</title>
+<style>
+:root {
+  --primary: #3b82f6; --secondary: #8b5cf6; --success: #10b981;
+  --danger: #ef4444; --warning: #f59e0b; --bg-dark: #0f172a;
+  --bg-card: #1e293b; --border: #334155; --text: #e2e8f0; --text-dim: #94a3b8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Segoe UI','Microsoft YaHei',sans-serif;
+  background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);
+  color:var(--text); line-height:1.6; overflow:hidden; height:100vh;
+}
+.book { position:relative; width:100vw; height:100vh; }
+.page {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  padding:28px 36px 60px; overflow-y:auto; overflow-x:hidden;
+  display:none; animation:pageIn .4s ease;
+}
+.page.active { display:block; }
+@keyframes pageIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pageOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(-30px)} }
+.page::-webkit-scrollbar { width:6px; }
+.page::-webkit-scrollbar-thumb { background:rgba(59,130,246,0.3); border-radius:3px; }
+.page::-webkit-scrollbar-track { background:transparent; }
+
+.nav-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:rgba(15,23,42,0.95); backdrop-filter:blur(12px);
+  border-top:1px solid var(--border); padding:10px 24px;
+  display:flex; align-items:center; justify-content:center; gap:16px;
+}
+.nav-btn {
+  padding:8px 24px; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; color:var(--text-dim); cursor:pointer; font-size:14px;
+  transition:all .3s;
+}
+.nav-btn:hover { border-color:var(--primary); color:var(--primary); }
+.nav-btn:disabled { opacity:.3; cursor:not-allowed; }
+.page-dots { display:flex; gap:8px; }
+.dot {
+  width:10px; height:10px; border-radius:50%; background:var(--border);
+  cursor:pointer; transition:all .3s;
+}
+.dot.active { background:var(--primary); transform:scale(1.3); }
+.page-num { color:var(--text-dim); font-size:13px; min-width:60px; text-align:center; }
+
+.page-header {
+  background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.12));
+  border:1px solid var(--border); border-radius:14px;
+  padding:20px 28px; margin-bottom:20px; display:flex;
+  align-items:center; justify-content:space-between;
+}
+.page-header h1 {
+  font-size:24px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.page-header .sub { color:var(--text-dim); font-size:12px; margin-top:4px; }
+.page-tag {
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:600;
+}
+
+.card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:12px; padding:20px; margin-bottom:16px;
+}
+.card h2 {
+  font-size:18px; color:var(--primary); margin-bottom:14px;
+  padding-bottom:10px; border-bottom:1px solid var(--border);
+}
+.card h3 { font-size:15px; color:var(--secondary); margin:14px 0 10px; }
+
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th {
+  background:rgba(59,130,246,0.1); color:var(--primary);
+  padding:10px 12px; text-align:left; font-weight:600;
+}
+td { padding:8px 12px; border-bottom:1px solid var(--border); }
+tr:hover { background:rgba(59,130,246,0.05); }
+.num { text-align:right; font-family:'Consolas',monospace; }
+.up { color:#16a34a; }
+.down { color:#dc2626; }
+.flat { color:var(--text-dim); }
+
+.metric-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px; margin-bottom:16px;
+}
+.metric-card {
+  background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));
+  border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center;
+}
+.metric-card .label { color:var(--text-dim); font-size:11px; margin-bottom:4px; }
+.metric-card .value { font-size:20px; font-weight:700; color:var(--primary); }
+.metric-card .sub { font-size:11px; margin-top:4px; }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:600; }
+.badge-success { background:rgba(16,185,129,0.2); color:var(--success); }
+.badge-danger { background:rgba(239,68,68,0.2); color:var(--danger); }
+.badge-warning { background:rgba(245,158,11,0.2); color:var(--warning); }
+
+.formula {
+  background:rgba(59,130,246,0.05); border-left:3px solid var(--primary);
+  padding:10px 14px; margin:10px 0; border-radius:0 8px 8px 0;
+  font-family:'Consolas',monospace; font-size:12px; color:var(--text-dim);
+}
+
+.analysis-box {
+  background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.2);
+  border-radius:8px; padding:14px; margin:12px 0;
+}
+.analysis-box.danger { background:rgba(239,68,68,0.05); border-color:rgba(239,68,68,0.2); }
+.analysis-box.success { background:rgba(16,185,129,0.05); border-color:rgba(16,185,129,0.2); }
+.analysis-box.warning { background:rgba(245,158,11,0.05); border-color:rgba(245,158,11,0.2); }
+.analysis-box p { margin:4px 0; }
+.analysis-box ul { margin:6px 0 6px 20px; }
+.analysis-box li { margin:4px 0; font-size:13px; }
+
+.flow-box { display:flex; gap:10px; align-items:center; margin:12px 0; flex-wrap:wrap; }
+.flow-item {
+  background:var(--bg-dark); border:1px solid var(--border);
+  border-radius:8px; padding:10px 16px; text-align:center;
+}
+.flow-item .title { font-size:10px; color:var(--text-dim); }
+.flow-item .val { font-size:13px; font-weight:600; }
+.flow-arrow { color:var(--primary); font-size:20px; }
+
+.attr-row { display:flex; align-items:center; margin:6px 0; }
+.attr-label { width:110px; font-size:12px; color:var(--text-dim); flex-shrink:0; }
+.attr-bar-wrap { flex:1; display:flex; height:24px; border-radius:4px; overflow:hidden; margin:0 8px; }
+.attr-seg { display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:white; min-width:16px; }
+.attr-val { width:80px; font-size:12px; font-family:'Consolas',monospace; text-align:right; flex-shrink:0; }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:900px) { .two-col { grid-template-columns:1fr; } }
+
+.rating-circle {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:52px; height:52px; border-radius:50%; font-size:20px; font-weight:700;
+}
+.rating-up { background:rgba(16,185,129,0.2); color:var(--success); border:2px solid var(--success); }
+.rating-mid { background:rgba(59,130,246,0.2); color:var(--primary); border:2px solid var(--primary); }
+.rating-down { background:rgba(245,158,11,0.2); color:var(--warning); border:2px solid var(--warning); }
+.rating-low { background:rgba(239,68,68,0.2); color:var(--danger); border:2px solid var(--danger); }
+
+.score-row { display:flex; align-items:center; margin:4px 0; }
+.score-label { width:80px; font-size:12px; color:var(--text-dim); }
+.score-track { flex:1; height:8px; background:rgba(255,255,255,0.05); border-radius:4px; margin:0 8px; overflow:hidden; }
+.score-fill { height:100%; border-radius:4px; }
+.score-num { width:32px; font-size:12px; font-family:'Consolas',monospace; text-align:right; }
+
+/* ===== Homepage ===== */
+.homepage-container { max-width:1200px; margin:0 auto; padding-top:40px; }
+.homepage-header { text-align:center; margin-bottom:60px; }
+.tag-pill { display:inline-block; background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15)); border:1px solid rgba(59,130,246,0.3); border-radius:20px; padding:8px 20px; font-size:13px; color:var(--primary); margin-bottom:20px; }
+.main-title { font-size:48px; font-weight:700; margin-bottom:16px; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.subtitle { font-size:18px; color:var(--text-dim); max-width:600px; margin:0 auto; line-height:1.8; }
+.feature-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:20px; margin-top:40px; }
+.feature-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; text-align:center; transition:all .3s; cursor:pointer; }
+.feature-card:hover { border-color:var(--primary); transform:translateY(-4px); box-shadow:0 10px 30px rgba(59,130,246,0.2); }
+.feature-icon { font-size:36px; display:block; margin-bottom:12px; }
+.feature-name { font-size:16px; font-weight:600; color:var(--text); }
+.toc-container { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:40px; }
+.toc-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:28px; text-decoration:none; transition:all .3s; display:block; }
+.toc-card:hover { border-color:var(--primary); transform:translateY(-4px); box-shadow:0 10px 40px rgba(59,130,246,0.25); }
+.toc-year { font-size:20px; font-weight:700; color:var(--primary); margin-bottom:12px; }
+.toc-title { font-size:18px; font-weight:600; color:var(--text); margin-bottom:12px; }
+.toc-desc { font-size:13px; color:var(--text-dim); line-height:1.8; margin-bottom:16px; }
+.toc-action { font-size:14px; color:var(--primary); font-weight:600; }
+@media(max-width:1100px) { .feature-grid { grid-template-columns:repeat(3,1fr); } .toc-container { grid-template-columns:1fr; } }
+@media(max-width:700px) { .feature-grid { grid-template-columns:repeat(2,1fr); } .main-title { font-size:32px; } }
+</style>
+</head>
+<body>
+
+<div class="book" id="book">
+
+<!-- PAGE 1: 首页 -->
+<div class="page active" id="p1">
+  <div class="homepage-container">
+    <div class="homepage-header">
+      <div class="tag-pill">AI-Powered Financial Analysis</div>
+      <h1 class="main-title">财务智能分析助手</h1>
+      <p class="subtitle">企业级财务 BP 智能分析能力 · 基于 AI 的财务经营分析与决策支持系统</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">财报解读</span></div>
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">经营归因</span></div>
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">趋势预测</span></div>
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">管理汇报</span></div>
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">风险预警</span></div>
+      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">决策支持</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: 目录页 -->
+<div class="page" id="p2">
+  <div class="page-header">
+    <div>
+      <h1>财务报告目录</h1>
+      <div class="sub">选择年度查看对应财务分析报告</div>
+    </div>
+    <div class="page-tag">2 / 9</div>
+  </div>
+  <div class="toc-container">
+    <a href="report_2024.html" class="toc-card">
+      <div class="toc-year">2024 年度</div>
+      <div class="toc-title">海尔生物 (688139) 财务分析报告</div>
+      <div class="toc-desc">包含杜邦分析、偿债能力、运营能力、盈利能力、现金流质量、EVA 经济增加值等六大维度分析</div>
+      <div class="toc-action">点击查看详情 →</div>
+    </a>
+    <a href="report_2025.html" class="toc-card">
+      <div class="toc-year">2025 年度</div>
+      <div class="toc-title">海尔生物 (688139) 财务分析报告</div>
+      <div class="toc-desc">包含杜邦分析、偿债能力、运营能力、盈利能力、现金流质量、EVA 经济增加值等六大维度分析</div>
+      <div class="toc-action">点击查看详情 →</div>
+    </a>
+    <a href="report_2026Q1.html" class="toc-card">
+      <div class="toc-year">2026 Q1</div>
+      <div class="toc-title">海尔生物 (688139) 季度财务分析报告</div>
+      <div class="toc-desc">2026 年第一季度财务分析报告，包含六大维度综合诊断</div>
+      <div class="toc-action">点击查看详情 →</div>
+    </a>
+  </div>
+</div>
+
+
+
+<!-- ========== PAGE 3: 杜邦分析 ========== -->
+<div class="page" id="p3">
+  <div class="page-header">
+    <div>
+      <h1>杜邦分析 · 三期归因分解</h1>
+      <div class="sub">海尔生物(688139) | 2024年度 → 2025年度 → 2026Q1(年化) | ROE驱动因子量化拆解</div>
+    </div>
+    <div class="page-tag">3 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">ROE趋势</div>
+      <div class="value">8.25%→5.61%→7.20%</div>
+      <div class="sub"><span class="down">↓2.64pp</span> <span class="up">↑1.59pp</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">净利率趋势</div>
+      <div class="value">16.68%→10.96%→12.27%</div>
+      <div class="sub"><span class="down">↓5.72pp</span> <span class="up">↑1.31pp</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">资产周转率</div>
+      <div class="value">0.395→0.402→0.448</div>
+      <div class="sub"><span class="up">↑0.007</span> <span class="up">↑0.046</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">权益乘数</div>
+      <div class="value">1.253→1.273→1.249</div>
+      <div class="sub"><span class="up">↑0.020</span> <span class="down">↓0.024</span></div>
+    </div>
+  </div>
+
+  <h3>ROE三因子趋势对比</h3>
+  <table>
+    <tr><th>指标</th><th class="num">2024年度</th><th class="num">2025年度</th><th class="num">2026Q1(年化)</th><th>24→25</th><th>25→26Q1</th><th>三期累计</th></tr>
+    <tr><td><strong>ROE</strong></td><td class="num"><strong>8.25%</strong></td><td class="num"><strong>5.61%</strong></td><td class="num"><strong>7.20%</strong></td><td class="num down">-2.64pp</td><td class="num up">+1.59pp</td><td class="num down">-1.05pp</td></tr>
+    <tr><td>= 净利率</td><td class="num">16.68%</td><td class="num">10.96%</td><td class="num">12.27%</td><td class="num down">-5.72pp</td><td class="num up">+1.31pp</td><td class="num down">-4.41pp</td></tr>
+    <tr><td>× 资产周转率</td><td class="num">0.3947</td><td class="num">0.4021</td><td class="num">0.4479</td><td class="num up">+0.0074</td><td class="num up">+0.0458</td><td class="num up">+0.0532</td></tr>
+    <tr><td>× 权益乘数</td><td class="num">1.2532</td><td class="num">1.2730</td><td class="num">1.2490</td><td class="num up">+0.0198</td><td class="num down">-0.0240</td><td class="num down">-0.0042</td></tr>
+  </table>
+
+  <div class="two-col">
+    <div>
+      <h3>2024→2025：ROE下降2.64pp 归因</h3>
+      <div class="attr-row">
+        <div class="attr-label">净利率贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(239,68,68,0.7);width:95%">-2.83pp</div></div>
+        <div class="attr-val down">107%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">周转率贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.5);width:10%">+0.15pp</div></div>
+        <div class="attr-val up">-6%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">杠杆贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(139,92,246,0.5);width:8%">+0.13pp</div></div>
+        <div class="attr-val up">-5%</div>
+      </div>
+      <div class="analysis-box danger" style="margin-top:10px">
+        <p><strong>核心驱动：</strong>净利率骤降5.72pp贡献了ROE下降的<span class="down">107%</span>（周转率和杠杆的正向贡献部分抵消了部分降幅）。</p>
+        <ul>
+          <li>销售费用+23.79%（+0.69亿）是费用率飙升的最大推手</li>
+          <li>期间费用率从31.96%飙升至36.45%（+4.49pp）</li>
+          <li>毛利率仅微降1.18pp，非主要因素</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h3>2025→2026Q1：ROE回升1.59pp 归因</h3>
+      <div class="attr-row">
+        <div class="attr-label">净利率贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.6);width:42%">+0.67pp</div></div>
+        <div class="attr-val up">42%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">周转率贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.4);width:40%">+0.64pp</div></div>
+        <div class="attr-val up">40%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">杠杆贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(239,68,68,0.4);width:8%">-0.11pp</div></div>
+        <div class="attr-val down">-7%</div>
+      </div>
+      <div class="analysis-box success" style="margin-top:10px">
+        <p><strong>核心驱动：</strong><span class="up">净利率+周转率双驱动</span>，各贡献约40%。</p>
+        <ul>
+          <li>净利率回升1.31pp：毛利率+0.74pp + 费用率-0.71pp</li>
+          <li>周转率提升+0.0458（年化），收入规模恢复</li>
+          <li>权益乘数微降，杠杆进一步保守化</li>
+          <li><strong>注意：</strong>Q1年化数据含季节性放大效应</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 4: 偿债能力 ========== -->
+<div class="page" id="p4">
+  <div class="page-header">
+    <div>
+      <h1>偿债能力 · 三期安全边际追踪</h1>
+      <div class="sub">资产负债率持续下降，有息负债率波动，整体偿债能力极度安全</div>
+    </div>
+    <div class="page-tag">4 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">资产负债率</div>
+      <div class="value">20.20%→20.16%→19.70%</div>
+      <div class="sub up">三期累计降0.50pp</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">流动比率</div>
+      <div class="value">2.59→2.45→2.57</div>
+      <div class="sub">V型修复</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">有息负债率</div>
+      <div class="value">0.53%→2.78%→1.62%</div>
+      <div class="sub warning">2025跳升后回落</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">利息保障倍数</div>
+      <div class="value">118.9x→68.7x→96.7x</div>
+      <div class="sub up">V型回升，仍极安全</div>
+    </div>
+  </div>
+
+  <h3>短期偿债能力</h3>
+  <table>
+    <tr><th>指标</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1</th><th>24→25</th><th>25→26Q1</th><th>三期趋势</th></tr>
+    <tr><td>流动比率</td><td class="num">2.59</td><td class="num">2.45</td><td class="num">2.57</td><td class="num down">-0.14</td><td class="num up">+0.12</td><td><span class="badge badge-success">V型修复</span></td></tr>
+    <tr><td>速动比率</td><td class="num">2.27</td><td class="num">2.13</td><td class="num">2.25</td><td class="num down">-0.14</td><td class="num up">+0.12</td><td><span class="badge badge-success">V型修复</span></td></tr>
+    <tr><td>现金比率</td><td class="num">0.88</td><td class="num">0.78</td><td class="num">0.91</td><td class="num down">-0.10</td><td class="num up">+0.13</td><td><span class="badge badge-success">V型修复</span></td></tr>
+  </table>
+
+  <h3>长期偿债能力</h3>
+  <table>
+    <tr><th>指标</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1</th><th>24→25</th><th>25→26Q1</th><th>三期趋势</th></tr>
+    <tr><td>资产负债率</td><td class="num">20.20%</td><td class="num">20.16%</td><td class="num">19.70%</td><td class="num up">-0.04pp</td><td class="num up">-0.46pp</td><td><span class="badge badge-success">持续改善</span></td></tr>
+    <tr><td>有息负债率</td><td class="num">0.53%</td><td class="num">2.78%</td><td class="num">1.62%</td><td class="num down">+2.25pp</td><td class="num up">-1.16pp</td><td><span class="badge badge-warning">波动</span></td></tr>
+    <tr><td>利息保障倍数</td><td class="num">118.9x</td><td class="num">68.7x</td><td class="num">96.7x</td><td class="num down">-42.2%</td><td class="num up">+40.8%</td><td><span class="badge badge-success">安全</span></td></tr>
+  </table>
+
+  <div class="two-col">
+    <div class="analysis-box success">
+      <h3 style="color:var(--success);margin-bottom:8px">✓ 安全因素</h3>
+      <ul>
+        <li><strong>资产负债率持续下降：</strong>20.20%→20.16%→19.70%，三期累计下降0.50pp，财务结构愈发稳健</li>
+        <li><strong>短期偿债指标V型修复：</strong>流动比率/速动比率/现金比率在2025年短暂下降后，2026Q1全面回升至超越2024年水平</li>
+        <li><strong>利息保障倍数>68x：</strong>远超安全线3x，偿付能力零风险</li>
+        <li><strong>货币资金充裕：</strong>8.44亿→5.54亿→9.73亿，2026Q1现金储备创新高</li>
+      </ul>
+    </div>
+    <div class="analysis-box warning">
+      <h3 style="color:var(--warning);margin-bottom:8px">⚠ 关注点</h3>
+      <ul>
+        <li><strong>2025年有息负债率跳升：</strong>0.53%→2.78%（+2.25pp），主因一年内到期非流动负债增加（1.32亿→0.81亿）</li>
+        <li><strong>2026Q1有息负债结构变化：</strong>短期借款0.10亿+一年内到期非流动负债0.80亿+租赁负债0.05亿，合计0.95亿</li>
+        <li><strong>过度保守的风险：</strong>极低杠杆+低ROE=资本利用严重不足，资产负债率19.70%虽安全但限制了股东回报放大</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="analysis-box">
+    <p><strong>三期量化结论：</strong>偿债能力是海尔生物三期<strong>最稳定的维度</strong>（评分95→93→95）。资产负债率始终低于21%，流动比率始终高于2.4x，利息保障倍数始终高于68x。2025年有息负债率跳升为唯一波动点，但2026Q1已回落。整体偿债风险极低，为企业提供充足的财务安全垫和战略灵活性。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 5: 运营能力 ========== -->
+<div class="page" id="p5">
+  <div class="page-header">
+    <div>
+      <h1>运营能力 · 现金周转天数三期追踪</h1>
+      <div class="sub">CCC连续三期恶化（34.7→50.0→63.0天），应收账款周转恶化是核心驱动</div>
+    </div>
+    <div class="page-tag">5 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">现金周转天数 CCC</div>
+      <div class="value" style="color:var(--danger)">34.7→50.0→63.0</div>
+      <div class="sub down">累计恶化+28.3天</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">应收账款天数</div>
+      <div class="value" style="color:var(--danger)">40.9→48.2→63.7</div>
+      <div class="sub down">累计恶化+22.8天</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">存货周转天数</div>
+      <div class="value" style="color:var(--warning)">89.5→100.9→91.1</div>
+      <div class="sub">先升后降，改善中</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">应付账款天数</div>
+      <div class="value">95.7→99.1→91.7</div>
+      <div class="sub">2026Q1议价力下降</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>指标</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1(年化)</th><th>24→25</th><th>25→26Q1</th><th>三期趋势</th></tr>
+    <tr><td>应收账款天数</td><td class="num">40.9天</td><td class="num">48.2天</td><td class="num">63.7天</td><td class="num down">+7.3天</td><td class="num down">+15.5天</td><td><span class="badge badge-danger">持续恶化 ↑↑</span></td></tr>
+    <tr><td>存货周转天数</td><td class="num">89.5天</td><td class="num">100.9天</td><td class="num">91.1天</td><td class="num down">+11.4天</td><td class="num up">-9.8天</td><td><span class="badge badge-warning">先升后降</span></td></tr>
+    <tr><td>应付账款天数</td><td class="num">95.7天</td><td class="num">99.1天</td><td class="num">91.7天</td><td class="num">+3.4天</td><td class="num down">-7.4天</td><td><span class="badge badge-warning">波动</span></td></tr>
+    <tr><td><strong>CCC</strong></td><td class="num"><strong>34.7天</strong></td><td class="num"><strong>50.0天</strong></td><td class="num"><strong>63.0天</strong></td><td class="num down">+15.3天</td><td class="num down">+13.0天</td><td><span class="badge badge-danger">持续恶化</span></td></tr>
+    <tr><td>总资产周转率</td><td class="num">0.395x</td><td class="num">0.402x</td><td class="num">0.448x</td><td class="num up">+0.007x</td><td class="num up">+0.046x</td><td><span class="badge badge-success">持续改善</span></td></tr>
+  </table>
+
+  <h3>CCC变动归因分解</h3>
+  <div class="two-col">
+    <div>
+      <h3>2024→2025: CCC延长+15.3天</h3>
+      <div class="attr-row">
+        <div class="attr-label">应收天数贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(239,68,68,0.7);width:48%">+7.3天</div></div>
+        <div class="attr-val down">48%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">存货天数贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(245,158,11,0.7);width:74%">+11.4天</div></div>
+        <div class="attr-val down">74%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">应付天数对冲</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.5);width:22%">-3.4天</div></div>
+        <div class="attr-val up">-22%</div>
+      </div>
+      <div class="analysis-box danger" style="margin-top:8px">
+        <p><strong>主因：存货积压（74%）+ 应收恶化（48%）</strong></p>
+        <ul>
+          <li>应收账款3.24亿→4.04亿（+24.7%）</li>
+          <li>存货3.35亿→3.45亿（+3.0%），周转天数+11.4天</li>
+          <li>应付延长3.4天，部分对冲</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h3>2025→2026Q1: CCC延长+13.0天</h3>
+      <div class="attr-row">
+        <div class="attr-label">应收天数贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(239,68,68,0.8);width:100%">+15.5天</div></div>
+        <div class="attr-val down">119%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">存货天数对冲</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.6);width:63%">-9.8天</div></div>
+        <div class="attr-val up">-75%</div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">应付天数贡献</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(245,158,11,0.5);width:48%">+7.4天</div></div>
+        <div class="attr-val down">57%</div>
+      </div>
+      <div class="analysis-box danger" style="margin-top:8px">
+        <p><strong>主因：应收回款严重恶化（119%贡献）</strong></p>
+        <ul>
+          <li>应收账款4.04亿→5.05亿（+25.0%），收入却-5.36%</li>
+          <li>存货管理改善：-9.8天（唯一正面因素）</li>
+          <li>应付缩短7.4天，议价能力下降</li>
+          <li><strong>应收与收入背离是最大预警</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="analysis-box">
+    <p><strong>三期量化结论：</strong>CCC从34.7天→63.0天，累计恶化28.3天。核心驱动因素为<strong>应收账款周转天数从40.9天→63.7天（+22.8天，占CCC恶化的80%）</strong>。2024年存货积压是主因（贡献74%），2026Q1应收恶化已升级为绝对主因（贡献119%）。唯一亮点是存货管理2026Q1显著改善（-9.8天）。需紧急关注应收回款能力恶化，警惕放宽信用政策或坏账风险。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 6: 盈利能力 ========== -->
+<div class="page" id="p6">
+  <div class="page-header">
+    <div>
+      <h1>盈利能力 · 三期利润瀑布与费用结构</h1>
+      <div class="sub">净利率从16.68%→10.96%→12.27%，费用率飙升是利润侵蚀的核心驱动</div>
+    </div>
+    <div class="page-tag">6 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">毛利率</div>
+      <div class="value">47.99%→46.81%→47.55%</div>
+      <div class="sub">高位稳定，定价能力强</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">净利率(杜邦)</div>
+      <div class="value" style="color:var(--warning)">16.68%→10.96%→12.27%</div>
+      <div class="sub down">三期累计↓4.41pp</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">期间费用率</div>
+      <div class="value" style="color:var(--danger)">31.96%→36.45%→35.74%</div>
+      <div class="sub down">三期累计↑3.78pp</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">归母净利润(亿)</div>
+      <div class="value" style="color:var(--danger)">3.67→2.56→0.79</div>
+      <div class="sub down">三期累计降78.5%</div>
+    </div>
+  </div>
+
+  <h3>盈利能力核心指标三期对比</h3>
+  <table>
+    <tr><th>指标</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1(年化)</th><th>24→25</th><th>25→26Q1</th></tr>
+    <tr><td>营业收入(亿)</td><td class="num">22.84</td><td class="num">23.29</td><td class="num">6.52</td><td class="num up">+1.95%</td><td class="num down">-5.36%</td></tr>
+    <tr><td>毛利率</td><td class="num">47.99%</td><td class="num">46.81%</td><td class="num">47.55%</td><td class="num down">-1.18pp</td><td class="num up">+0.74pp</td></tr>
+    <tr><td>销售费用率</td><td class="num">12.70%</td><td class="num">15.41%</td><td class="num">15.16%</td><td class="num down">+2.71pp</td><td class="num up">-0.25pp</td></tr>
+    <tr><td>管理费用率</td><td class="num">7.92%</td><td class="num">8.29%</td><td class="num">7.36%</td><td class="num down">+0.37pp</td><td class="num up">-0.93pp</td></tr>
+    <tr><td>研发费用率</td><td class="num">13.40%</td><td class="num">13.87%</td><td class="num">12.88%</td><td class="num down">+0.47pp</td><td class="num up">-0.99pp</td></tr>
+    <tr><td>财务费用率</td><td class="num">-2.06%</td><td class="num">-1.12%</td><td class="num">0.31%</td><td class="num down">+0.94pp</td><td class="num down">+1.43pp</td></tr>
+    <tr><td>期间费用率</td><td class="num">31.96%</td><td class="num">36.45%</td><td class="num">35.74%</td><td class="num down">+4.49pp</td><td class="num up">-0.71pp</td></tr>
+    <tr><td>净利率(杜邦)</td><td class="num">16.68%</td><td class="num">10.96%</td><td class="num">12.27%</td><td class="num down">-5.72pp</td><td class="num up">+1.31pp</td></tr>
+    <tr><td>ROE</td><td class="num">8.25%</td><td class="num">5.61%</td><td class="num">7.20%</td><td class="num down">-2.64pp</td><td class="num up">+1.59pp</td></tr>
+    <tr><td>ROA</td><td class="num">6.48%</td><td class="num">4.31%</td><td class="num">5.47%</td><td class="num down">-2.17pp</td><td class="num up">+1.16pp</td></tr>
+  </table>
+
+  <h3>费用结构演变（金额：亿元）</h3>
+  <table>
+    <tr><th>费用项</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1</th><th>24→25变动</th><th>25→26Q1变动</th></tr>
+    <tr><td>销售费用</td><td class="num">2.90</td><td class="num">3.59</td><td class="num">0.99</td><td class="num down">+23.79% ↑最大增长项</td><td class="num up">-5.29%</td></tr>
+    <tr><td>管理费用</td><td class="num">1.81</td><td class="num">1.93</td><td class="num">0.48</td><td class="num down">+6.63%</td><td class="num up">-5.18%</td></tr>
+    <tr><td>研发费用</td><td class="num">3.06</td><td class="num">3.23</td><td class="num">0.84</td><td class="num down">+5.56%</td><td class="num up">-4.64%</td></tr>
+    <tr><td>财务费用</td><td class="num">-0.47</td><td class="num">-0.26</td><td class="num">0.02</td><td class="num down">由负收窄(利息收入减少)</td><td class="num down">由负转正</td></tr>
+    <tr style="background:rgba(239,68,68,0.05)"><td><strong>费用合计</strong></td><td class="num"><strong>7.30</strong></td><td class="num"><strong>8.49</strong></td><td class="num"><strong>2.33</strong></td><td class="num down"><strong>+16.30%</strong></td><td class="num up"><strong>-8.95%</strong></td></tr>
+  </table>
+
+  <div class="analysis-box danger">
+    <h3 style="color:var(--danger);margin-bottom:8px">盈利能力三期量化归因</h3>
+    <p><strong>2024→2025：净利率下降5.72pp</strong></p>
+    <ul>
+      <li><strong>费用率飙升贡献约4.49pp侵蚀</strong>（销售费用+23.79%为最大推手，销售费用率+2.71pp）</li>
+      <li>毛利率微降贡献1.18pp侵蚀（成本增速+4.29%快于收入+1.95%）</li>
+      <li>财务费用率由负收窄+0.94pp（利息收入从0.48亿降至0.35亿）</li>
+    </ul>
+    <p style="margin-top:8px"><strong>2025→2026Q1：净利率回升1.31pp</strong></p>
+    <ul>
+      <li>毛利率回升+0.74pp（成本控制改善）</li>
+      <li>费用率下降+0.71pp（销售费用开始收缩-5.29%）</li>
+      <li>财务费用由负转正-1.43pp（新增净财务费用，侵蚀利润）</li>
+    </ul>
+  </div>
+
+  <div class="analysis-box">
+    <p><strong>三期量化结论：</strong>毛利率三期稳定在47-48%区间，体现强定价能力。但净利率从16.68%骤降至12.27%（-4.41pp），<strong>核心病因是期间费用率从31.96%飙升至35.74%（+3.78pp）</strong>，其中销售费用增长是最大推手（2024→2025增长+23.79%）。2026Q1费用率开始回落，但仍高于2024年水平。ROE始终低于制造业基准8-15%下限。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 7: 现金流质量 ========== -->
+<div class="page" id="p7">
+  <div class="page-header">
+    <div>
+      <h1>现金流质量 · 三期造血能力追踪</h1>
+      <div class="sub">经营现金流从2.92亿→0.12亿断崖式下滑，应收资金占用是元凶</div>
+    </div>
+    <div class="page-tag">7 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">经营现金流</div>
+      <div class="value" style="color:var(--danger)">2.92→2.68→0.12亿</div>
+      <div class="sub down">25→26Q1暴降95.5%</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">OCF/净利润</div>
+      <div class="value" style="color:var(--danger)">0.80→1.05→0.15</div>
+      <div class="sub down">2026Q1盈利质量极差</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">自由现金流</div>
+      <div class="value" style="color:var(--danger)">1.65→1.41→-0.04亿</div>
+      <div class="sub down">2026Q1转负</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">期末现金(亿)</div>
+      <div class="value">5.35→5.54→8.00</div>
+      <div class="sub up">2026Q1充裕（理财回收）</div>
+    </div>
+  </div>
+
+  <h3>现金流组合模式演变</h3>
+  <table>
+    <tr><th>维度</th><th>2024年度</th><th>2025年度</th><th>2026Q1</th><th>趋势判断</th></tr>
+    <tr><td>经营活动</td><td class="num up">+2.92亿</td><td class="num up">+2.68亿</td><td class="num down">+0.12亿</td><td><span class="badge badge-danger">造血断崖</span></td></tr>
+    <tr><td>投资活动</td><td class="num down">-7.91亿</td><td class="num up">+0.17亿</td><td class="num up">+2.44亿</td><td><span class="badge badge-warning">由投转收</span></td></tr>
+    <tr><td>筹资活动</td><td class="num down">-2.27亿</td><td class="num down">-2.69亿</td><td class="num down">-0.02亿</td><td><span class="badge badge-success">支出缩小</span></td></tr>
+    <tr style="background:rgba(59,130,246,0.05)"><td><strong>模式</strong></td><td>成熟期:经(+)+投(-)+筹(-)</td><td>回收型:经(+)+投(+)+筹(-)</td><td>弱回收:经(≈0)+投(+)+筹(≈0)</td><td><span class="badge badge-warning">退化</span></td></tr>
+  </table>
+
+  <h3>现金流质量指标</h3>
+  <table>
+    <tr><th>指标</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1</th><th>24→25</th><th>25→26Q1</th></tr>
+    <tr><td>经营现金流/净利润</td><td class="num">0.80</td><td class="num">1.05</td><td class="num">0.15</td><td class="num up">+0.25</td><td class="num down">-0.90</td></tr>
+    <tr><td>自由现金流(亿)</td><td class="num">1.65</td><td class="num">1.41</td><td class="num">-0.04</td><td class="num down">-0.24</td><td class="num down">-1.45</td></tr>
+    <tr><td>资本开支(亿)</td><td class="num">1.27</td><td class="num">1.27</td><td class="num">0.16</td><td class="flat">持平</td><td class="num up">-87.4%</td></tr>
+    <tr><td>期末现金(亿)</td><td class="num">5.35</td><td class="num">5.54</td><td class="num">8.00</td><td class="num up">+0.19</td><td class="num up">+2.46</td></tr>
+  </table>
+
+  <div class="analysis-box danger">
+    <h3 style="color:var(--danger);margin-bottom:8px">三期现金流归因分析</h3>
+    <p><strong>2024→2025：经营现金流微降8.2%（2.92亿→2.68亿），但OCF/NP比率改善至1.05</strong></p>
+    <ul>
+      <li>利润下降33%但经营现金流仅降8%，说明2025年现金回收效率改善（OCF/NP 0.80→1.05）</li>
+      <li>投资活动由大额流出（-7.91亿）转为净流入（+0.17亿），理财产品到期回收</li>
+      <li>自由现金流1.65→1.41亿，基本稳定</li>
+    </ul>
+    <p style="margin-top:8px"><strong>2025→2026Q1：经营现金流断崖式下滑95.5%（2.68亿→0.12亿）</strong></p>
+    <ul>
+      <li><strong>元凶：应收账款暴增25.0%（4.04亿→5.05亿）</strong>，约1亿资金被客户占用，而收入反而下降5.36%</li>
+      <li>OCF/NP从1.05暴降至0.15，账面利润几乎未转化为现金</li>
+      <li>自由现金流-0.04亿转负，造血能力严重不足</li>
+      <li>期末现金8.00亿充裕，但来源于投资活动理财到期净回收2.44亿，非经营积累</li>
+    </ul>
+  </div>
+
+  <div class="analysis-box warning">
+    <p><strong>三期量化结论：</strong>经营现金流评分75→80→30，呈断崖式恶化。2024-2025年造血能力尚可（OCF>2.6亿），但2026Q1出现严重预警——OCF仅0.12亿，应收资金占用是绝对主因（应收+1.01亿 ≈ OCF下降2.56亿的40%+）。期末现金充裕（8.00亿）掩盖了造血能力的真实恶化，若应收回款不能改善，现金储备将持续消耗。建议Q2重点跟踪：①应收账龄变化 ②OCF能否回正 ③单季度现金储备变动。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 8: EVA分析 ========== -->
+<div class="page" id="p8">
+  <div class="page-header">
+    <div>
+      <h1>EVA经济增加值 · 三期价值创造追踪</h1>
+      <div class="sub">ROE始终低于WACC，EVA连续三期为负，价值毁损持续但2026Q1略有收窄</div>
+    </div>
+    <div class="page-tag">8 / 9</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">EVA(年化/亿)</div>
+      <div class="value" style="color:var(--danger)">-0.95→-1.68→-1.38</div>
+      <div class="sub down">三期均为负值</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">ROE vs WACC</div>
+      <div class="value">缺口2.43pp</div>
+      <div class="sub">8.25%→5.61%→7.20% vs ~9.7%</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">WACC</div>
+      <div class="value">9.71%→9.71%→9.63%</div>
+      <div class="sub flat">基本稳定</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">投入资本(亿)</div>
+      <div class="value">50.50→→47.97</div>
+      <div class="sub">2026Q1有所收缩</div>
+    </div>
+  </div>
+
+  <h3>EVA计算要素三期对比</h3>
+  <table>
+    <tr><th>项目</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1(年化)</th><th>趋势</th></tr>
+    <tr><td>ROE</td><td class="num">8.25%</td><td class="num">5.61%</td><td class="num">7.20%</td><td><span class="badge badge-warning">低于WACC</span></td></tr>
+    <tr><td>WACC</td><td class="num">9.71%</td><td class="num">9.71%</td><td class="num">9.63%</td><td class="flat">基本稳定</td></tr>
+    <tr><td>ROE - WACC 缺口</td><td class="num down">-1.46pp</td><td class="num down">-4.10pp</td><td class="num down">-2.43pp</td><td><span class="badge badge-warning">2025最严峻后收窄</span></td></tr>
+    <tr><td>投入资本(亿)</td><td class="num">50.50</td><td class="num">—</td><td class="num">47.97</td><td class="up">收缩</td></tr>
+    <tr><td>EVA(亿)</td><td class="num down">-0.95</td><td class="num down">-1.68</td><td class="num down">-1.38(年化)</td><td><span class="badge badge-danger">持续毁损</span></td></tr>
+  </table>
+
+  <h3>EVA变动归因分解</h3>
+  <div class="formula">
+    EVA = 投入资本 × (ROE - WACC)<br>
+    ΔEVA = Δ投入资本 × (ROE-WACC) + 投入资本 × Δ(ROE-WACC)
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3>2024→2025：EVA恶化-0.73亿</h3>
+      <div class="attr-row">
+        <div class="attr-label">ROE-WACC缺口扩大</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(239,68,68,0.7);width:80%">缺口-1.46→-4.10pp</div></div>
+      </div>
+      <div class="analysis-box danger" style="margin-top:8px">
+        <ul>
+          <li><strong>ROE-WACC缺口从-1.46pp扩大至-4.10pp</strong>，扩大2.64pp</li>
+          <li>ROE下降2.64pp是EVA恶化的直接原因</li>
+          <li>WACC基本不变（9.71%），资本成本端稳定</li>
+          <li>净利率骤降（-5.72pp）→ ROE下降 → EVA恶化，与杜邦归因一致</li>
+          <li>2025年是三期EVA最严峻的一年</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h3>2025→2026Q1：EVA改善+0.30亿(年化)</h3>
+      <div class="attr-row">
+        <div class="attr-label">ROE-WACC缺口收窄</div>
+        <div class="attr-bar-wrap"><div class="attr-seg" style="background:rgba(16,185,129,0.6);width:60%">缺口-4.10→-2.43pp</div></div>
+      </div>
+      <div class="analysis-box success" style="margin-top:8px">
+        <ul>
+          <li><strong>ROE-WACC缺口从-4.10pp收窄至-2.43pp</strong>，收窄1.67pp</li>
+          <li>ROE回升1.59pp（年化），净利率+周转率双驱动</li>
+          <li>WACC微降0.08pp（9.71%→9.63%），影响极小</li>
+          <li>投入资本有所收缩（47.97亿），资本效率略有改善</li>
+          <li>EVA仍为负但趋势向好</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="analysis-box warning">
+    <p><strong>三期量化结论：</strong>EVA连续三期为负（-0.95→-1.68→-1.38亿年化），说明企业始终未能覆盖资本成本。ROE-WACC缺口从-1.46pp→-4.10pp→-2.43pp，<strong>2025年最为严峻（缺口4.10pp），2026Q1有所收窄但仍处价值毁损区间</strong>。根本原因是极低杠杆（权益乘数仅1.25x）放大了ROE与WACC的差距——企业拥有大量低效资产（交易性金融资产5.05亿+其他理财类资产），资本配置效率亟待提升。若ROE不能回升至>9.63%，EVA将持续为负。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 9: 综合分析结论 ========== -->
+<div class="page" id="p9">
+  <div class="page-header">
+    <div>
+      <h1>综合分析结论 · 三期趋势与展望</h1>
+      <div class="sub">六大维度量化评分汇总 | 综合评级B+→B→B- | 核心矛盾与行动建议</div>
+    </div>
+    <div class="page-tag">9 / 9</div>
+  </div>
+
+  <h3>六维度综合评分趋势</h3>
+  <table>
+    <tr><th>维度</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026Q1</th><th>累计变动</th><th>核心驱动</th></tr>
+    <tr><td>偿债能力</td><td class="num">95</td><td class="num">93</td><td class="num">95</td><td class="flat">±0</td><td>三期极稳，资产负债率始终&lt;21%</td></tr>
+    <tr><td>盈利能力</td><td class="num">70</td><td class="num">50</td><td class="num">58</td><td class="num down">-12</td><td>费用率飙升+3.78pp，净利率-4.41pp</td></tr>
+    <tr><td>运营效率</td><td class="num">78</td><td class="num">65</td><td class="num">55</td><td class="num down">-23</td><td>CCC恶化+28.3天，应收+22.8天是主因</td></tr>
+    <tr><td>现金流质量</td><td class="num">75</td><td class="num">80</td><td class="num">30</td><td class="num down">-45</td><td>OCF断崖-95.5%，应收占用是元凶</td></tr>
+    <tr><td>EVA</td><td class="num">40</td><td class="num">25</td><td class="num">30</td><td class="num down">-10</td><td>ROE&lt;WACC持续，缺口最高达4.10pp</td></tr>
+    <tr><td>成长性</td><td class="num">55</td><td class="num">45</td><td class="num">40</td><td class="num down">-15</td><td>收入增速0.13%→1.95%→-5.36%</td></tr>
+    <tr style="background:rgba(59,130,246,0.08)"><td><strong>综合评分</strong></td><td class="num"><strong>72</strong></td><td class="num"><strong>60</strong></td><td class="num"><strong>52</strong></td><td class="num down"><strong>-20</strong></td><td><strong>连续两期下滑，累计降20分</strong></td></tr>
+    <tr style="background:rgba(245,158,11,0.08)"><td><strong>综合评级</strong></td>
+      <td class="num"><span class="rating-circle rating-mid" style="width:36px;height:36px;font-size:14px;display:inline-flex">B+</span></td>
+      <td class="num"><span class="rating-circle rating-down" style="width:36px;height:36px;font-size:14px;display:inline-flex">B</span></td>
+      <td class="num"><span class="rating-circle rating-low" style="width:36px;height:36px;font-size:14px;display:inline-flex">B-</span></td>
+      <td class="down">降1档</td><td><strong>从良好滑至中等偏下</strong></td></tr>
+  </table>
+
+  <h3>三期核心矛盾与量化归因</h3>
+  <div class="two-col">
+    <div class="analysis-box success">
+      <h3 style="color:var(--success);margin-bottom:8px">✓ 底盘优势（三期持续）</h3>
+      <ul>
+        <li><strong>毛利率47-48%高位稳定</strong>：定价能力强，核心竞争力稳固</li>
+        <li><strong>资产负债率持续下降</strong>：20.20%→19.70%，零偿债压力</li>
+        <li><strong>现金储备充裕</strong>：期末现金8.00亿，短期流动性无忧</li>
+        <li><strong>利息保障倍数>68x</strong>：偿付能力零风险</li>
+      </ul>
+    </div>
+    <div class="analysis-box danger">
+      <h3 style="color:var(--danger);margin-bottom:8px">⚠ 恶化趋势（核心矛盾）</h3>
+      <ul>
+        <li><strong>应收账款失控</strong>：40.9天→63.7天，三期恶化+22.8天，应收金额+55%</li>
+        <li><strong>经营现金流断崖</strong>：2.92亿→0.12亿，OCF/NP从0.80→0.15</li>
+        <li><strong>费用率飙升侵蚀利润</strong>：31.96%→35.74%，销售费用+23.79%（2024→2025）</li>
+        <li><strong>ROE始终低于WACC</strong>：价值毁损持续，EVA三期均为负</li>
+        <li><strong>收入增长失速</strong>：+0.13%→+1.95%→-5.36%</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>评级演变归因</h3>
+  <div class="analysis-box">
+    <p><strong>B+→B（2024→2025）：降半档，扣12分</strong></p>
+    <ul>
+      <li>ROE从8.25%降至5.61%（-2.64pp），100%由净利率下降驱动</li>
+      <li>净利润-33.07%，销售费用+23.79%是费用增长最大推手</li>
+      <li>CCC从34.7天→50.0天（+15.3天），存货积压是主因（贡献74%）</li>
+      <li>EVA从-0.95亿→-1.68亿，价值毁损加剧</li>
+    </ul>
+    <p style="margin-top:10px"><strong>B→B-（2025→2026Q1）：降半档，扣8分</strong></p>
+    <ul>
+      <li>经营现金流断崖式下滑（2.68亿→0.12亿），OCF/NP从1.05→0.15</li>
+      <li>应收账款激增25.0%（4.04亿→5.05亿），回款能力严重恶化</li>
+      <li>收入首次转负（-5.36%），增长动力衰减</li>
+      <li>正面：存货管理改善（-9.8天）、费用率回落（-0.71pp）、ROE季节性回升</li>
+    </ul>
+  </div>
+
+  <h3>行动建议（按优先级排序）</h3>
+  <div class="analysis-box warning">
+    <ul>
+      <li><strong>🔴 紧急（1季度）：</strong>应收账款专项催收，遏制经营现金流恶化。应收+25%与收入-5.36%背离是最大预警，需梳理大额客户账龄、加强信用管理、建立回款考核机制</li>
+      <li><strong>🟠 重要（半年）：</strong>销售费用效能审计。收入下滑背景下销售费用率15.16%仍高于2024年12.70%，需评估投入产出效率，建立费用增长与收入增长的联动约束</li>
+      <li><strong>🟡 中期（1年）：</strong>优化资本配置，提升ROE。极低杠杆（19.70%）+低ROE（7.20%）=资本利用严重不足。可考虑增加分红/回购、优化理财配置（交易性金融资产5.05亿）、战略并购</li>
+      <li><strong>🟢 长期（1-3年）：</strong>加速研发成果转化（研发投入12.88%保持高位），巩固毛利率优势；建立商誉减值预警机制（商誉7.58亿占净资产17%）；在保持财务稳健的同时适度提升杠杆放大股东回报</li>
+    </ul>
+  </div>
+
+  <div class="analysis-box" style="text-align:center;padding:20px">
+    <p style="font-size:16px"><strong>最终结论：</strong>海尔生物财务基本面<strong>底盘依然扎实</strong>（毛利率47%+、杠杆&lt;20%、现金8亿+），但2024→2026Q1出现<strong>盈利质量、运营效率、现金流质量三重恶化</strong>，综合评级从B+连续下调至B-（-20分）。核心矛盾在于<strong>应收账款失控</strong>（+22.8天）和<strong>费用率飙升</strong>（+3.78pp）双重侵蚀利润与现金流。若Q2应收回款不能改善、经营现金流未能回正，需升级风险应对。反之，若应收催收见效+费用控制持续，ROE有望修复至8%+，评级可企稳。</p>
+  </div>
+</div>
+
+
+
+<!-- ===== Navigation Bar ===== -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goPage(currentPage-1)">← 上一页</button>
+  <div class="page-dots" id="pageDots"></div>
+  <span class="page-num" id="pageNum">1 / 9</span>
+  <button class="nav-btn" id="nextBtn" onclick="goPage(currentPage+1)">下一页 →</button>
+</div>
+
+<script>
+const totalPages = 9;
+let currentPage = 1;
+
+const dotsContainer = document.getElementById('pageDots');
+for(let i=1; i<=totalPages; i++){
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i===1?' active':'');
+  dot.onclick = () => goPage(i);
+  dotsContainer.appendChild(dot);
+}
+
+function goPage(n){
+  if(n<1||n>totalPages) return;
+  document.getElementById('p'+currentPage).classList.remove('active');
+  currentPage = n;
+  document.getElementById('p'+currentPage).classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    d.classList.toggle('active', i+1===currentPage);
+  });
+  document.getElementById('pageNum').textContent = currentPage+' / '+totalPages;
+  document.getElementById('prevBtn').disabled = (currentPage===1);
+  document.getElementById('nextBtn').disabled = (currentPage===totalPages);
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') goPage(currentPage-1);
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') goPage(currentPage+1);
+});
+
+goPage(1);
+</script>
+</body>
+</html>
