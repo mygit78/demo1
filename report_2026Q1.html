@@ -26,6 +26,7 @@ body {
 }
 .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 .header {
+  position: relative;
   background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -41,6 +42,31 @@ body {
   margin-bottom: 8px;
 }
 .header .sub { color: var(--text-dim); font-size: 14px; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  padding: 10px 20px;
+  background: rgba(59,130,246,0.15);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  color: var(--primary);
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+}
+.back-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(59,130,246,0.35);
+}
+
 .tab-nav {
   display: flex;
   gap: 8px;
@@ -220,6 +246,7 @@ tr:hover { background: rgba(59,130,246,0.05); }
 <body>
 <div class="container">
   <div class="header">
+    <a href="综合分析.html" class="back-btn">&#8592; 返回目录</a>
     <h1>企业财务分析报告</h1>
     <div class="sub">2026年第一季度 | 基于SKILL七步分析法 | 数据来源：合并财务报表 | 688139 海尔生物</div>
   </div>
