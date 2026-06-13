@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海尔生物医疗(688139) 财务分析报告</title>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+  --border: #475569; --text: #e2e8f0; --text2: #94a3b8;
+  --accent: #3b82f6; --green: #22c55e; --red: #ef4444; --yellow: #eab308;
+  --orange: #f97316;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #1e3a5f, #2d1b69); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header .sub { color: var(--text2); font-size: 14px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 0; background: var(--surface); border-radius: 12px 12px 0 0; padding: 8px 8px 0; }
+.tab { padding: 12px 24px; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 14px; font-weight: 500;
+        color: var(--text2); transition: all 0.2s; border: none; background: none; }
+.tab:hover { color: var(--text); background: var(--surface2); }
+.tab.active { color: var(--accent); background: var(--bg); font-weight: 600; }
+.tab-content { display: none; background: var(--surface); border-radius: 0 0 12px 12px; padding: 28px; min-height: 600px; }
+.tab-content.active { display: block; }
+.section { margin-bottom: 32px; }
+.section h2 { font-size: 20px; color: var(--accent); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.section h3 { font-size: 16px; color: var(--yellow); margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+th { background: var(--surface2); color: var(--text); padding: 10px 12px; text-align: left; font-weight: 600; white-space: nowrap; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+tr:hover { background: rgba(59,130,246,0.05); }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', Consolas, monospace; }
+.formula-cell { font-size: 11px; color: var(--text2); max-width: 280px; }
+.formula-tag { background: rgba(59,130,246,0.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 11px; display: inline-block; }
+.metric-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.metric-card { background: var(--surface2); border-radius: 12px; padding: 20px; }
+.metric-card .label { color: var(--text2); font-size: 12px; margin-bottom: 4px; }
+.metric-card .value { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric-card .change { font-size: 13px; margin-top: 4px; }
+.cause-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.cause-card { background: var(--surface2); border-radius: 12px; padding: 20px; border-left: 3px solid var(--accent); }
+.cause-card h4 { font-size: 14px; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.cause-card h4 .tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.cause-card h4 .tag-up { background: rgba(34,197,94,0.15); color: var(--green); }
+.cause-card h4 .tag-down { background: rgba(239,68,68,0.15); color: var(--red); }
+.cause-card h4 .tag-flat { background: rgba(148,163,184,0.15); color: var(--text2); }
+.cause-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px dashed rgba(71,85,105,0.5); font-size: 13px; }
+.cause-item:last-child { border-bottom: none; }
+.cause-item .factor { color: var(--text); flex: 1; }
+.cause-item .impact { font-variant-numeric: tabular-nums; font-family: 'SF Mono', Consolas, monospace; font-size: 12px; white-space: nowrap; margin-left: 12px; }
+.cause-summary { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); line-height: 1.7; }
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+.neutral { color: var(--text2); }
+.flow-diagram { background: var(--surface2); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+.flow-steps { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.flow-step { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; text-align: center; min-width: 120px; }
+.flow-step .step-title { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.flow-step .step-name { font-size: 13px; font-weight: 600; }
+.flow-arrow { color: var(--accent); font-size: 20px; }
+.warning-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-safe { background: rgba(34,197,94,0.15); color: var(--green); }
+.badge-warn { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.badge-danger { background: rgba(239,68,68,0.15); color: var(--red); }
+.data-source-tag { background: rgba(59,130,246,0.1); color: var(--accent); padding: 4px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 16px; display: inline-block; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+.cash-flow-pattern { display: flex; gap: 16px; align-items: center; margin: 12px 0; }
+.cf-box { padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; min-width: 100px; }
+.cf-plus { background: rgba(34,197,94,0.15); color: var(--green); }
+.cf-minus { background: rgba(239,68,68,0.15); color: var(--red); }
+.calc-detail { background: rgba(59,130,246,0.05); border-left: 3px solid var(--accent); padding: 12px 16px; margin: 8px 0 16px; border-radius: 0 8px 8px 0; font-size: 12px; color: var(--text2); font-family: 'SF Mono', Consolas, monospace; }
+.summary-box { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1)); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+.summary-box h3 { color: var(--accent); margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <h1>青岛海尔生物医疗股份有限公司 (688139)</h1>
+  <div class="sub">财务分析报告 | 数据来源：2025年年度报告 & 2026年第一季度报告 | 分析框架：SKILL.md 七步分析法</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">分析逻辑</button>
+  <button class="tab" onclick="switchTab(1)">数据源 (年报)</button>
+  <button class="tab" onclick="switchTab(2)">数据源 (Q1报告)</button>
+  <button class="tab" onclick="switchTab(3)">年度分析结果</button>
+  <button class="tab" onclick="switchTab(4)">季度对比分析</button>
+  <button class="tab" onclick="switchTab(5)">综合诊断</button>
+</div>
+
+<!-- TAB 0: Analysis Logic -->
+<div class="tab-content active" id="tab0">
+<div class="section">
+<h2>财务分析框架 — SKILL.md 七步分析法</h2>
+<p style="color:var(--text2);margin-bottom:20px">本报告严格遵循SKILL.md定义的财务分析框架，对海尔生物医疗进行七维度全面分析。分析流程如下：</p>
+
+<div class="flow-diagram">
+<h3 style="color:var(--accent);margin-bottom:12px">分析流程图</h3>
+<div class="flow-steps">
+  <div class="flow-step"><div class="step-title">第一步</div><div class="step-name">数据提取</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第二步</div><div class="step-name">杜邦分析</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第三步</div><div class="step-name">偿债能力</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第四步</div><div class="step-name">运营能力</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第五步</div><div class="step-name">盈利能力</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第六步</div><div class="step-name">现金流质量</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第七步</div><div class="step-name">EVA经济增加值</div></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-step"><div class="step-title">第八步</div><div class="step-name">综合诊断</div></div>
+</div>
+</div>
+
+<div class="two-col">
+<div>
+<h3>第二步：杜邦分析</h3>
+<div class="calc-detail">
+ROE = 净利率 × 资产周转率 × 权益乘数<br>
+= (净利润/营业收入) × (营业收入/平均总资产) × (平均总资产/平均净资产)<br>
+拆解：盈利能力 + 运营效率 + 杠杆水平
+</div>
+
+<h3>第三步：偿债能力</h3>
+<div class="calc-detail">
+流动比率 = 流动资产 / 流动负债<br>
+速动比率 = (流动资产 - 存货) / 流动负债<br>
+现金比率 = 货币资金 / 流动负债<br>
+资产负债率 = 总负债 / 总资产<br>
+利息保障倍数 = EBIT / 利息支出
+</div>
+
+<h3>第四步：运营能力</h3>
+<div class="calc-detail">
+应收账款周转天数 = 365 / (营业收入/平均应收账款)<br>
+存货周转天数 = 365 / (营业成本/平均存货)<br>
+应付账款周转天数 = 365 / (营业成本/平均应付账款)<br>
+现金周转天数 = 应收天数 + 存货天数 - 应付天数
+</div>
+</div>
+<div>
+<h3>第五步：盈利能力</h3>
+<div class="calc-detail">
+毛利率 = (营业收入-营业成本)/营业收入<br>
+净利率 = 净利润/营业收入<br>
+期间费用率 = (销售+管理+研发+财务费用)/营业收入<br>
+ROA = 净利润/平均总资产
+</div>
+
+<h3>第六步：现金流质量</h3>
+<div class="calc-detail">
+经营现金流/净利润比率 (>1 盈利质量高)<br>
+自由现金流 = 经营现金流 - 资本开支<br>
+现金流组合模式判断：经营±/投资±/筹资±
+</div>
+
+<h3>第七步：EVA 经济增加值</h3>
+<div class="calc-detail">
+EVA = NOPAT - 资本成本<br>
+NOPAT = 营业利润 × (1 - 有效税率)<br>
+资本成本 = 投入资本 × WACC<br>
+投入资本 = 所有者权益 + 有息负债 - 在建工程<br>
+WACC 假设 = 8%
+</div>
+
+<h3>第八步：综合诊断</h3>
+<div class="calc-detail">
+汇总预警信号：<br>
+• 经营现金流是否持续为负<br>
+• 资产负债率是否过高 (>80%)<br>
+• 应收账款周转是否恶化<br>
+• 毛利率是否持续下滑<br>
+• EVA是否为负
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TAB 1: Annual Report Data Source -->
+<div class="tab-content" id="tab1">
+<div class="data-source-tag">数据来源：688139_20260328_8OT7.pdf (2025年年度报告, 272页)</div>
+
+<div class="section">
+<h2>资产负债表 (合并)</h2>
+<table>
+<tr><th>项目</th><th class="num">2025/12/31</th><th class="num">2024/12/31</th><th class="num">同比变动</th></tr>
+<tr><th colspan="4" style="background:rgba(59,130,246,0.1);color:var(--accent)">流动资产</th></tr>
+<tr><td>货币资金</td><td style="">8.44 亿</td><td style="">9.01 亿</td><td style="color:#dc2626;font-weight:500">-6.37%</td></tr>
+<tr><td>交易性金融资产</td><td style="">4.48 亿</td><td style="">8.77 亿</td><td style="color:#dc2626;font-weight:500">-48.98%</td></tr>
+<tr><td>应收票据</td><td style="">729.30 万</td><td style="">714.59 万</td><td style="color:#16a34a;font-weight:500">+2.06%</td></tr>
+<tr><td>应收账款</td><td style="">4.04 亿</td><td style="">3.24 亿</td><td style="color:#16a34a;font-weight:500">+24.88%</td></tr>
+<tr><td>应收款项融资</td><td style="">1,970.26 万</td><td style="">1,241.81 万</td><td style="color:#16a34a;font-weight:500">+58.66%</td></tr>
+<tr><td>预付款项</td><td style="">3,008.74 万</td><td style="">2,726.71 万</td><td style="color:#16a34a;font-weight:500">+10.34%</td></tr>
+<tr><td>其他应收款</td><td style="">805.03 万</td><td style="">855.70 万</td><td style="color:#dc2626;font-weight:500">-5.92%</td></tr>
+<tr><td>存货</td><td style="">3.45 亿</td><td style="">3.35 亿</td><td style="color:#16a34a;font-weight:500">+3.21%</td></tr>
+<tr><td>合同资产</td><td style="">1,386.60 万</td><td style="">934.89 万</td><td style="color:#16a34a;font-weight:500">+48.32%</td></tr>
+<tr><td>一年内到期非流动资产</td><td style="">5.26 亿</td><td style="">1.27 亿</td><td style="color:#16a34a;font-weight:500">+315.30%</td></tr>
+<tr><td>其他流动资产</td><td style="">1,301.57 万</td><td style="">2,410.36 万</td><td style="color:#dc2626;font-weight:500">-46.00%</td></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>流动资产合计</td><td style="">26.59 亿</td><td style="">26.52 亿</td><td style="color:#16a34a;font-weight:500">+0.24%</td></tr>
+<tr><th colspan="4" style="background:rgba(59,130,246,0.1);color:var(--accent)">非流动资产</th></tr>
+<tr><td>长期股权投资</td><td style="">1.88 亿</td><td style="">1.38 亿</td><td style="color:#16a34a;font-weight:500">+36.41%</td></tr>
+<tr><td>固定资产</td><td style="">8.59 亿</td><td style="">8.07 亿</td><td style="color:#16a34a;font-weight:500">+6.37%</td></tr>
+<tr><td>在建工程</td><td style="">5,496.87 万</td><td style="">9,503.40 万</td><td style="color:#dc2626;font-weight:500">-42.16%</td></tr>
+<tr><td>无形资产</td><td style="">3.60 亿</td><td style="">4.02 亿</td><td style="color:#dc2626;font-weight:500">-10.39%</td></tr>
+<tr><td>商誉</td><td style="">7.58 亿</td><td style="">7.58 亿</td><td style="color:#16a34a;font-weight:500">+0.05%</td></tr>
+<tr><td>递延所得税资产</td><td style="">8,967.46 万</td><td style="">6,600.86 万</td><td style="color:#16a34a;font-weight:500">+35.85%</td></tr>
+<tr><td>其他非流动资产</td><td style="">7.29 亿</td><td style="">7.90 亿</td><td style="color:#dc2626;font-weight:500">-7.63%</td></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>非流动资产合计</td><td style="">31.33 亿</td><td style="">31.35 亿</td><td style="color:#dc2626;font-weight:500">-0.07%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.1)"><td>资产总计</td><td style="font-weight:600;">57.92 亿</td><td style="font-weight:600;">57.87 亿</td><td style="color:#16a34a;font-weight:500">+0.07%</td></tr>
+<tr><th colspan="4" style="background:rgba(239,68,68,0.1);color:var(--red)">流动负债</th></tr>
+<tr><td>短期借款</td><td style="">1,000.71 万</td><td style="">1,000.90 万</td><td style="color:#dc2626;font-weight:500">-0.02%</td></tr>
+<tr><td>应付票据</td><td style="">9,491.32 万</td><td style="">9,019.22 万</td><td style="color:#16a34a;font-weight:500">+5.23%</td></tr>
+<tr><td>应付账款</td><td style="">3.34 亿</td><td style="">3.37 亿</td><td style="color:#dc2626;font-weight:500">-0.87%</td></tr>
+<tr><td>合同负债</td><td style="">1.71 亿</td><td style="">1.52 亿</td><td style="color:#16a34a;font-weight:500">+12.46%</td></tr>
+<tr><td>应付职工薪酬</td><td style="">8,261.41 万</td><td style="">8,394.03 万</td><td style="color:#dc2626;font-weight:500">-1.58%</td></tr>
+<tr><td>应交税费</td><td style="">4,442.51 万</td><td style="">5,091.35 万</td><td style="color:#dc2626;font-weight:500">-12.74%</td></tr>
+<tr><td>其他应付款</td><td style="">2.51 亿</td><td style="">2.73 亿</td><td style="color:#dc2626;font-weight:500">-8.12%</td></tr>
+<tr><td>一年内到期非流动负债</td><td style="">8,059.51 万</td><td style="">1,320.48 万</td><td style="color:#16a34a;font-weight:500">+510.35%</td></tr>
+<tr style="font-weight:600;background:rgba(239,68,68,0.05)"><td>流动负债合计</td><td style="">10.85 亿</td><td style="">10.22 亿</td><td style="color:#16a34a;font-weight:500">+6.17%</td></tr>
+<tr><th colspan="4" style="background:rgba(239,68,68,0.1);color:var(--red)">非流动负债</th></tr>
+<tr><td>预计负债</td><td style="">630.88 万</td><td style="">856.08 万</td><td style="color:#dc2626;font-weight:500">-26.31%</td></tr>
+<tr><td>递延收益</td><td style="">2,608.45 万</td><td style="">2,316.88 万</td><td style="color:#16a34a;font-weight:500">+12.58%</td></tr>
+<tr><td>递延所得税负债</td><td style="">4,589.18 万</td><td style="">5,251.48 万</td><td style="color:#dc2626;font-weight:500">-12.61%</td></tr>
+<tr style="font-weight:600;background:rgba(239,68,68,0.05)"><td>非流动负债合计</td><td style="">8,282.98 万</td><td style="">1.47 亿</td><td style="color:#dc2626;font-weight:500">-43.63%</td></tr>
+<tr style="font-weight:700;background:rgba(239,68,68,0.08)"><td>负债合计</td><td style="font-weight:600;">11.68 亿</td><td style="font-weight:600;">11.69 亿</td><td style="color:#dc2626;font-weight:500">-0.09%</td></tr>
+<tr><th colspan="4" style="background:rgba(34,197,94,0.1);color:var(--green)">所有者权益</th></tr>
+<tr><td>股本</td><td style="">3.18 亿</td><td style="">3.18 亿</td><td style="color:#64748b;font-weight:500">+0.00%</td></tr>
+<tr><td>资本公积</td><td style="">19.76 亿</td><td style="">19.77 亿</td><td style="color:#dc2626;font-weight:500">-0.05%</td></tr>
+<tr><td>盈余公积</td><td style="">1.59 亿</td><td style="">1.59 亿</td><td style="color:#64748b;font-weight:500">+0.00%</td></tr>
+<tr><td>未分配利润</td><td style="">21.64 亿</td><td style="">20.60 亿</td><td style="color:#16a34a;font-weight:500">+5.02%</td></tr>
+<tr style="font-weight:600;background:rgba(34,197,94,0.05)"><td>归母所有者权益</td><td style="">43.76 亿</td><td style="">43.72 亿</td><td style="color:#16a34a;font-weight:500">+0.09%</td></tr>
+<tr style="font-weight:700;background:rgba(34,197,94,0.08)"><td>所有者权益合计</td><td style="font-weight:600;">46.23 亿</td><td style="font-weight:600;">46.18 亿</td><td style="color:#16a34a;font-weight:500">+0.11%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.1)"><td>负债和所有者权益总计</td><td style="font-weight:600;">57.92 亿</td><td style="font-weight:600;">57.87 亿</td><td style="color:#16a34a;font-weight:500">+0.07%</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>利润表 (合并)</h2>
+<table>
+<tr><th>项目</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th></tr>
+<tr><td>营业收入</td><td style="font-weight:600;">23.29 亿</td><td style="font-weight:600;">22.84 亿</td><td style="color:#16a34a;font-weight:500">+1.96%</td></tr>
+<tr><td>减：营业成本</td><td style="">12.39 亿</td><td style="">11.88 亿</td><td style="color:#16a34a;font-weight:500">+4.31%</td></tr>
+<tr><td>  税金及附加</td><td style="">2,265.33 万</td><td style="">2,329.32 万</td><td style="color:#dc2626;font-weight:500">-2.75%</td></tr>
+<tr><td>  销售费用</td><td style="">3.59 亿</td><td style="">2.90 亿</td><td style="color:#16a34a;font-weight:500">+23.78%</td></tr>
+<tr><td>  管理费用</td><td style="">1.93 亿</td><td style="">1.81 亿</td><td style="color:#16a34a;font-weight:500">+6.31%</td></tr>
+<tr><td>  研发费用</td><td style="">3.23 亿</td><td style="">3.06 亿</td><td style="color:#16a34a;font-weight:500">+5.58%</td></tr>
+<tr><td>  财务费用</td><td style="">-2,587.81 万</td><td style="">-4,725.43 万</td><td style="color:#16a34a;font-weight:500">+45.24%</td></tr>
+<tr><td>加：其他收益</td><td style="">4,287.78 万</td><td style="">4,864.68 万</td><td style="color:#dc2626;font-weight:500">-11.86%</td></tr>
+<tr><td>  投资收益</td><td style="">2,730.90 万</td><td style="">2,379.48 万</td><td style="color:#16a34a;font-weight:500">+14.77%</td></tr>
+<tr><td>  公允价值变动</td><td style="">-49.41 万</td><td style="">546.88 万</td><td style="color:#dc2626;font-weight:500">-109.04%</td></tr>
+<tr><td>  信用减值损失</td><td style="">-1,279.59 万</td><td style="">-1,553.53 万</td><td style="color:#16a34a;font-weight:500">+17.63%</td></tr>
+<tr><td>  资产减值损失</td><td style="">-850.78 万</td><td style="">-275.62 万</td><td style="color:#dc2626;font-weight:500">-208.68%</td></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>营业利润</td><td style="">2.66 亿</td><td style="">4.02 亿</td><td style="color:#dc2626;font-weight:500">-33.72%</td></tr>
+<tr><td>加：营业外收入</td><td style="">206.49 万</td><td style="">324.71 万</td><td style="color:#dc2626;font-weight:500">-36.41%</td></tr>
+<tr><td>减：营业外支出</td><td style="">364.83 万</td><td style="">311.82 万</td><td style="color:#16a34a;font-weight:500">+17.00%</td></tr>
+<tr style="font-weight:600"><td>利润总额</td><td style="">2.65 亿</td><td style="">4.02 亿</td><td style="color:#dc2626;font-weight:500">-34.13%</td></tr>
+<tr><td>减：所得税费用</td><td style="">962.77 万</td><td style="">2,094.87 万</td><td style="color:#dc2626;font-weight:500">-54.04%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.08)"><td>净利润</td><td style="font-weight:600;">2.55 亿</td><td style="font-weight:600;">3.81 亿</td><td style="color:#dc2626;font-weight:500">-33.04%</td></tr>
+<tr><td>  归母净利润</td><td style="">2.51 亿</td><td style="">3.67 亿</td><td style="color:#dc2626;font-weight:500">-31.61%</td></tr>
+<tr><td>  少数股东损益</td><td style="">440.15 万</td><td style="">1,437.52 万</td><td style="color:#dc2626;font-weight:500">-69.38%</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>现金流量表 (合并)</h2>
+<table>
+<tr><th>项目</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th></tr>
+<tr><th colspan="4" style="background:rgba(59,130,246,0.1);color:var(--accent)">经营活动</th></tr>
+<tr><td>销售商品收到的现金</td><td style="">24.44 亿</td><td style="">23.31 亿</td><td style="color:#16a34a;font-weight:500">+4.85%</td></tr>
+<tr><td>收到税费返还</td><td style="">3,832.06 万</td><td style="">3,663.12 万</td><td style="color:#16a34a;font-weight:500">+4.61%</td></tr>
+<tr><td>经营活动现金流入小计</td><td style="">25.37 亿</td><td style="">24.29 亿</td><td style="color:#16a34a;font-weight:500">+4.44%</td></tr>
+<tr><td>购买商品支付的现金</td><td style="">11.93 亿</td><td style="">11.59 亿</td><td style="color:#16a34a;font-weight:500">+2.93%</td></tr>
+<tr><td>支付给职工的现金</td><td style="">6.47 亿</td><td style="">5.73 亿</td><td style="color:#16a34a;font-weight:500">+12.87%</td></tr>
+<tr><td>支付的各项税费</td><td style="">1.38 亿</td><td style="">1.41 亿</td><td style="color:#dc2626;font-weight:500">-1.92%</td></tr>
+<tr><td>经营活动现金流出小计</td><td style="">22.69 亿</td><td style="">21.38 亿</td><td style="color:#16a34a;font-weight:500">+6.15%</td></tr>
+<tr style="font-weight:700;background:rgba(59,130,246,0.08)"><td>经营活动现金流量净额</td><td style="font-weight:600;">2.68 亿</td><td style="font-weight:600;">2.92 亿</td><td style="color:#dc2626;font-weight:500">-8.15%</td></tr>
+<tr><th colspan="4" style="background:rgba(249,115,22,0.1);color:var(--orange)">投资活动</th></tr>
+<tr><td>投资活动现金流入小计</td><td style="">39.78 亿</td><td style="">29.82 亿</td><td style="color:#16a34a;font-weight:500">+33.43%</td></tr>
+<tr><td>购建固定资产支付的现金</td><td style="">1.19 亿</td><td style="">1.27 亿</td><td style="color:#dc2626;font-weight:500">-5.88%</td></tr>
+<tr><td>投资活动现金流出小计</td><td style="">39.62 亿</td><td style="">37.73 亿</td><td style="color:#16a34a;font-weight:500">+5.00%</td></tr>
+<tr style="font-weight:700;background:rgba(249,115,22,0.08)"><td>投资活动现金流量净额</td><td style="font-weight:600;">1,674.51 万</td><td style="font-weight:600;">-7.91 亿</td><td style="color:#16a34a;font-weight:500">+102.12%</td></tr>
+<tr><th colspan="4" style="background:rgba(239,68,68,0.1);color:var(--red)">筹资活动</th></tr>
+<tr><td>筹资活动现金流入小计</td><td style="">7.38 亿</td><td style="">1.94 亿</td><td style="color:#16a34a;font-weight:500">+280.54%</td></tr>
+<tr><td>筹资活动现金流出小计</td><td style="">10.07 亿</td><td style="">4.21 亿</td><td style="color:#16a34a;font-weight:500">+139.28%</td></tr>
+<tr style="font-weight:700;background:rgba(239,68,68,0.08)"><td>筹资活动现金流量净额</td><td style="font-weight:600;">-2.69 亿</td><td style="font-weight:600;">-2.27 亿</td><td style="color:#dc2626;font-weight:500">-18.48%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.1)"><td>现金及等价物净增加额</td><td style="font-weight:600;">1,910.26 万</td><td style="font-weight:600;">-7.22 亿</td><td style="color:#16a34a;font-weight:500">+102.65%</td></tr>
+</table>
+</div>
+</div>
+
+<!-- TAB 2: Q1 Report Data Source -->
+<div class="tab-content" id="tab2">
+<div class="data-source-tag">数据来源：688139_20260430_YM6Q.pdf (2026年第一季度报告, 15页)</div>
+
+<div class="section">
+<h2>资产负债表 (2026/3/31 vs 2025/12/31)</h2>
+<table>
+<tr><th>项目</th><th class="num">2026/3/31</th><th class="num">2025/12/31</th><th class="num">变动</th></tr>
+<tr><td>货币资金</td><td class="num">9.73 亿</td><td class="num">8.44 亿</td><td style="color:#16a34a;font-weight:500">+15.36%</td></tr>
+<tr><td>交易性金融资产</td><td class="num">5.05 亿</td><td class="num">4.48 亿</td><td style="color:#16a34a;font-weight:500">+12.92%</td></tr>
+<tr><td>应收账款</td><td class="num">5.05 亿</td><td class="num">4.04 亿</td><td style="color:#16a34a;font-weight:500">+24.98%</td></tr>
+<tr><td>存货</td><td class="num">3.37 亿</td><td class="num">3.45 亿</td><td style="color:#dc2626;font-weight:500">-2.42%</td></tr>
+<tr><td>固定资产</td><td class="num">8.66 亿</td><td class="num">8.59 亿</td><td style="color:#16a34a;font-weight:500">+0.80%</td></tr>
+<tr><td>商誉</td><td class="num">7.58 亿</td><td class="num">7.58 亿</td><td style="color:#dc2626;font-weight:500">-0.05%</td></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>流动资产合计</td><td class="num">27.41 亿</td><td class="num">26.59 亿</td><td style="color:#16a34a;font-weight:500">+3.10%</td></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>非流动资产合计</td><td class="num">31.14 亿</td><td class="num">31.33 亿</td><td style="color:#dc2626;font-weight:500">-0.59%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.1)"><td>资产总计</td><td class="num">58.56 亿</td><td class="num">57.92 亿</td><td style="color:#16a34a;font-weight:500">+1.11%</td></tr>
+<tr><td>短期借款</td><td class="num">1,000.36 万</td><td class="num">1,000.71 万</td><td style="color:#dc2626;font-weight:500">-0.04%</td></tr>
+<tr><td>应付账款</td><td class="num">3.53 亿</td><td class="num">3.34 亿</td><td style="color:#16a34a;font-weight:500">+5.50%</td></tr>
+<tr><td>合同负债</td><td class="num">1.23 亿</td><td class="num">1.71 亿</td><td style="color:#dc2626;font-weight:500">-28.10%</td></tr>
+<tr style="font-weight:600"><td>流动负债合计</td><td class="num">10.68 亿</td><td class="num">10.85 亿</td><td style="color:#dc2626;font-weight:500">-1.57%</td></tr>
+<tr style="font-weight:700;background:rgba(239,68,68,0.08)"><td>负债合计</td><td class="num">11.54 亿</td><td class="num">11.68 亿</td><td style="color:#dc2626;font-weight:500">-1.26%</td></tr>
+<tr style="font-weight:700;background:rgba(34,197,94,0.08)"><td>归母所有者权益</td><td class="num">44.54 亿</td><td class="num">43.76 亿</td><td style="color:#16a34a;font-weight:500">+1.79%</td></tr>
+<tr style="font-weight:700"><td>所有者权益合计</td><td class="num">47.02 亿</td><td class="num">46.23 亿</td><td style="color:#16a34a;font-weight:500">+1.71%</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>利润表 (Q1 2026 vs Q1 2025)</h2>
+<table>
+<tr><th>项目</th><th class="num">2026年Q1</th><th class="num">2025年Q1</th><th class="num">同比变动</th></tr>
+<tr><td>营业收入</td><td class="num">6.52 亿</td><td class="num">6.89 亿</td><td style="color:#dc2626;font-weight:500">-5.36%</td></tr>
+<tr><td>减：营业成本</td><td class="num">3.42 亿</td><td class="num">3.56 亿</td><td style="color:#dc2626;font-weight:500">-3.88%</td></tr>
+<tr><td>  税金及附加</td><td class="num">597.69 万</td><td class="num">702.93 万</td><td style="color:#dc2626;font-weight:500">-14.97%</td></tr>
+<tr><td>  销售费用</td><td class="num">9,887.35 万</td><td class="num">9,007.32 万</td><td style="color:#16a34a;font-weight:500">+9.77%</td></tr>
+<tr><td>  管理费用</td><td class="num">4,819.12 万</td><td class="num">4,798.95 万</td><td style="color:#16a34a;font-weight:500">+0.42%</td></tr>
+<tr><td>  研发费用</td><td class="num">8,398.95 万</td><td class="num">8,045.22 万</td><td style="color:#16a34a;font-weight:500">+4.40%</td></tr>
+<tr><td>  财务费用</td><td class="num">249.69 万</td><td class="num">-602.49 万</td><td style="color:#16a34a;font-weight:500">+141.44%</td></tr>
+<tr style="font-weight:600"><td>营业利润</td><td class="num">8,393.24 万</td><td class="num">1.27 亿</td><td style="color:#dc2626;font-weight:500">-33.67%</td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.08)"><td>净利润</td><td class="num">7,998.93 万</td><td class="num">1.16 亿</td><td style="color:#dc2626;font-weight:500">-31.16%</td></tr>
+<tr><td>  归母净利润</td><td class="num">7,946.08 万</td><td class="num">1.10 亿</td><td style="color:#dc2626;font-weight:500">-27.93%</td></tr>
+<tr><td>基本每股收益(元)</td><td class="num">0.25</td><td class="num">0.35</td><td style="color:#dc2626;font-weight:500">-28.57%</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>现金流量表 (Q1 2026 vs Q1 2025)</h2>
+<table>
+<tr><th>项目</th><th class="num">2026年Q1</th><th class="num">2025年Q1</th><th class="num">同比变动</th></tr>
+<tr style="font-weight:600;background:rgba(59,130,246,0.05)"><td>经营活动现金流量净额</td><td class="num">1,167.72 万</td><td class="num">3,721.92 万</td><td style="color:#dc2626;font-weight:500">-68.63%</td></tr>
+<tr style="font-weight:600;background:rgba(249,115,22,0.05)"><td>投资活动现金流量净额</td><td class="num">2.44 亿</td><td class="num">8,243.45 万</td><td style="color:#16a34a;font-weight:500">+195.43%</td></tr>
+<tr style="font-weight:600;background:rgba(239,68,68,0.05)"><td>筹资活动现金流量净额</td><td class="num">-163.35 万</td><td class="num">-1,816.87 万</td><td style="color:#16a34a;font-weight:500">+91.01%</td></tr>
+<tr style="font-weight:700"><td>现金净增加额</td><td class="num">2.46 亿</td><td class="num">1.03 亿</td><td style="color:#16a34a;font-weight:500">+139.70%</td></tr>
+</table>
+</div>
+</div>
+
+<!-- TAB 3: Annual Analysis Results -->
+<div class="tab-content" id="tab3">
+<div class="section">
+<h2>年度分析结果 — 2025 vs 2024</h2>
+
+<!-- Key Metric Cards -->
+<div class="metric-cards">
+  <div class="metric-card">
+    <div class="label">营业收入</div>
+    <div class="value">23.29 亿</div>
+    <div class="change"><span style="color:#22c55e">↑ +1.96%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">归母净利润</div>
+    <div class="value">2.51 亿</div>
+    <div class="change"><span style="color:#ef4444">↓ -31.61%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">ROE (加权)</div>
+    <div class="value">5.73%</div>
+    <div class="change"><span style="color:#ef4444">↓ -31.64%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">经营现金流</div>
+    <div class="value">2.68 亿</div>
+    <div class="change"><span style="color:#ef4444">↓ -8.15%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">毛利率</div>
+    <div class="value">46.79%</div>
+    <div class="change"><span style="color:#ef4444">↓ -2.49%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">资产负债率</div>
+    <div class="value">20.17%</div>
+    <div class="change"><span style="color:#ef4444">↓ -0.16%</span></div>
+  </div>
+</div>
+
+<!-- Cause Analysis for Annual Metrics -->
+<div class="cause-grid">
+
+  <div class="cause-card">
+    <h4>营业收入 <span class="tag tag-up">↑ +1.96%</span></h4>
+    <div class="cause-item"><span class="factor">2025年收入 23.29亿 vs 2024年 22.84亿，增加 4,484万</span><span class="impact" style="color:var(--green)">+4,484万</span></div>
+    <div class="cause-item"><span class="factor">营业成本同步增长 4.31%（12.39亿→11.88亿），成本增速快于收入</span><span class="impact" style="color:var(--red)">+5,119万</span></div>
+    <div class="cause-item"><span class="factor">销售费用大增 23.76%（3.59亿→2.90亿），市场推广投入加大</span><span class="impact" style="color:var(--red)">+6,905万</span></div>
+    <div class="cause-item"><span class="factor">研发费用增长 5.57%（3.23亿→3.06亿），研发占收入 13.88%</span><span class="impact" style="color:var(--red)">+1,708万</span></div>
+    <div class="cause-summary">收入小幅增长，但成本与费用增速远超收入增速，呈现"增收不增利"特征。销售费用率从12.71%升至15.43%，为利润下滑的核心原因。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>归母净利润 <span class="tag tag-down">↓ -31.61%</span></h4>
+    <div class="cause-item"><span class="factor">营业成本增加：12.39亿 vs 11.88亿</span><span class="impact" style="color:var(--red)">-5,119万</span></div>
+    <div class="cause-item"><span class="factor">销售费用激增：3.59亿 vs 2.90亿（+23.76%）</span><span class="impact" style="color:var(--red)">-6,905万</span></div>
+    <div class="cause-item"><span class="factor">管理费用增加：1.93亿 vs 1.81亿（+6.31%）</span><span class="impact" style="color:var(--red)">-1,144万</span></div>
+    <div class="cause-item"><span class="factor">研发费用增加：3.23亿 vs 3.06亿（+5.57%）</span><span class="impact" style="color:var(--red)">-1,708万</span></div>
+    <div class="cause-item"><span class="factor">财务费用收益减少（利息收入从4,766万降至3,537万）</span><span class="impact" style="color:var(--red)">-2,138万</span></div>
+    <div class="cause-item"><span class="factor">公允价值变动收益下降（+547万→-49万）</span><span class="impact" style="color:var(--red)">-596万</span></div>
+    <div class="cause-item"><span class="factor">其他收益减少（4,288万→4,865万）</span><span class="impact" style="color:var(--red)">-577万</span></div>
+    <div class="cause-item"><span class="factor">所得税费用减少（2,095万→963万）</span><span class="impact" style="color:var(--green)">+1,132万</span></div>
+    <div class="cause-summary">归母净利润从3.67亿降至2.51亿（-1.16亿）。营业利润下降33.73%（从4.02亿到2.66亿），主要受销售费用激增（+6,905万）和成本上升（+5,119万）双重挤压。四项费用合计增加1.59亿，而收入仅增4,484万。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>ROE (加权) <span class="tag tag-down">↓ -31.64%</span></h4>
+    <div class="cause-item"><span class="factor">净利率下降：10.77% vs 16.05%（↓ 5.28个百分点）— 主因</span><span class="impact" style="color:var(--red)">↓ -32.93%</span></div>
+    <div class="cause-item"><span class="factor">资产周转率微升：0.4022 vs 0.3946（↑ 1.93%）— 正向</span><span class="impact" style="color:var(--green)">↑ +1.93%</span></div>
+    <div class="cause-item"><span class="factor">权益乘数稳定：1.253 vs 1.254（基本持平）</span><span class="impact" style="color:var(--text2)">≈ 0%</span></div>
+    <div class="cause-summary">ROE = 净利率 × 资产周转率 × 权益乘数。ROE从8.39%降至5.73%，几乎完全由净利率下滑驱动（利润下降31.61%，而收入仅增1.96%）。权益乘数和周转率基本稳定，杠杆和运营效率未恶化。核心问题在于费用率上升侵蚀利润率。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>经营现金流 <span class="tag tag-down">↓ -8.15%</span></h4>
+    <div class="cause-item"><span class="factor">经营现金流入增加（25.37亿 vs 24.29亿，+4.44%）</span><span class="impact" style="color:var(--green)">+1.08亿</span></div>
+    <div class="cause-item"><span class="factor">经营现金流出增加更快（22.69亿 vs 21.38亿，+6.16%）</span><span class="impact" style="color:var(--red)">+1.32亿</span></div>
+    <div class="cause-item"><span class="factor"> ├ 员工薪酬支付增长（6.47亿 vs 5.73亿，+12.87%）</span><span class="impact" style="color:var(--red)">+7,378万</span></div>
+    <div class="cause-item"><span class="factor"> ├ 其他经营现金流出（2.91亿 vs 2.64亿，+10.04%）</span><span class="impact" style="color:var(--red)">+2,653万</span></div>
+    <div class="cause-item"><span class="factor"> ├ 商品采购支付（11.93亿 vs 11.59亿，+2.93%）</span><span class="impact" style="color:var(--red)">+3,396万</span></div>
+    <div class="cause-item"><span class="factor"> └ 税费支付减少（1.38亿 vs 1.41亿，-1.92%）</span><span class="impact" style="color:var(--green)">-270万</span></div>
+    <div class="cause-summary">经营现金流从2.92亿降至2.68亿（-2,377万）。虽然现金流入增长4.44%，但流出增长更快（6.16%），主要因员工薪酬多付7,378万和其他运营开支增加。经营现金流/净利润 = 1.05，盈利质量尚可。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>毛利率 <span class="tag tag-down">↓ -2.49%</span></h4>
+    <div class="cause-item"><span class="factor">营业收入增长 +1.96%（23.29亿 vs 22.84亿）</span><span class="impact" style="color:var(--green)">+4,484万</span></div>
+    <div class="cause-item"><span class="factor">营业成本增长 +4.31%（12.39亿 vs 11.88亿），成本增速快于收入2倍</span><span class="impact" style="color:var(--red)">+5,119万</span></div>
+    <div class="cause-item"><span class="factor">毛利额：10.90亿 vs 10.96亿（下降 635万）</span><span class="impact" style="color:var(--red)">-635万</span></div>
+    <div class="cause-item"><span class="factor">毛利率：46.79% vs 47.99%（↓ 1.20个百分点）</span><span class="impact" style="color:var(--red)">↓ 1.20pp</span></div>
+    <div class="cause-summary">成本增速（+4.31%）显著快于收入增速（+1.96%），毛利额绝对值下降635万。可能原因：原材料成本上升、产品结构变化或市场竞争加剧导致定价能力减弱。毛利率虽仍维持在46%以上，但已连续下滑。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>资产负债率 <span class="tag tag-flat">↓ -0.16%（基本持平）</span></h4>
+    <div class="cause-item"><span class="factor">总负债：11.68亿 vs 11.69亿（微降 0.09%）</span><span class="impact" style="color:var(--green)">-101万</span></div>
+    <div class="cause-item"><span class="factor">总资产：57.92亿 vs 57.87亿（微增 0.07%）</span><span class="impact" style="color:var(--text2)">+405万</span></div>
+    <div class="cause-item"><span class="factor">流动负债增加 6.17%（10.85亿→10.22亿），应付职工薪酬等增长</span><span class="impact" style="color:var(--red)">+6,309万</span></div>
+    <div class="cause-item"><span class="factor">非流动负债大降 43.62%（828万→1,469万），长期应付款清零</span><span class="impact" style="color:var(--green)">-6,410万</span></div>
+    <div class="cause-summary">资产负债率20.17%（去年20.20%），变动极小（-0.03pp），结构稳定。流动负债与非流动负债此消彼长，总体负债水平极低。流动比率2.45、速动比率2.13，偿债能力优秀，无财务风险。</div>
+  </div>
+
+</div>
+
+<!-- Step 2: DuPont Analysis -->
+<h3>第二步：杜邦分析 (ROE 驱动因子拆解)</h3>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th><th>计算公式</th></tr>
+<tr>
+            <td>ROE</td>
+            <td class="num">5.73%</td>
+            <td class="num">8.39%</td>
+            <td class="num" style="color:#dc2626">↓ -31.64%</td>
+            <td class="formula-cell"><span class="formula-tag">净利率×周转率×权益乘数</span></td>
+        </tr>
+<tr>
+            <td>净利率</td>
+            <td class="num">10.77%</td>
+            <td class="num">16.05%</td>
+            <td class="num" style="color:#dc2626">↓ -32.93%</td>
+            <td class="formula-cell"><span class="formula-tag">归母净利润/营业收入</span></td>
+        </tr>
+<tr>
+            <td>资产周转率</td>
+            <td class="num">0.4022</td>
+            <td class="num">0.3946</td>
+            <td class="num" style="color:#16a34a">↑ +1.93%</td>
+            <td class="formula-cell"><span class="formula-tag">营业收入/平均总资产</span></td>
+        </tr>
+<tr>
+            <td>权益乘数</td>
+            <td class="num">1.3237</td>
+            <td class="num">1.3239</td>
+            <td class="num" style="color:#dc2626">↓ -0.01%</td>
+            <td class="formula-cell"><span class="formula-tag">平均总资产/平均净资产</span></td>
+        </tr>
+</table>
+<div class="calc-detail">
+ROE验证 (2025)：净利率 10.77% × 资产周转率 0.4022 × 权益乘数 1.3237 = 5.73%<br>
+平均净资产 = (43.76 亿 + 43.72 亿) / 2 = 43.74 亿<br>
+平均总资产 = (57.92 亿 + 57.87 亿) / 2 = 57.89 亿
+</div>
+
+<!-- Step 3: Solvency -->
+<h3>第三步：偿债能力分析</h3>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th><th>计算公式</th></tr>
+<tr>
+            <td>流动比率</td>
+            <td class="num">2.4494</td>
+            <td class="num">2.5943</td>
+            <td class="num" style="color:#dc2626">↓ -5.58%</td>
+            <td class="formula-cell"><span class="formula-tag">流动资产/流动负债</span></td>
+        </tr>
+<tr>
+            <td>速动比率</td>
+            <td class="num">2.1312</td>
+            <td class="num">2.2669</td>
+            <td class="num" style="color:#dc2626">↓ -5.99%</td>
+            <td class="formula-cell"><span class="formula-tag">(流动资产-存货)/流动负债</span></td>
+        </tr>
+<tr>
+            <td>现金比率</td>
+            <td class="num">0.7774</td>
+            <td class="num">0.8815</td>
+            <td class="num" style="color:#dc2626">↓ -11.81%</td>
+            <td class="formula-cell"><span class="formula-tag">货币资金/流动负债</span></td>
+        </tr>
+<tr>
+            <td>资产负债率</td>
+            <td class="num">20.17%</td>
+            <td class="num">20.20%</td>
+            <td class="num" style="color:#dc2626">↓ -0.16%</td>
+            <td class="formula-cell"><span class="formula-tag">总负债/总资产</span></td>
+        </tr>
+<tr>
+            <td>有息负债率</td>
+            <td class="num">1.56%</td>
+            <td class="num">0.40%</td>
+            <td class="num" style="color:#16a34a">↑ +290.02%</td>
+            <td class="formula-cell"><span class="formula-tag">有息负债/总资产</span></td>
+        </tr>
+</table>
+<div class="calc-detail">
+流动比率(2025) = 26.59 亿 / 10.85 亿 = 2.4494<br>
+速动比率(2025) = (26.59 亿 - 3.45 亿) / 10.85 亿 = 2.1312<br>
+有息负债(2025) = 短期借款1,000.71 万 + 一年内到期非流动负债8,059.51 万 = 9,060.22 万
+</div>
+
+<!-- Step 4: Operating Efficiency -->
+<h3>第四步：运营能力分析</h3>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th><th>计算公式</th></tr>
+<tr>
+            <td>应收账款周转天数</td>
+            <td class="num">57.07</td>
+            <td class="num">51.76</td>
+            <td class="num" style="color:#16a34a">↑ +10.28%</td>
+            <td class="formula-cell"><span class="formula-tag">365/(营业收入/平均应收账款)</span></td>
+        </tr>
+<tr>
+            <td>存货周转天数</td>
+            <td class="num">100.19</td>
+            <td class="num">102.85</td>
+            <td class="num" style="color:#dc2626">↓ -2.59%</td>
+            <td class="formula-cell"><span class="formula-tag">365/(营业成本/平均存货)</span></td>
+        </tr>
+<tr>
+            <td>应付账款周转天数</td>
+            <td class="num">98.96</td>
+            <td class="num">103.67</td>
+            <td class="num" style="color:#dc2626">↓ -4.55%</td>
+            <td class="formula-cell"><span class="formula-tag">365/(营业成本/平均应付账款)</span></td>
+        </tr>
+<tr>
+            <td>现金周转天数</td>
+            <td class="num">58.30</td>
+            <td class="num">50.94</td>
+            <td class="num" style="color:#16a34a">↑ +14.46%</td>
+            <td class="formula-cell"><span class="formula-tag">应收天数+存货天数-应付天数</span></td>
+        </tr>
+<tr>
+            <td>总资产周转率</td>
+            <td class="num">0.4022</td>
+            <td class="num">0.3946</td>
+            <td class="num" style="color:#16a34a">↑ +1.93%</td>
+            <td class="formula-cell"><span class="formula-tag">营业收入/平均总资产</span></td>
+        </tr>
+</table>
+<div class="calc-detail">
+应收周转天数(2025) = 365 / (23.29 亿 / 3.64 亿) = 57.07天<br>
+存货周转天数(2025) = 365 / (12.39 亿 / 3.40 亿) = 100.19天<br>
+现金周转天数(2025) = 57.07 + 100.19 - 98.96 = 58.30天
+</div>
+
+<!-- Step 5: Profitability -->
+<h3>第五步：盈利能力分析</h3>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th><th>计算公式</th></tr>
+<tr>
+            <td>毛利率</td>
+            <td class="num">46.79%</td>
+            <td class="num">47.99%</td>
+            <td class="num" style="color:#dc2626">↓ -2.49%</td>
+            <td class="formula-cell"><span class="formula-tag">(收入-成本)/收入</span></td>
+        </tr>
+<tr>
+            <td>净利率</td>
+            <td class="num">10.77%</td>
+            <td class="num">16.05%</td>
+            <td class="num" style="color:#dc2626">↓ -32.93%</td>
+            <td class="formula-cell"><span class="formula-tag">归母净利润/营业收入</span></td>
+        </tr>
+<tr>
+            <td>期间费用率</td>
+            <td class="num">36.48%</td>
+            <td class="num">31.99%</td>
+            <td class="num" style="color:#16a34a">↑ +14.04%</td>
+            <td class="formula-cell"><span class="formula-tag">(销+管+研+财)/收入</span></td>
+        </tr>
+<tr>
+            <td>销售费用率</td>
+            <td class="num">15.43%</td>
+            <td class="num">12.71%</td>
+            <td class="num" style="color:#16a34a">↑ +21.40%</td>
+            <td class="formula-cell"><span class="formula-tag">销售费用/营业收入</span></td>
+        </tr>
+<tr>
+            <td>管理费用率</td>
+            <td class="num">8.28%</td>
+            <td class="num">7.94%</td>
+            <td class="num" style="color:#16a34a">↑ +4.26%</td>
+            <td class="formula-cell"><span class="formula-tag">管理费用/营业收入</span></td>
+        </tr>
+<tr>
+            <td>研发费用率</td>
+            <td class="num">13.88%</td>
+            <td class="num">13.41%</td>
+            <td class="num" style="color:#16a34a">↑ +3.55%</td>
+            <td class="formula-cell"><span class="formula-tag">研发费用/营业收入</span></td>
+        </tr>
+<tr>
+            <td>ROA</td>
+            <td class="num">4.41%</td>
+            <td class="num">6.58%</td>
+            <td class="num" style="color:#dc2626">↓ -33.06%</td>
+            <td class="formula-cell"><span class="formula-tag">净利润/平均总资产</span></td>
+        </tr>
+</table>
+<div class="calc-detail">
+毛利率(2025) = (23.29 亿 - 12.39 亿) / 23.29 亿 = 46.79%<br>
+净利率(2025) = 2.51 亿 / 23.29 亿 = 10.77%<br>
+ROA(2025) = 2.55 亿 / 57.89 亿 = 4.41%
+</div>
+
+<!-- Step 6: Cash Flow Quality -->
+<h3>第六步：现金流质量分析</h3>
+<div class="cash-flow-pattern">
+<span style="color:var(--text2)">2025年现金流组合：</span>
+<div class="cf-box cf-plus">经营 2.68亿</div>
+<div class="cf-box cf-plus">投资 0.17亿</div>
+<div class="cf-box cf-minus">筹资 -2.69亿</div>
+<span class="warning-badge badge-safe">成熟期特征</span>
+</div>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th class="num">同比变动</th><th>计算公式</th></tr>
+<tr>
+            <td>经营现金流/净利润</td>
+            <td class="num">1.0500</td>
+            <td class="num">0.7655</td>
+            <td class="num" style="color:#16a34a">↑ +37.17%</td>
+            <td class="formula-cell"><span class="formula-tag">经营现金流/净利润</span></td>
+        </tr>
+<tr><td>自由现金流</td><td class="num">1.49 亿</td><td class="num">1.65 亿</td><td style="color:#dc2626;font-weight:500">-9.89%</td></tr>
+</table>
+<div class="calc-detail">
+经营现金流/净利润(2025) = 2.68 亿 / 2.55 亿 = 1.0500<br>
+自由现金流(2025) = 经营现金流2.68 亿 - 资本开支1.19 亿 = 1.49 亿<br>
+判断：经营现金流/净利润  > 1，盈利质量高
+</div>
+
+<!-- Step 7: EVA -->
+<h3>第七步：EVA 经济增加值</h3>
+<table>
+<tr><th>指标</th><th class="num">2025年</th><th class="num">2024年</th><th>说明</th></tr>
+<tr><td>NOPAT (税后净营业利润)</td><td class="num">2.57 亿</td><td class="num">3.81 亿</td><td class="formula-cell"><span class="formula-tag">营业利润×(1-有效税率)</span></td></tr>
+<tr><td>投入资本</td><td class="num">46.59 亿</td><td class="num">45.46 亿</td><td class="formula-cell"><span class="formula-tag">所有者权益+有息负债-在建工程</span></td></tr>
+<tr><td>WACC</td><td class="num">8%</td><td class="num">8%</td><td class="formula-cell"><span class="formula-tag">假设值</span></td></tr>
+<tr style="font-weight:700;background:rgba(234,179,8,0.1)"><td>EVA</td><td class="num">-1.16 亿</td><td class="num">1,718.06 万</td><td class="formula-cell"><span class="formula-tag">NOPAT - 投入资本×WACC</span></td></tr>
+</table>
+<div class="calc-detail">
+有效税率(2025) = 962.77 万 / 2.65 亿 = 3.64%<br>
+NOPAT(2025) = 2.66 亿 × (1 - 3.64%) = 2.57 亿<br>
+投入资本(2025) = 46.23 亿 + 9,060.22 万 - 5,496.87 万 = 46.59 亿<br>
+资本成本 = 46.59 亿 × 8% = 3.73 亿<br>
+EVA(2025) = 2.57 亿 - 3.73 亿 = -1.16 亿<br>
+判断：EVA < 0，未能覆盖资本成本，价值毁损
+</div>
+</div>
+</div>
+
+<!-- TAB 4: Q1 Comparison -->
+<div class="tab-content" id="tab4">
+<div class="section">
+<h2>季度对比分析 — Q1 2026 vs Q1 2025</h2>
+
+<div class="metric-cards">
+  <div class="metric-card">
+    <div class="label">Q1 营业收入</div>
+    <div class="value">6.52 亿</div>
+    <div class="change"><span style="color:#ef4444">↓ -5.36%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Q1 归母净利润</div>
+    <div class="value">7,946.08 万</div>
+    <div class="change"><span style="color:#ef4444">↓ -27.93%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Q1 毛利率</div>
+    <div class="value">47.55%</div>
+    <div class="change"><span style="color:#ef4444">↓ -1.66%</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Q1 经营现金流</div>
+    <div class="value">1,167.72 万</div>
+    <div class="change"><span style="color:#ef4444">↓ -68.63%</span></div>
+  </div>
+</div>
+
+<!-- Cause Analysis for Q1 Metrics -->
+<div class="cause-grid">
+
+  <div class="cause-card">
+    <h4>Q1 营业收入 <span class="tag tag-down">↓ -5.36%</span></h4>
+    <div class="cause-item"><span class="factor">Q1 2026收入 6.52亿 vs Q1 2025 6.89亿，减少 3,691万</span><span class="impact" style="color:var(--red)">-3,691万</span></div>
+    <div class="cause-item"><span class="factor">营业成本下降 3.89%（3.42亿→3.56亿），成本降幅小于收入降幅</span><span class="impact" style="color:var(--green)">+1,382万</span></div>
+    <div class="cause-item"><span class="factor">销售费用逆势增长 9.77%（9,887万→9,007万）</span><span class="impact" style="color:var(--red)">-880万</span></div>
+    <div class="cause-item"><span class="factor">研发费用增长 4.40%（8,399万→8,045万），研发占收入12.88%</span><span class="impact" style="color:var(--red)">-354万</span></div>
+    <div class="cause-summary">Q1收入同比下降5.36%，延续2025年"增收不增利"反转态势。收入萎缩但销售费用和研发费用仍在增长，费用刚性特征明显。销售费用率从13.07%升至15.16%，进一步压缩利润空间。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>Q1 归母净利润 <span class="tag tag-down">↓ -27.93%</span></h4>
+    <div class="cause-item"><span class="factor">毛利额下降（3.10亿→3.33亿），收入降幅大于成本降幅</span><span class="impact" style="color:var(--red)">-2,323万</span></div>
+    <div class="cause-item"><span class="factor">销售费用增加（9,887万→9,007万，+9.77%）</span><span class="impact" style="color:var(--red)">-880万</span></div>
+    <div class="cause-item"><span class="factor">研发费用增加（8,399万→8,045万，+4.40%）</span><span class="impact" style="color:var(--red)">-354万</span></div>
+    <div class="cause-item"><span class="factor">财务费用由收益转为支出（-602万→+250万），利息收入骤降</span><span class="impact" style="color:var(--red)">-852万</span></div>
+    <div class="cause-item"><span class="factor">投资收益减少（261万→753万）</span><span class="impact" style="color:var(--red)">-492万</span></div>
+    <div class="cause-item"><span class="factor">其他收益增加（1,693万→1,315万）</span><span class="impact" style="color:var(--green)">+378万</span></div>
+    <div class="cause-item"><span class="factor">所得税减少（462万→929万）</span><span class="impact" style="color:var(--green)">+467万</span></div>
+    <div class="cause-summary">归母净利润从1.10亿降至7,946万（-3,080万）。经营利润从1.27亿降至8,393万（-33.7%）。核心拖累因素：毛利下降（-2,323万）+ 财务费用由正转负（-852万）+ 销售费用增加（-880万），合计贡献降幅的约130%。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>Q1 毛利率 <span class="tag tag-down">↓ -1.66%</span></h4>
+    <div class="cause-item"><span class="factor">Q1 2026收入 6.52亿 vs Q1 2025 6.89亿（↓ 5.36%）</span><span class="impact" style="color:var(--red)">-3,691万</span></div>
+    <div class="cause-item"><span class="factor">Q1 2026成本 3.42亿 vs Q1 2025 3.56亿（↓ 3.89%）</span><span class="impact" style="color:var(--green)">-1,382万</span></div>
+    <div class="cause-item"><span class="factor">成本占收入比：52.45% vs 51.65%（↑ 0.80pp）</span><span class="impact" style="color:var(--red)">↑ 0.80pp</span></div>
+    <div class="cause-item"><span class="factor">毛利额：3.10亿 vs 3.33亿（↓ 6.98%）</span><span class="impact" style="color:var(--red)">-2,323万</span></div>
+    <div class="cause-summary">毛利率从48.35%降至47.55%（↓ 0.80pp），降幅小于年度毛利率降幅（1.20pp）。收入下降5.36%而成本仅降3.89%，说明存在固定成本刚性。不过Q1毛利率仍高于2025全年水平（46.79%），盈利能力尚未大幅恶化。</div>
+  </div>
+
+  <div class="cause-card">
+    <h4>Q1 经营现金流 <span class="tag tag-down">↓ -68.63%</span></h4>
+    <div class="cause-item"><span class="factor">经营现金流入增加（6.01亿→5.81亿，+3.54%）</span><span class="impact" style="color:var(--green)">+2,057万</span></div>
+    <div class="cause-item"><span class="factor">经营现金流出大幅增加（5.90亿→5.43亿，+8.48%）</span><span class="impact" style="color:var(--red)">+4,611万</span></div>
+    <div class="cause-item"><span class="factor"> ├ 税费支付激增（5,851万→3,588万，+63.1%）</span><span class="impact" style="color:var(--red)">+2,263万</span></div>
+    <div class="cause-item"><span class="factor"> ├ 其他经营现金流出（7,044万→6,012万，+17.2%）</span><span class="impact" style="color:var(--red)">+1,032万</span></div>
+    <div class="cause-item"><span class="factor"> ├ 商品采购支付（2.75亿→2.65亿，+3.60%）</span><span class="impact" style="color:var(--red)">+957万</span></div>
+    <div class="cause-item"><span class="factor"> └ 员工薪酬支付（1.86亿→1.82亿，+1.97%）</span><span class="impact" style="color:var(--red)">+358万</span></div>
+    <div class="cause-summary">经营现金流从3,722万骤降至1,168万（-2,554万），降幅高达68.63%。核心原因：税费支付激增2,263万（+63%）及其他运营开支增加1,032万。虽然现金流入小幅增长，但无法抵消流出端的快速膨胀。Q1自由现金流已转负（-390万），需持续关注后续季度现金流修复情况。</div>
+  </div>
+
+</div>
+
+<h3>盈利能力对比</h3>
+<table>
+<tr><th>指标</th><th class="num">2026年Q1</th><th class="num">2025年Q1</th><th class="num">变动</th><th>计算公式</th></tr>
+<tr>
+            <td>毛利率</td>
+            <td class="num">47.55%</td>
+            <td class="num">48.35%</td>
+            <td class="num" style="color:#dc2626">↓ -1.66%</td>
+            <td class="formula-cell"><span class="formula-tag">(收入-成本)/收入</span></td>
+        </tr>
+<tr>
+            <td>净利率</td>
+            <td class="num">12.19%</td>
+            <td class="num">16.00%</td>
+            <td class="num" style="color:#dc2626">↓ -23.85%</td>
+            <td class="formula-cell"><span class="formula-tag">归母净利润/营业收入</span></td>
+        </tr>
+<tr>
+            <td>销售费用率</td>
+            <td class="num">15.16%</td>
+            <td class="num">13.07%</td>
+            <td class="num" style="color:#16a34a">↑ +15.98%</td>
+            <td class="formula-cell"><span class="formula-tag">销售费用/营业收入</span></td>
+        </tr>
+<tr>
+            <td>管理费用率</td>
+            <td class="num">7.39%</td>
+            <td class="num">6.97%</td>
+            <td class="num" style="color:#16a34a">↑ +6.10%</td>
+            <td class="formula-cell"><span class="formula-tag">管理费用/营业收入</span></td>
+        </tr>
+<tr>
+            <td>研发费用率</td>
+            <td class="num">12.88%</td>
+            <td class="num">11.68%</td>
+            <td class="num" style="color:#16a34a">↑ +10.31%</td>
+            <td class="formula-cell"><span class="formula-tag">研发费用/营业收入</span></td>
+        </tr>
+</table>
+<div class="calc-detail">
+毛利率(2026Q1) = (6.52 亿 - 3.42 亿) / 6.52 亿 = 47.55%<br>
+毛利率(2025Q1) = (6.89 亿 - 3.56 亿) / 6.89 亿 = 48.35%
+</div>
+
+<h3>现金流质量对比</h3>
+<div class="two-col">
+<div>
+<h3 style="color:var(--text)">2026年Q1现金流组合</h3>
+<div class="cash-flow-pattern">
+  <div class="cf-box cf-plus">经营 1,168万</div>
+  <div class="cf-box cf-plus">投资 24,354万</div>
+  <div class="cf-box cf-minus">筹资 -163万</div>
+</div>
+</div>
+<div>
+<h3 style="color:var(--text)">2025年Q1现金流组合</h3>
+<div class="cash-flow-pattern">
+  <div class="cf-box cf-plus">经营 3,722万</div>
+  <div class="cf-box cf-plus">投资 8,243万</div>
+  <div class="cf-box cf-minus">筹资 -1,817万</div>
+</div>
+</div>
+</div>
+
+<table>
+<tr><th>指标</th><th class="num">2026年Q1</th><th class="num">2025年Q1</th><th>变动</th></tr>
+<tr><td>经营现金流</td><td class="num">1,167.72 万</td><td class="num">3,721.92 万</td><td style="color:#dc2626;font-weight:500">-68.63%</td></tr>
+<tr><td>自由现金流</td><td class="num">-390.10 万</td><td class="num">911.58 万</td><td style="color:#dc2626;font-weight:500">-142.79%</td></tr>
+<tr><td>资本开支</td><td class="num">1,557.82 万</td><td class="num">2,810.34 万</td><td style="color:#dc2626;font-weight:500">-44.57%</td></tr>
+</table>
+</div>
+</div>
+
+<!-- TAB 5: Comprehensive Diagnosis -->
+<div class="tab-content" id="tab5">
+<div class="section">
+<h2>综合诊断</h2>
+
+<div class="summary-box">
+<h3>核心结论</h3>
+<p style="margin-bottom:12px">海尔生物医疗(688139) 2025年度财务表现呈现<strong style="color:var(--yellow)">"增收不增利"</strong>的特征。营业收入同比微增1.96%至23.29亿元，但归母净利润同比大幅下滑31.61%至2.51亿元。主要原因系销售费用大幅增长23.76%及研发费用持续高投入（占营收13.88%）所致。</p>
+<p>公司资产负债率仅20.17%，偿债能力优秀；经营现金流为正（2.68亿），但盈利质量指标（经营现金流/净利润 = 1.05）表明盈利质量较好。EVA为-1.16 亿，已转负，存在价值毁损风险。</p>
+<p>2026年Q1延续下滑趋势，营收同比-5.36%，归母净利润同比-27.93%，经营现金流大幅缩减至1,168万（同比-68.63%），需持续关注。</p>
+</div>
+
+<h3>财务预警信号清单</h3>
+<table>
+<tr><th>预警信号</th><th>风险类型</th><th>2025年状态</th><th>2026Q1状态</th></tr>
+<tr><td>经营现金流连续为负</td><td>持续经营风险</td><td><span class="warning-badge badge-safe">正常 (2.68 亿)</span></td><td><span class="warning-badge badge-safe">正常 (1,167.72 万)</span></td></tr>
+<tr><td>资产负债率 >80%</td><td>偿债危机</td><td><span class="warning-badge badge-safe">安全 (20.17%)</span></td><td><span class="warning-badge badge-safe">安全 (19.70%)</span></td></tr>
+<tr><td>应收账款周转天数延长</td><td>回款恶化</td><td><span class="warning-badge badge-warn">57.1天 (去年51.8天)</span></td><td>-</td></tr>
+<tr><td>存货周转天数延长</td><td>滞销风险</td><td><span class="warning-badge badge-safe">100.2天 (去年102.9天)</span></td><td>-</td></tr>
+<tr><td>毛利率持续下滑</td><td>竞争力下降</td><td><span class="warning-badge badge-warn">46.79% (去年47.99%)</span></td><td><span class="warning-badge badge-warn">47.55% (去年同期48.35%)</span></td></tr>
+<tr><td>销售费用率快速上升</td><td>费用失控</td><td><span class="warning-badge badge-danger">15.43% (去年12.71%)</span></td><td><span class="warning-badge badge-safe">15.16%</span></td></tr>
+<tr><td>商誉占净资产比例 >30%</td><td>减值风险</td><td><span class="warning-badge badge-warn">17.33%</span></td><td><span class="warning-badge badge-safe">17.01%</span></td></tr>
+<tr><td>EVA连续为负</td><td>价值毁损</td><td><span class="warning-badge badge-danger">EVA为负</span></td><td>-</td></tr>
+</table>
+
+<h3 style="margin-top:24px">建议关注</h3>
+<div style="background:var(--surface2);border-radius:12px;padding:20px;margin-top:12px;">
+<p style="margin-bottom:8px"><strong style="color:var(--yellow)">1. 销售费用高增长：</strong>2025年销售费用同比增长23.76%（从2.90亿增至3.59亿），远超收入增速1.96%，销售费用率从12.71%升至15.43%。需评估市场推广投入产出效率。</p>
+<p style="margin-bottom:8px"><strong style="color:var(--yellow)">2. 利润持续下滑：</strong>归母净利润从2024年的3.67亿降至2025年的2.51亿（-31.61%），Q1延续下滑（-27.93%）。若趋势延续，需关注盈利能力恢复能力。</p>
+<p style="margin-bottom:8px"><strong style="color:var(--yellow)">3. 应收账款快速增长：</strong>应收账款从2024年末3.24亿增至2025年末4.04亿（+24.9%），再增至2026Q1末5.05亿（+25%），增速远超收入增速，回款压力加大。</p>
+<p style="margin-bottom:8px"><strong style="color:var(--green)">4. 偿债能力优秀：</strong>资产负债率仅20.17%，流动比率2.45，速动比率2.13，偿债能力良好。</p>
+<p><strong style="color:var(--green)">5. 研发投入持续高：</strong>研发费用率保持13.88%高位（2024年13.41%），有利于长期竞争力，但短期内加大利润压力。</p>
+</div>
+</div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.tab-content').forEach((c,i) => c.classList.toggle('active', i===idx));
+}
+</script>
+</body>
+</html>
