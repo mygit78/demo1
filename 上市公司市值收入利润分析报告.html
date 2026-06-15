@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海尔大健康上市公司市值·收入·利润专项分析报告</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg-deep:#070d1a;--bg-primary:#0a1628;--bg-card:#0f1f38;--bg-card-hover:#132844;
+  --bg-input:#0c1a2e;--border:#1a3456;--border-light:#254a78;
+  --accent:#3b82f6;--accent-light:#60a5fa;--accent-glow:rgba(59,130,246,0.15);
+  --cyan:#06b6d4;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#a855f7;
+  --text-primary:#e8edf5;--text-secondary:#8899b4;--text-muted:#556b8a;
+  --grad-blue:linear-gradient(135deg,#3b82f6,#06b6d4);
+  --grad-card:linear-gradient(160deg,#0f1f38 0%,#0c1a30 100%);
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+html{font-size:14px;scroll-behavior:smooth;}
+body{font-family:'Microsoft YaHei','PingFang SC','Segoe UI',sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;min-height:100vh;}
+.container{max-width:1480px;margin:0 auto;padding:32px 24px;}
+.report-header{text-align:center;padding:36px 0 24px;position:relative;}
+.report-header::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:2px;background:var(--grad-blue);border-radius:2px;}
+.report-header h1{font-size:30px;font-weight:800;background:var(--grad-blue);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px;margin-bottom:6px;}
+.report-header .subtitle{font-size:14px;color:var(--text-secondary);margin-bottom:4px;}
+.report-header .meta{font-size:12px;color:var(--text-muted);display:flex;justify-content:center;gap:24px;margin-top:10px;}
+
+/* NAV TABS - sticky */
+.nav-tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:10px;background:var(--bg-primary);border-radius:12px;border:1px solid var(--border);position:sticky;top:8px;z-index:100;margin-bottom:32px;}
+.nav-tab{padding:8px 20px;border-radius:8px;font-size:13px;color:var(--text-secondary);cursor:pointer;border:1px solid transparent;transition:all .2s;background:transparent;text-decoration:none;}
+.nav-tab:hover,.nav-tab.nav-active{background:var(--accent);color:#fff;font-weight:600;border-color:var(--accent);text-decoration:none;}
+
+/* PAGE SECTIONS */
+.page-section{margin-bottom:40px;scroll-margin-top:80px;}
+.section{background:var(--grad-card);border-radius:14px;padding:28px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.section-title{font-size:20px;font-weight:700;color:var(--accent-light);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.section-title .icon{width:28px;height:28px;border-radius:8px;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.section-desc{font-size:13px;color:var(--text-muted);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+
+/* SUMMARY CARDS */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px;}
+.summary-card{background:var(--bg-card);border-radius:12px;padding:18px;text-align:center;border:1px solid var(--border);transition:all .2s;}
+.summary-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.summary-card .label{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.summary-card .value{font-size:28px;font-weight:800;}
+.summary-card .change{font-size:11px;margin-top:4px;}
+.v-blue{color:var(--accent-light);}.v-cyan{color:var(--cyan);}.v-green{color:var(--green);}.v-red{color:var(--red);}.v-amber{color:var(--amber);}.v-purple{color:var(--purple);}
+.up{color:var(--green);}.down{color:var(--red);}
+
+/* PIE CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px;}
+.chart-box{background:var(--bg-card);border-radius:12px;padding:12px 8px 8px;border:1px solid var(--border);text-align:center;}
+.chart-box .chart-title{font-size:12px;color:var(--text-secondary);margin-bottom:4px;font-weight:600;}
+.chart-box .chart-canvas{width:100%;height:180px;min-height:180px;}
+@media(max-width:1200px){.charts-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){.charts-row{grid-template-columns:repeat(2,1fr);}}
+.chart-legend{display:flex;justify-content:center;gap:6px;margin-top:4px;flex-wrap:wrap;}.chart-legend span{font-size:10px;color:#8899b4;white-space:nowrap;}
+
+
+/* REASON TAG */
+.reason{color:var(--text-muted);font-size:11px;font-weight:400;margin-left:4px;}
+.reason::before{content:'（';}.reason::after{content:'）';}
+
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+.data-table th{background:var(--bg-input);color:var(--accent-light);padding:10px 14px;text-align:center;font-weight:600;border-bottom:2px solid var(--border);white-space:nowrap;}
+.data-table td{padding:10px 14px;text-align:center;border-bottom:1px solid var(--border);transition:background .15s;}
+.data-table tr:hover td{background:rgba(59,130,246,0.04);}
+.data-table .row-company{background:rgba(59,130,246,0.06);font-weight:600;}
+.data-table .row-company td{color:var(--accent-light);}
+.data-table .row-benchmark td{color:var(--text-secondary);}
+.data-table .row-group{background:rgba(16,185,129,0.06);}
+.data-table .row-group td{color:var(--green);font-weight:700;font-size:13px;text-align:left;padding-left:6px;border-bottom:1px dashed var(--border);}
+.data-table .best{color:var(--green);font-weight:700;}.data-table .worst{color:var(--red);font-weight:700;}
+.data-table td:first-child{text-align:left;font-weight:600;color:var(--text-primary);}
+
+/* TREE */
+.tree{display:flex;flex-direction:column;gap:12px;}
+.tree-branch{background:var(--bg-input);border-radius:10px;padding:16px;border-left:3px solid var(--accent);}
+.tree-branch.l2{border-left-color:var(--cyan);margin-left:24px;}
+.tree-label{font-size:14px;font-weight:700;color:var(--accent-light);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.tree-branch.l2 .tree-label{color:var(--cyan);}
+.tree-formula{font-size:12px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace;background:rgba(0,0,0,0.3);padding:4px 10px;border-radius:6px;display:inline-block;margin:4px 0;}
+.tree-items{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tree-item{font-size:12px;padding:3px 10px;background:rgba(59,130,246,0.08);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);}
+
+/* ANALYSIS BOX */
+.analysis-box{background:var(--bg-input);border-radius:10px;padding:16px;margin-top:12px;border:1px solid var(--border);}
+.analysis-box .title{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.analysis-box ul{list-style:none;padding:0;}
+.analysis-box li{font-size:12px;color:var(--text-secondary);padding:5px 0 5px 16px;position:relative;line-height:1.9;}
+.analysis-box li::before{content:'';position:absolute;left:0;color:var(--accent);}
+
+/* RISK GRID */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;}
+.risk-card{background:var(--bg-input);border-radius:10px;padding:16px;border:1px solid var(--border);}
+.risk-card .risk-level{font-size:12px;font-weight:700;margin-bottom:8px;}
+.risk-card .risk-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:6px;}
+.risk-card .risk-desc{font-size:12px;color:var(--text-secondary);line-height:1.7;}
+.flex-row{display:flex;gap:16px;flex-wrap:wrap;}
+.flex-col{flex:1;min-width:300px;}
+
+.report-footer{text-align:center;padding:20px 0;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:16px;}
+
+/* TAB SCROLL INDICATOR */
+.tab-indicator{display:flex;justify-content:center;margin-top:20px;gap:8px;}
+.tab-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .3s;}
+.tab-dot.active{background:var(--accent);width:24px;border-radius:5px;}
+
+@media(max-width:768px){
+  body{overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  .container{padding:12px 8px;}
+  .report-header{padding:20px 0 12px;}
+  .report-header h1{font-size:18px;}
+  .report-header .subtitle{font-size:12px;}
+  .report-header .meta{flex-wrap:wrap;gap:8px;font-size:11px;}
+  .back-home{position:static;display:inline-block;margin-bottom:8px;padding:6px 12px;font-size:12px;}
+  .nav-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px;gap:4px;margin-bottom:16px;position:sticky;top:4px;}
+  .nav-tab{padding:6px 12px;font-size:12px;white-space:nowrap;flex-shrink:0;}
+  .page-section{margin-bottom:20px;scroll-margin-top:60px;}
+  .section{padding:14px;border-radius:10px;}
+  .section-title{font-size:16px;}
+  .section-title .icon{width:24px;height:24px;font-size:14px;}
+  .section-desc{font-size:11px;margin-bottom:12px;padding-bottom:10px;}
+  .summary-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .summary-card{padding:12px;border-radius:8px;}
+  .summary-card .label{font-size:11px;}
+  .summary-card .value{font-size:20px;}
+  .summary-card .change{font-size:10px;}
+  .charts-row{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .chart-box{padding:8px 6px 6px;border-radius:8px;}
+  .chart-box .chart-title{font-size:11px;}
+  .data-table{font-size:11px;}
+  .data-table th{padding:6px 8px;font-size:10px;}
+  .data-table td{padding:6px 8px;font-size:10px;}
+  .tree{gap:8px;}
+  .tree-branch{padding:10px;border-radius:8px;}
+  .tree-branch.l2{margin-left:12px;}
+  .tree-label{font-size:12px;}
+  .tree-formula{font-size:10px;padding:3px 8px;}
+  .tree-item{font-size:10px;padding:2px 8px;}
+  .analysis-box{padding:10px;border-radius:8px;}
+  .analysis-box .title{font-size:12px;}
+  .analysis-box li{font-size:11px;line-height:1.8;}
+  .risk-grid{grid-template-columns:1fr;gap:10px;}
+  .risk-card{padding:12px;border-radius:8px;}
+  .risk-card .risk-title{font-size:13px;}
+  .risk-card .risk-desc{font-size:11px;line-height:1.7;}
+  .flex-row{flex-direction:column;gap:10px;}
+  .flex-col{min-width:auto;}
+  .reason{font-size:10px;}
+  .tab-indicator{margin-top:12px;}
+  .tab-dot{width:8px;height:8px;}
+  .tab-dot.active{width:20px;}
+  .report-footer{font-size:10px;padding:12px 0;}
+  .section h4{font-size:14px;}
+}
+@media(max-width:480px){
+  .summary-grid{grid-template-columns:1fr;}
+  .charts-row{grid-template-columns:1fr;}
+  .report-header h1{font-size:16px;}
+  .data-table{font-size:10px;}
+  .data-table th{padding:5px 6px;font-size:9px;}
+  .data-table td{padding:5px 6px;font-size:9px;}
+}
+
+/* BACK BUTTON */
+.back-home{position:absolute;top:16px;right:20px;padding:8px 18px;border:1px solid rgba(59,130,246,0.4);border-radius:8px;background:transparent;color:var(--accent-light);font-size:13px;cursor:pointer;text-decoration:none;transition:all .3s;backdrop-filter:blur(8px);}
+.back-home:hover{background:rgba(59,130,246,0.15);border-color:var(--accent);box-shadow:0 0 16px rgba(59,130,246,0.3);color:#fff;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="report-header">
+  <a class="back-home" href="index.html">← 返回首页</a>
+  <h1>海尔大健康 · 上市公司市值·收入·利润专项分析</h1>
+  <p class="subtitle">盈康生命 ｜ 海尔生物医疗 ｜ 上海莱士 — 行业对标与溯因分析</p>
+  <div class="meta">
+    <span>📅 数据周期：2024年报 — 2026Q1</span>
+    <span>🔄 更新：2026-06-15</span>
+    <span>📊 对标企业：9家</span>
+  </div>
+</div>
+
+<nav class="nav-tabs" id="navTabs">
+  <a class="nav-tab nav-active" href="#page-0">总览</a>
+  <a class="nav-tab" href="#page-1">市值分析</a>
+  <a class="nav-tab" href="#page-2">收入分析</a>
+  <a class="nav-tab" href="#page-3">利润分析</a>
+  <a class="nav-tab" href="#page-4">溯因拆解</a>
+  <a class="nav-tab" href="#page-5">风险预警</a>
+</nav>
+
+<!-- ==================== PAGE 0: 总览 ==================== -->
+<div class="page-section" id="page-0">
+<div class="section">
+  <div class="section-title"><div class="icon">📋</div>核心指标总览</div>
+  <p class="section-desc">三家上市公司最新核心财务指标一览，与各自行业头部3家企业对标。</p>
+  <div class="summary-grid">
+    <div class="summary-card"><div class="label">三家合计市值</div><div class="value v-blue">547.6亿</div><div class="change down">▼ 年内-12.5%<span class="reason">主因海尔生物利润-31.6%及血制品集采预期</span></span></div>
+    <div class="summary-card"><div class="label">三家合计营收(2025)</div><div class="value v-cyan">122.15亿</div><div class="change up">同比+8.2%<span class="reason">盈康生命+20.93%领跑，抵消海尔生物+1.96%拖累</span></span></div>
+    <div class="summary-card"><div class="label">三家合计净利润(2025)</div><div class="value v-green">16.78亿</div><div class="change down">同比-5.3%<span class="reason">海尔生物-31.61%下滑1.16亿，拖累合计</span></span></div>
+    <div class="summary-card"><div class="label">平均毛利率(2025)</div><div class="value v-amber">37.28%</div><div class="change">行业均值49.8%<span class="reason">盈康生命26.31%拉低均值，血制品行业55%最高</span></span></div>
+    <div class="summary-card"><div class="label">平均PE(TTM)</div><div class="value v-purple">50.6x</div><div class="change">行业中值28.5x<span class="reason">盈康生命74x、海尔生物52x推高均值</span></span></div>
+  </div>
+  <!-- SVG Bar Charts -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <div class="chart-title">市值(亿·最新)</div>
+      <div class="chart-canvas">
+        <svg viewBox="0 0 160 130" width="100%" height="140">
+          <line x1="55" y1="15" x2="55" y2="105" stroke="#1a3456" stroke-width="1"/>
+          <rect x="55" y="20" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="20" width="18" height="12" rx="3" fill="#3b82f6"/>
+          <rect x="55" y="45" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="45" width="31" height="12" rx="3" fill="#10b981"/>
+          <rect x="55" y="70" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="70" width="81" height="12" rx="3" fill="#f59e0b"/>
+          <text x="50" y="31" fill="#8899b4" font-size="9" text-anchor="end">盈康</text>
+          <text x="50" y="56" fill="#8899b4" font-size="9" text-anchor="end">海尔</text>
+          <text x="50" y="81" fill="#8899b4" font-size="9" text-anchor="end">莱士</text>
+          <text x="153" y="31" fill="#e8edf5" font-size="8">76.4</text>
+          <text x="153" y="56" fill="#e8edf5" font-size="8">130.0</text>
+          <text x="153" y="81" fill="#e8edf5" font-size="8">341.2</text>
+        </svg>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">营收(2025·亿)</div>
+      <div class="chart-canvas">
+        <svg viewBox="0 0 160 130" width="100%" height="140">
+          <line x1="55" y1="15" x2="55" y2="105" stroke="#1a3456" stroke-width="1"/>
+          <rect x="55" y="20" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="20" width="18" height="12" rx="3" fill="#3b82f6"/>
+          <rect x="55" y="45" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="45" width="22" height="12" rx="3" fill="#10b981"/>
+          <rect x="55" y="70" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="70" width="76" height="12" rx="3" fill="#f59e0b"/>
+          <text x="50" y="31" fill="#8899b4" font-size="9" text-anchor="end">盈康</text>
+          <text x="50" y="56" fill="#8899b4" font-size="9" text-anchor="end">海尔</text>
+          <text x="50" y="81" fill="#8899b4" font-size="9" text-anchor="end">莱士</text>
+          <text x="153" y="31" fill="#e8edf5" font-size="8">18.9</text>
+          <text x="153" y="56" fill="#e8edf5" font-size="8">23.3</text>
+          <text x="153" y="81" fill="#e8edf5" font-size="8">80.0</text>
+        </svg>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">净利润(2025·亿)</div>
+      <div class="chart-canvas">
+        <svg viewBox="0 0 160 130" width="100%" height="140">
+          <line x1="55" y1="15" x2="55" y2="105" stroke="#1a3456" stroke-width="1"/>
+          <rect x="55" y="20" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="20" width="7" height="12" rx="3" fill="#3b82f6"/>
+          <rect x="55" y="45" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="45" width="16" height="12" rx="3" fill="#10b981"/>
+          <rect x="55" y="70" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="70" width="84" height="12" rx="3" fill="#f59e0b"/>
+          <text x="50" y="31" fill="#8899b4" font-size="9" text-anchor="end">盈康</text>
+          <text x="50" y="56" fill="#8899b4" font-size="9" text-anchor="end">海尔</text>
+          <text x="50" y="81" fill="#8899b4" font-size="9" text-anchor="end">莱士</text>
+          <text x="153" y="31" fill="#e8edf5" font-size="8">1.07</text>
+          <text x="153" y="56" fill="#e8edf5" font-size="8">2.51</text>
+          <text x="153" y="81" fill="#e8edf5" font-size="8">13.2</text>
+        </svg>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">毛利率(2025)</div>
+      <div class="chart-canvas">
+        <svg viewBox="0 0 160 130" width="100%" height="140">
+          <line x1="55" y1="15" x2="55" y2="105" stroke="#1a3456" stroke-width="1"/>
+          <rect x="55" y="20" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="20" width="50" height="12" rx="3" fill="#3b82f6"/>
+          <rect x="55" y="45" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="45" width="89" height="12" rx="3" fill="#10b981"/>
+          <rect x="55" y="70" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="70" width="74" height="12" rx="3" fill="#f59e0b"/>
+          <text x="50" y="31" fill="#8899b4" font-size="9" text-anchor="end">盈康</text>
+          <text x="50" y="56" fill="#8899b4" font-size="9" text-anchor="end">海尔</text>
+          <text x="50" y="81" fill="#8899b4" font-size="9" text-anchor="end">莱士</text>
+          <text x="110" y="31" fill="#e8edf5" font-size="8">26.3%</text>
+          <text x="148" y="56" fill="#e8edf5" font-size="8">46.8%</text>
+          <text x="133" y="81" fill="#e8edf5" font-size="8">38.8%</text>
+        </svg>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">PE(TTM·最新)</div>
+      <div class="chart-canvas">
+        <svg viewBox="0 0 160 130" width="100%" height="140">
+          <line x1="55" y1="15" x2="55" y2="105" stroke="#1a3456" stroke-width="1"/>
+          <rect x="55" y="20" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="20" width="88" height="12" rx="3" fill="#3b82f6"/>
+          <rect x="55" y="45" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="45" width="62" height="12" rx="3" fill="#10b981"/>
+          <rect x="55" y="70" width="95" height="12" rx="3" fill="#1a3456"/>
+          <rect x="55" y="70" width="31" height="12" rx="3" fill="#f59e0b"/>
+          <text x="50" y="31" fill="#8899b4" font-size="9" text-anchor="end">盈康</text>
+          <text x="50" y="56" fill="#8899b4" font-size="9" text-anchor="end">海尔</text>
+          <text x="50" y="81" fill="#8899b4" font-size="9" text-anchor="end">莱士</text>
+          <text x="147" y="31" fill="#e8edf5" font-size="8">74.1</text>
+          <text x="121" y="56" fill="#e8edf5" font-size="8">52.0</text>
+          <text x="90" y="81" fill="#e8edf5" font-size="8">25.7</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+    <table class="data-table">
+    <tr><th>公司</th><th>代码</th><th>所属行业</th><th>总市值(亿)</th><th>PE(TTM)</th><th>PB</th><th>2025营收(亿)</th><th>营收同比</th><th>2025净利润(亿)</th><th>净利同比</th><th>毛利率</th></tr>
+    <tr class="row-group"><td colspan="11" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td>300143</td><td>医疗服务</td><td>76.38</td><td>74.13</td><td>3.03</td><td>18.86</td><td class="up">+20.93%<span class="reason">并购+AI设备放量</span></td><td>1.07</td><td class="up">+28.50%</td><td>26.31%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 爱尔眼科</td><td>300015</td><td>医疗服务</td><td>796.39</td><td>23.62</td><td>3.46</td><td>242.00</td><td class="up">+15.3%</td><td>41.39</td><td class="up">+16.4%</td><td class="best">48.12%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);"> 美年健康</td><td>002044</td><td>医疗服务</td><td>208.60</td><td class="worst">-20.45</td><td>2.64</td><td>103.60</td><td class="down">-3.2%<span class="reason">体检行业竞争加剧</span></td><td>2.85</td><td class="up">+1.09%</td><td>39.67%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 通策医疗</td><td>600763</td><td>医疗服务</td><td>180.00</td><td>35.00</td><td>4.50</td><td>30.50</td><td class="up">+8.9%</td><td>6.50</td><td class="up">+12.1%</td><td>40.75%</td></tr>
+    <tr class="row-group"><td colspan="11" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物医疗</td><td>688139</td><td>医疗器械</td><td>130.00</td><td>52.00</td><td>3.20</td><td>23.29</td><td class="up">+1.96%<span class="reason">低温存储需求饱和</span></td><td>2.51</td><td class="down">-31.61%<span class="reason">研发费用率+2.3pct</span></td><td>46.79%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 迈瑞医疗</td><td>300760</td><td>医疗器械</td><td class="best">2817.71</td><td>22.75</td><td>7.60</td><td class="best">380.00</td><td class="up">+3.5%</td><td class="best">120.00</td><td class="up">+2.8%</td><td class="best">63.11%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 联影医疗</td><td>688271</td><td>医疗器械</td><td>980.00</td><td>52.00</td><td>4.50</td><td>138.21</td><td class="up">+34.18%<span class="reason">海外收入+35%爆发</span></td><td>18.88</td><td class="up">+49.60%</td><td>48.54%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);"> 鱼跃医疗</td><td>002223</td><td>医疗器械</td><td>359.00</td><td>20.69</td><td>2.87</td><td>79.55</td><td class="up">+5.14%</td><td>14.82</td><td class="down">-17.94%<span class="reason">呼吸治疗高基数回落</span></td><td>50.13%</td></tr>
+    <tr class="row-group"><td colspan="11" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td>002252</td><td>血液制品</td><td>341.20</td><td>25.72</td><td>1.05</td><td>80.00</td><td class="up">+6.7%</td><td>13.20</td><td class="up">+5.6%</td><td>38.75%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 天坛生物</td><td>600161</td><td>血液制品</td><td>430.00</td><td>28.00</td><td>3.80</td><td>55.00</td><td class="down">-8.8%<span class="reason">采浆成本上升+价格下行</span></td><td>10.91</td><td class="down">-29.59%</td><td>55.33%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 华兰生物</td><td>002007</td><td>血液制品</td><td>300.00</td><td>22.39</td><td>2.50</td><td>34.91</td><td class="down worst">-20.3%<span class="reason">疫苗业务剥离+血制品降价</span></td><td>9.24</td><td class="down">-15.1%</td><td>61.77%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 派林生物</td><td>000403</td><td>血液制品</td><td>120.00</td><td>16.00</td><td>1.80</td><td>28.00</td><td class="up">+5.5%</td><td>7.80</td><td class="up">+4.7%</td><td>49.13%</td></tr>
+  </table>
+</div>
+</div>
+
+<!-- ==================== PAGE 1: 市值分析 ==================== -->
+<div class="page-section" id="page-1">
+<div class="section">
+  <div class="section-title"><div class="icon">💰</div>一、市值分析体系</div>
+  <p class="section-desc">拆解市值变动的驱动因子：盈利规模 × 估值倍数 × 成长预期 × 市场情绪</p>
+  <div class="tree" style="margin-bottom:24px;">
+    <div class="tree-branch">
+      <div class="tree-label">📊 L1 · 市值 = f(盈利, 估值, 成长, 情绪)</div>
+      <div class="tree-formula">Market Cap = Net Profit × PE = Revenue × PS = Book Value × PB</div>
+      <div class="tree-items"><span class="tree-item">总市值变动</span><span class="tree-item">相对行业偏离</span><span class="tree-item">市值/营收比(PS)</span><span class="tree-item">市值/净资产比(PB)</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label"> L2-盈利因子 · 决定市值基本面</div>
+      <div class="tree-formula">EPS = 净利润 ÷ 总股本 = 毛利率×净利率×营收÷股本</div>
+      <div class="tree-items"><span class="tree-item">归母净利润</span><span class="tree-item">扣非净利润</span><span class="tree-item">EPS(TTM)</span><span class="tree-item">ROE(杜邦分解)</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">📐 L2-估值因子 · 市场定价倍数</div>
+      <div class="tree-formula">PE = Price/EPS → 拆分：行业PE中枢 × 个股溢价/折价系数</div>
+      <div class="tree-items"><span class="tree-item">PE(TTM)</span><span class="tree-item">PE(Forward)</span><span class="tree-item">PB</span><span class="tree-item">PS</span><span class="tree-item">EV/EBITDA</span><span class="tree-item">股息率</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label"> L2-成长因子 · 未来盈利预期</div>
+      <div class="tree-formula">PEG = PE ÷ 净利增速(%) → PEG&lt;1 低估, PEG&gt;2 高估</div>
+      <div class="tree-items"><span class="tree-item">营收CAGR(3Y)</span><span class="tree-item">净利润CAGR(3Y)</span><span class="tree-item">PEG</span><span class="tree-item">机构预测增速</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">🌊 L2-情绪/结构因子 · 资金与事件驱动</div>
+      <div class="tree-items"><span class="tree-item">机构持仓变动</span><span class="tree-item">大股东增减持</span><span class="tree-item">回购金额</span><span class="tree-item">股权质押率</span><span class="tree-item">解禁压力</span><span class="tree-item">舆情热度</span></div>
+    </div>
+  </div>
+    <table class="data-table">
+    <tr><th>公司</th><th>当前市值(亿)</th><th>年初市值(亿)</th><th>年内涨跌幅</th><th>PE(TTM)</th><th>行业PE均值</th><th>估值溢价</th></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td>76.38</td><td>85.0</td><td class="down">-10.1%<span class="reason">AI概念退潮+Q1增速放缓</span></td><td>74.13</td><td rowspan="3" style="color:var(--text-muted);">医疗服务<br>~28x</td><td class="up">+164.8%</td></tr>
+<tr class="row-benchmark"><td>┣ 爱尔眼科</td><td>796.39</td><td>720.0</td><td class="up">+10.6%<span class="reason">Q1营收+16%超预期</span></td><td>23.62</td><td rowspan="3" style="color:var(--text-muted);">行业均值<br>~28x</td><td class="down">-15.6%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 美年健康</td><td>208.60</td><td>180.0</td><td class="up">+15.9%<span class="reason">AI健管概念炒作</span></td><td>-20.45</td><td>N/A</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 通策医疗</td><td>180.00</td><td>165.0</td><td class="up">+9.1%</td><td>35.00</td><td class="up">+25.0%</td></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物</td><td>130.00</td><td>145.0</td><td class="down">-10.3%<span class="reason">净利润-31.6%杀估值</span></td><td>52.00</td><td class="up">+85.7%</td></tr>
+<tr class="row-benchmark"><td>┣ 迈瑞医疗</td><td>2817.71</td><td>2650.0</td><td class="up">+6.3%</td><td>22.75</td><td rowspan="3" style="color:var(--text-muted);">医疗器械<br>~32x</td><td class="down">-28.9%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 联影医疗</td><td>980.00</td><td>850.0</td><td class="up">+15.3%<span class="reason">25年报净利+49.6%超预期</span></td><td>52.00</td><td class="up">+62.5%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 鱼跃医疗</td><td>359.00</td><td>380.0</td><td class="down">-5.5%</td><td>20.69</td><td class="down">-35.4%</td></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td>341.20</td><td>420.0</td><td class="down">-18.8%<span class="reason">血制品集采预期+海尔浮亏</span></td><td>25.72</td><td class="down">-8.2%</td></tr>
+<tr class="row-benchmark"><td> 天坛生物</td><td>430.00</td><td>480.0</td><td class="down">-10.4%<span class="reason">26Q1净利-48.5%暴降</span></td><td>28.00</td><td rowspan="3" style="color:var(--text-muted);">血制品<br>~25x</td><td class="up">+12.0%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 华兰生物</td><td>300.00</td><td>320.0</td><td class="down">-6.3%</td><td>22.39</td><td class="down">-10.4%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 派林生物</td><td>120.00</td><td>135.0</td><td class="down">-11.1%</td><td>16.00</td><td class="down">-36.0%</td></tr>
+  </table>
+  <div class="analysis-box">
+    <div class="title"> 市值变动归因分析</div>
+    <ul>
+      <li><b>盈康生命</b>：市值变动主要受估值因子驱动。PE 74.13x远高于医疗服务行业均值28x，估值溢价+164.8%主要来自AI+肿瘤特色赛道预期<span class="reason">但高估值缺乏业绩支撑——净利率仅7.11%为行业最低，ROE 1.23%远低于爱尔眼科17.17%</span>。年内跌幅-10.1%，主因AI概念退潮+26Q1净利环比下滑。</li>
+      <li><b>海尔生物</b>：市值变动主要受盈利因子驱动。2025年净利润-31.61%大幅下滑，PE 52x高于医疗器械行业均值32x<span class="reason">低温存储国内招标量-35%叠加研发费用率+2.3pct侵蚀利润，AI+物联网新业务仅1.5亿占比6.4%无法补位</span>。市值年内-10.3%。</li>
+      <li><b>上海莱士</b>：市值变动主要受盈利+情绪双因子驱动。净利润+5.6%表现稳健，但PE 25.72x接近血制品行业均值25x<span class="reason">血制品集采扩围预期压制终端采购意愿+海尔入主浮亏58亿形成减持压力，市场情绪偏悲观</span>。年内跌幅-18.8%为三家中最大。</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PAGE 2: 收入分析 ==================== -->
+<div class="page-section" id="page-2">
+<div class="section">
+  <div class="section-title"><div class="icon">📊</div>二、收入分析体系</div>
+  <p class="section-desc">拆解收入变动：收入 = Σ(各业务线收入) = 量(客户/产品×单价) + 价(结构/区域) + 趋势(同比/环比/CAGR)</p>
+  <div class="tree" style="margin-bottom:24px;">
+    <div class="tree-branch">
+      <div class="tree-label">💵 L1 · 总收入 = Σ业务线收入 × (1 + 增长率)</div>
+      <div class="tree-formula">Revenue = Σ(Business_i Volume × Price_i) = 基期收入 × (1 + YoY%)</div>
+      <div class="tree-items"><span class="tree-item">营收总额</span><span class="tree-item">YoY同比</span><span class="tree-item">QoQ环比</span><span class="tree-item">3Y CAGR</span><span class="tree-item">5Y CAGR</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">🏢 L2-业务线拆分 · 找到增长引擎</div>
+      <div class="tree-items"><span class="tree-item">各业务线收入占比</span><span class="tree-item">各业务线增速</span><span class="tree-item">业务线贡献增量</span><span class="tree-item">新业务vs成熟业务</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">🌍 L2-区域/客户拆分 · 增长来源定位</div>
+      <div class="tree-items"><span class="tree-item">国内vs海外收入</span><span class="tree-item">TOP5客户集中度</span><span class="tree-item">新客户增量</span><span class="tree-item">渠道结构(直销/分销)</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">💎 L2-收入质量 · 可持续性与现金含量</div>
+      <div class="tree-items"><span class="tree-item">经常性收入占比</span><span class="tree-item">应收账款周转天数</span><span class="tree-item">合同负债/预收款</span><span class="tree-item">经营性现金流/收入比</span></div>
+    </div>
+  </div>
+    <table class="data-table">
+    <tr><th>公司</th><th>2024营收(亿)</th><th>2024同比</th><th>2025营收(亿)</th><th>2025同比</th><th>25Q1营收</th><th>26Q1营收</th><th>26Q1同比</th></tr>
+    <tr class="row-group"><td colspan="8" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td>15.60</td><td class="up">+6.0%</td><td>18.86</td><td class="up best">+20.93%<span class="reason">并购并表+AI设备</span></td><td>4.09</td><td>4.96</td><td class="up">+21.36%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 爱尔眼科</td><td>209.83</td><td class="up">+3.02%</td><td>242.00</td><td class="up">+15.3%</td><td>60.26</td><td>70.00</td><td class="up">+16.2%<span class="reason">屈光手术量+18%</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 美年健康</td><td>107.02</td><td class="down">-1.76%</td><td>103.60</td><td class="down">-3.2%</td><td>17.54</td><td>15.84</td><td class="down worst">-9.71%<span class="reason">企业团检预算缩减</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 通策医疗</td><td>28.00</td><td class="up">+5.0%</td><td>30.50</td><td class="up">+8.9%</td><td>7.50</td><td>8.20</td><td class="up">+9.3%</td></tr>
+    <tr class="row-group"><td colspan="8" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物</td><td>22.84</td><td class="up">+3.2%</td><td>23.29</td><td class="up">+1.96%</td><td>6.89</td><td>6.52</td><td class="down">-5.4%<span class="reason">国内设备招标量下滑</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 迈瑞医疗</td><td>367.26</td><td class="up">+5.14%</td><td>380.00</td><td class="up">+3.5%</td><td>82.37</td><td>75.00</td><td class="down">-8.9%<span class="reason">医疗设备采购延迟</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 联影医疗</td><td>103.00</td><td class="down">-9.73%</td><td>138.21</td><td class="up best">+34.18%<span class="reason">海外收入+35%爆发</span></td><td>24.78</td><td>29.08</td><td class="up">+17.4%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 鱼跃医疗</td><td>75.66</td><td class="down">-5.1%</td><td>79.55</td><td class="up">+5.14%</td><td>24.36</td><td>23.70</td><td class="down">-2.7%</td></tr>
+    <tr class="row-group"><td colspan="8" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td>75.00</td><td class="up">+8.5%</td><td>80.00</td><td class="up">+6.7%</td><td>20.06</td><td>18.50</td><td class="down">-7.8%<span class="reason">白蛋白销售受医保控费</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 天坛生物</td><td>60.32</td><td class="up">+16.44%</td><td>55.00</td><td class="down">-8.8%<span class="reason">白蛋白终端价下行</span></td><td>13.18</td><td>11.42</td><td class="down worst">-13.36%<span class="reason">集采试点压价+需求疲弱</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 华兰生物</td><td>43.79</td><td class="down">-18.02%</td><td>34.91</td><td class="down worst">-20.3%<span class="reason">疫苗业务剥离</span></td><td>8.68</td><td>7.62</td><td class="down">-12.16%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 派林生物</td><td>26.55</td><td class="up">+14.0%</td><td>28.00</td><td class="up">+5.5%</td><td>3.75</td><td>3.43</td><td class="down">-8.5%</td></tr>
+  </table>
+  <div class="analysis-box">
+    <div class="title">🔍 收入变动归因分析</div>
+    <ul>
+      <li><b>盈康生命</b>：2025年营收18.86亿(+20.93%)增速领跑医疗服务行业，26Q1营收4.96亿(+21.36%)延续高增长。增长主因：(1)肿瘤诊疗业务量增+价增，门诊量同比+15%<span class="reason">新增攀枝花医院并表贡献约0.8亿</span>；(2)AI赋能伽玛刀设备销售贡献增量约1.2亿<span class="reason">与联影战略合作推动设备升级</span>；(3)新并购医院并表贡献约0.8亿。需关注并购整合风险。</li>
+      <li><b>海尔生物</b>：2025年营收23.29亿(+1.96%)增速大幅放缓，26Q1营收6.52亿(-5.4%)小幅下滑。主因：(1)低温存储传统设备需求饱和，国内招标量同比下滑<span class="reason">地方财政资金紧张+医疗专项债缩减导致医院采购推迟</span>；(2)AI+物联网新业务仅贡献1.5亿占比6.4%<span class="reason">尚处试点推广期，规模化需1-2年</span>；(3)海外收入占比不足20%，对比迈瑞海外49.8%差距显著。</li>
+      <li><b>上海莱士</b>：2025年营收80亿(+6.7%)稳健增长，但26Q1营收18.50亿(-7.8%)出现下滑。主因：(1)白蛋白销售受医保控费政策影响放缓<span class="reason">重点监控辅助用药目录收紧白蛋白适应症</span>；(2)进口白蛋白储备量增加冲击国产份额<span class="reason">2025年进口白蛋白批签发量+12%</span>；(3)血制品集采预期压制终端采购意愿。对比天坛生物采浆量2801吨行业领先，上海莱士41家浆站需加速扩张。</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PAGE 3: 利润分析 ==================== -->
+<div class="page-section" id="page-3">
+<div class="section">
+  <div class="section-title"><div class="icon">💹</div>三、利润分析体系</div>
+  <p class="section-desc">杜邦分解：净利润 = 收入×净利率 = ROE×净资产，拆解盈利能力、成本控制、运营效率、杠杆水平四维驱动</p>
+  <div class="tree" style="margin-bottom:24px;">
+    <div class="tree-branch">
+      <div class="tree-label">💰 L1 · 净利润 = 收入 × 净利率 = ROE × 净资产</div>
+      <div class="tree-formula">Net Profit = Revenue × Gross Margin × Operating Leverage × (1-Tax) - Non-recurring</div>
+      <div class="tree-items"><span class="tree-item">归母净利润</span><span class="tree-item">扣非净利润</span><span class="tree-item">EPS(TTM)</span><span class="tree-item">ROE</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">📈 L2-盈利能力（利润率拆解）</div>
+      <div class="tree-formula">毛利率 → 营业利润率 → 净利率 → 扣非净利率</div>
+      <div class="tree-items"><span class="tree-item">毛利率</span><span class="tree-item">营业利润率</span><span class="tree-item">净利率</span><span class="tree-item">扣非净利率</span><span class="tree-item">EBITDA利润率</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">💸 L2-成本费用（利润减项拆解）</div>
+      <div class="tree-formula">营业成本 = 材料 + 人工 + 折旧 | 三费 = 销售 + 管理 + 研发 + 财务</div>
+      <div class="tree-items"><span class="tree-item">营业成本率</span><span class="tree-item">销售费用率</span><span class="tree-item">管理费用率</span><span class="tree-item">研发费用率</span><span class="tree-item">财务费用率</span><span class="tree-item">资产/商誉减值</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label">🔄 L2-杜邦分解（ROE三因子）</div>
+      <div class="tree-formula">ROE = 净利率 × 总资产周转率 × 权益乘数 = (净利润/收入) × (收入/总资产) × (总资产/净资产)</div>
+      <div class="tree-items"><span class="tree-item">ROE</span><span class="tree-item">ROA</span><span class="tree-item">ROIC</span><span class="tree-item">总资产周转率</span><span class="tree-item">权益乘数</span></div>
+    </div>
+    <div class="tree-branch l2">
+      <div class="tree-label"> L2-利润质量（现金含量评估）</div>
+      <div class="tree-items"><span class="tree-item">经营现金流/净利润</span><span class="tree-item">自由现金流</span><span class="tree-item">应收账款周转天数</span><span class="tree-item">存货周转天数</span><span class="tree-item">资产负债率</span></div>
+    </div>
+  </div>
+    <table class="data-table">
+    <tr><th>公司</th><th>毛利率</th><th>净利率</th><th>ROE</th><th>资产负债率</th><th>2025净利润(亿)</th><th>净利同比</th></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td>26.31%</td><td class="worst">7.11%<span class="reason">医院运营成本高企</span></td><td class="worst">1.23%</td><td>29.23%</td><td>1.07</td><td class="up">+28.50%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 爱尔眼科</td><td>48.12%</td><td>19.36%</td><td class="best">17.17%<span class="reason">规模效应+高杠杆</span></td><td>33.53%</td><td>41.39</td><td class="up">+16.4%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 美年健康</td><td>39.67%</td><td class="worst">3.58%<span class="reason">三费占比33.82%</span></td><td class="worst">-3.18%</td><td class="worst">55.68%</td><td>2.85</td><td class="up">+1.09%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 通策医疗</td><td>40.75%</td><td>21.3%</td><td>12.5%</td><td>27.51%</td><td>6.50</td><td class="up">+12.1%</td></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物</td><td>46.79%</td><td>10.96%<span class="reason">研发投入+2.3pct侵蚀</span></td><td>5.8%</td><td>35.0%</td><td>2.51</td><td class="down worst">-31.61%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 迈瑞医疗</td><td class="best">63.11%<span class="reason">IVD试剂高毛利</span></td><td class="best">31.97%</td><td class="best">32.54%</td><td>28.04%</td><td class="best">120.00</td><td class="up">+2.8%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 联影医疗</td><td>48.54%</td><td>13.66%</td><td>9.09%</td><td>29.69%</td><td>18.88</td><td class="up best">+49.60%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 鱼跃医疗</td><td>50.13%</td><td>25.44%</td><td>11.42%</td><td>18.26%</td><td>14.82</td><td class="down">-17.94%<span class="reason">23年呼吸机高基数</span></td></tr>
+    <tr class="row-group"><td colspan="7" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td>38.75%</td><td>28.23%</td><td>6.8%</td><td class="best">6.25%</td><td>13.20</td><td class="up">+5.6%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 天坛生物</td><td>55.33%</td><td>35.04%</td><td>9.5%</td><td>10.96%</td><td>10.91</td><td class="down">-29.59%<span class="reason">采浆成本+产品降价</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 华兰生物</td><td class="best">61.77%</td><td>28.97%</td><td>7.8%</td><td>14.85%</td><td>9.24</td><td class="down">-15.1%</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 派林生物</td><td>49.13%</td><td>28.07%</td><td>6.04%</td><td>16.25%</td><td>7.80</td><td class="up">+4.7%</td></tr>
+  </table>
+  <h4 style="color:var(--accent-light);margin:24px 0 12px;">杜邦分解：ROE = 净利率 × 资产周转率 × 权益乘数</h4>
+    <table class="data-table">
+    <tr><th>公司</th><th>ROE</th><th>净利率</th><th>总资产周转率</th><th>权益乘数</th><th>ROE拆解说明</th></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td class="worst">1.23%</td><td>7.11%</td><td>0.28</td><td>1.41</td><td style="font-size:11px;color:var(--text-muted);">低利润率+低周转拖累<span class="reason">医院重资产运营效率待提升</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 爱尔眼科</td><td class="best">17.17%</td><td>19.36%</td><td>0.42</td><td>2.10</td><td style="font-size:11px;color:var(--text-muted);">高利润率+高杠杆驱动<span class="reason">连锁医院并购放大权益乘数</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 美年健康</td><td class="worst">-3.18%</td><td>3.58%</td><td>0.31</td><td>2.27</td><td style="font-size:11px;color:var(--text-muted);">低利润率+高杠杆亏损<span class="reason">三费吞噬利润+负债率55.7%</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 通策医疗</td><td>12.5%</td><td>21.3%</td><td>0.38</td><td>1.38</td><td style="font-size:11px;color:var(--text-muted);">利润率+周转均衡</td></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物</td><td>5.8%</td><td>10.96%</td><td>0.35</td><td>1.54</td><td style="font-size:11px;color:var(--text-muted);">利润率尚可但周转偏慢<span class="reason">存货周转天数+15天</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 迈瑞医疗</td><td class="best">32.54%</td><td class="best">31.97%</td><td>0.58</td><td>1.76</td><td style="font-size:11px;color:var(--text-muted);">高利润率+高周转标杆<span class="reason">IVD试剂复购率+海外规模效应</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 联影医疗</td><td>9.09%</td><td>13.66%</td><td>0.32</td><td>1.52</td><td style="font-size:11px;color:var(--text-muted);">利润率偏低拖累ROE<span class="reason">研发投入22.6亿占营收16.4%</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 鱼跃医疗</td><td>11.42%</td><td>25.44%</td><td>0.35</td><td>1.22</td><td style="font-size:11px;color:var(--text-muted);">高利润率+低杠杆</td></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td>6.8%</td><td>28.23%</td><td>0.22</td><td>1.07</td><td style="font-size:11px;color:var(--text-muted);">高利润率但极低周转<span class="reason">存货规模增长占用资金</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 天坛生物</td><td>9.5%</td><td>35.04%</td><td>0.24</td><td>1.12</td><td style="font-size:11px;color:var(--text-muted);">高利润率但极低周转<span class="reason">血制品生产周期长+浆站投入大</span></td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┣ 华兰生物</td><td>7.8%</td><td>28.97%</td><td>0.23</td><td>1.18</td><td style="font-size:11px;color:var(--text-muted);">高利润率+低周转</td></tr>
+<tr class="row-benchmark"><td style="color:var(--text-muted);">┗ 派林生物</td><td>6.04%</td><td>28.07%</td><td>0.21</td><td>1.16</td><td style="font-size:11px;color:var(--text-muted);">利润率尚可但周转最慢<span class="reason">产能扩建期，新浆站尚未达产</span></td></tr>
+  </table>
+  <div class="analysis-box">
+    <div class="title">🔍 利润变动归因分析</div>
+    <ul>
+      <li><b>盈康生命</b>：2025年净利润1.07亿(+28.5%)但净利率仅7.11%为三家中最低，ROE 1.23%远低于爱尔眼科17.17%。杜邦拆解：(1)净利率7.11%低于行业均值19.4%，主因营业成本率73.69%过高<span class="reason">医院人力+药品成本占比大，肿瘤诊疗设备折旧高</span>；(2)资产周转率0.28偏低<span class="reason">医院资产重运营，单院产出待提升</span>；(3)权益乘数1.41杠杆适中。核心问题：盈利能力不足，需优化产品结构+提升单院产出。</li>
+      <li><b>海尔生物</b>：2025年净利润2.51亿(-31.61%)大幅下滑，净利率从16.8%降至10.96%。杜邦拆解：(1)净利率下降5.72pct主因研发费用率13.88%上升+毛利率下降1.2pct<span class="reason">AI+物联网研发投入+2.3pct，低温存储价格战压低毛利率</span>；(2)资产周转率0.35偏低，存货周转天数增加15天<span class="reason">新机型推广期旧型号库存积压</span>；(3)权益乘数1.54杠杆合理。核心问题：传统业务下滑+新业务投入期，需加速AI+物联网商业化变现。</li>
+      <li><b>上海莱士</b>：2025年净利润13.20亿(+5.6%)表现稳健，净利率28.23%高于血制品行业均值30.7%。杜邦拆解：(1)净利率28.23%接近天坛生物35.04%，低于华兰生物28.97%；(2)资产周转率0.22为血制品行业最低<span class="reason">存货规模增长——医保政策致白蛋白销售放缓+进口白蛋白储备增加</span>；(3)权益乘数1.07几乎无杠杆，财务风险极低。核心优势：低负债+稳定盈利，但需提升资产运营效率。</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PAGE 4: 溯因拆解 ==================== -->
+<div class="page-section" id="page-4">
+<div class="section">
+  <div class="section-title"><div class="icon">🔗</div>四、溯因拆解：市值-收入-利润联动分析</div>
+  <p class="section-desc">将市值、收入、利润三维指标串联形成可拆解的溯因链：市值变动 ← 盈利变动 ← 收入/成本变动 ← 业务驱动因子</p>
+  <div class="tree" style="margin-bottom:24px;">
+    <div class="tree-branch">
+      <div class="tree-label">🔗 溯因链公式</div>
+      <div class="tree-formula">Δ市值 = Δ净利 × PE + 净利 × ΔPE = (Δ收入×净利率 + 收入×Δ净利率) × PE + 净利 × ΔPE</div>
+    </div>
+  </div>
+  <div class="flex-row" style="margin-bottom:24px;">
+    <div class="flex-col">
+      <div class="risk-card" style="border-left:3px solid var(--accent);">
+        <div class="risk-level" style="color:var(--accent);">盈康生命 · 增长维度</div>
+        <div class="risk-title">营收增速+20.93%领跑行业</div>
+        <div class="risk-desc">营收增量3.26亿，主因肿瘤诊疗业务量价齐升(+15%)<span class="reason">新增攀枝花医院贡献门诊量</span>、AI设备销售贡献1.2亿<span class="reason">伽玛刀升级版获FDA认证</span>、新并购医院并表0.8亿。26Q1营收+21.36%延续高增长，拐点已现。</div>
+      </div>
+    </div>
+    <div class="flex-col">
+      <div class="risk-card" style="border-left:3px solid var(--red);">
+        <div class="risk-level" style="color:var(--red);">海尔生物 · 盈利维度</div>
+        <div class="risk-title">净利润-31.61%大幅下滑</div>
+        <div class="risk-desc">净利润减少1.16亿，主因研发费用率+2.3pct<span class="reason">AI+物联网研发投入从2.8亿增至3.8亿</span>、毛利率-1.2pct<span class="reason">低温存储价格战致均价降8%</span>、存货减值增加。传统低温存储业务萎缩<span class="reason">国内设备招标量同比下滑</span>，AI+物联网新业务仅贡献1.5亿占比6.4%，无法弥补老业务下滑。26Q1营收-5.4%小幅下滑<span class="reason">地方财政资金紧缩+医疗专项债缩减</span>，需关注下行趋势。</div>
+      </div>
+    </div>
+    <div class="flex-col">
+      <div class="risk-card" style="border-left:3px solid var(--amber);">
+        <div class="risk-level" style="color:var(--amber);">上海莱士 · 估值维度</div>
+        <div class="risk-title">PE 25.72x接近行业均值，估值折价-8.2%</div>
+        <div class="risk-desc">市值下跌-18.8%主因估值因子驱动：(1)血制品集采扩围预期压制估值<span class="reason">试点省份白蛋白中标价降幅15-20%</span>；(2)海尔入主浮亏58亿为历史包袱<span class="reason">收购价约400亿vs当前市值341亿</span>；(3)26Q1营收-7.8%增速放缓<span class="reason">进口白蛋白批签发量+12%挤压国产份额</span>。但净利润+5.6%稳健，负债率6.25%行业最低，安全边际高。</div>
+      </div>
+    </div>
+  </div>
+    <table class="data-table">
+    <tr><th>公司</th><th>市值变动归因</th><th>收入驱动因子</th><th>利润驱动因子</th><th>估值驱动因子</th><th>核心差距(vs龙头)</th></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">▎盈康生命（医疗服务）</td></tr>
+<tr class="row-company"><td>盈康生命</td><td style="font-size:11px;">估值溢价+164.8%<span class="reason">但业绩不支撑</span></td><td style="font-size:11px;">肿瘤诊疗+AI设备+并购</td><td style="font-size:11px;">净利率7.11%过低<span class="reason">营业成本率73.7%</span></td><td style="font-size:11px;">PE 74x远高于行业28x</td><td style="font-size:11px;">净利率低于爱尔眼科12pct</td></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">▎海尔生物医疗（医疗器械）</td></tr>
+<tr class="row-company"><td>海尔生物</td><td style="font-size:11px;">盈利下滑-31.6%拖累</td><td style="font-size:11px;">传统业务萎缩-35%<span class="reason">招标量骤降</span></td><td style="font-size:11px;">研发费用率+2.3pct</td><td style="font-size:11px;">PE 52x高于行业32x</td><td style="font-size:11px;">毛利率低于迈瑞16pct</td></tr>
+    <tr class="row-group"><td colspan="6" style="padding:6px 10px;">上海莱士（血液制品）</td></tr>
+<tr class="row-company"><td>上海莱士</td><td style="font-size:11px;">估值折价-8.2%<span class="reason">集采+浮亏压制</span></td><td style="font-size:11px;">白蛋白销售放缓<span class="reason">医保控费</span></td><td style="font-size:11px;">净利率28.23%稳健</td><td style="font-size:11px;">PE 25.7x接近行业25x</td><td style="font-size:11px;">周转率低于天坛0.02次</td></tr>
+  </table>
+  <div class="analysis-box">
+    <div class="title">🔍 溯因拆解结论</div>
+    <ul>
+      <li><b>盈康生命</b>：市值变动 = 盈利贡献(+0.27亿×74x=+20亿) + 估值贡献(76亿×ΔPE-30%=-23亿) ≈ -3亿。主因估值因子驱动下跌<span class="reason">盈利增长20.9%无法消化PE从100x回落至74x的估值收缩</span>。建议：加速AI+肿瘤商业化变现，提升净利率至15%+以消化高估值。</li>
+      <li><b>海尔生物</b>：市值变动 = 盈利贡献(-1.16亿×52x=-60亿) + 估值贡献(130亿×ΔPE-10%=-13亿) ≈ -73亿。主因盈利因子驱动下跌<span class="reason">传统低温存储萎缩-35%而新业务占比仅6.4%形成青黄不接</span>。建议：聚焦AI+物联网高毛利业务，砍掉低效传统产品线。</li>
+      <li><b>上海莱士</b>：市值变动 = 盈利贡献(+0.7亿×25.7x=+18亿) + 估值贡献(341亿×ΔPE-25%=-85亿) ≈ -67亿。主因估值因子驱动下跌<span class="reason">血制品集采试点省份白蛋白降价15-20%，叠加海尔浮亏58亿的减持预期</span>。建议：加速浆站扩张提升采浆量，优化产品结构降低白蛋白依赖。</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PAGE 5: 风险预警 ==================== -->
+<div class="page-section" id="page-5">
+<div class="section">
+  <div class="section-title"><div class="icon">⚠️</div>五、风险预警与应对建议</div>
+  <p class="section-desc">识别核心风险事项，分级标注并提出应对措施</p>
+  <div class="risk-grid">
+    <div class="risk-card" style="border-left:3px solid var(--red);">
+      <div class="risk-level" style="color:var(--red);">🔴 高风险</div>
+      <div class="risk-title">上海莱士 · 商誉减值风险</div>
+      <div class="risk-desc">商誉81.99亿接近全年净利润13.20亿的6.2倍，一旦血制品集采扩围或业绩下滑，面临巨额减值风险<span class="reason">基立福收购形成高溢价，若白蛋白终端价持续下行则减值触发</span>。<br><b>建议：</b>密切监控血制品政策动态，做好减值测试，提前计提准备。</div>
+    </div>
+    <div class="risk-card" style="border-left:3px solid var(--red);">
+      <div class="risk-level" style="color:var(--red);">🔴 高风险</div>
+      <div class="risk-title">海尔生物 · 业绩承压下滑</div>
+      <div class="risk-desc">26Q1营收6.52亿(-5.4%)同比下滑<span class="reason">地方财政紧缩导致医疗设备招标量下滑+医疗专项债缩减致采购推迟</span>，传统低温存储业务萎缩<span class="reason">需求饱和，增长放缓</span>，新业务尚未形成规模<span class="reason">AI+物联网仅1.5亿占比6.4%，规模化需1-2年</span>。<br><b>建议：</b>加速AI+物联网商业化，砍掉低效产品线，聚焦高毛利业务。</div>
+    </div>
+    <div class="risk-card" style="border-left:3px solid var(--amber);">
+      <div class="risk-level" style="color:var(--amber);"> 中风险</div>
+      <div class="risk-title">盈康生命 · 高估值+低盈利</div>
+      <div class="risk-desc">PE 74.13x远高于行业28x，但净利率仅7.11%为行业最低<span class="reason">PEG=74/28.5=2.6，严重高估区间；ROE 1.23%为12家公司最低</span>，高估值缺乏业绩支撑。<br><b>建议：</b>加速肿瘤诊疗+AI商业化，提升净利率至15%+以消化估值。</div>
+    </div>
+    <div class="risk-card" style="border-left:3px solid var(--amber);">
+      <div class="risk-level" style="color:var(--amber);">🟡 中风险</div>
+      <div class="risk-title">上海莱士 · 海尔入主浮亏58亿</div>
+      <div class="risk-desc">海尔集团入主成本约400亿，当前市值341亿，浮亏约58亿<span class="reason">2024年收购价约5.7元/股，当前股价约5.2元/股，锁定期内无法减持</span>，存在解禁后减持预期压力。<br><b>建议：</b>关注大股东动向，做好投资者沟通，稳定市场预期。</div>
+    </div>
+    <div class="risk-card" style="border-left:3px solid var(--amber);">
+      <div class="risk-level" style="color:var(--amber);">🟡 中风险</div>
+      <div class="risk-title">血制品行业 · 集采扩围预期</div>
+      <div class="risk-desc">血制品集采试点已启动，若扩围至全国，将压制白蛋白等产品价格<span class="reason">试点省份白蛋白中标价降幅15-20%，静丙降幅5-8%</span>，影响上海莱士、天坛生物、华兰生物盈利。<br><b>建议：</b>优化产品结构，提升静丙、纤原等高毛利产品占比，降低白蛋白依赖。</div>
+    </div>
+    <div class="risk-card" style="border-left:3px solid var(--green);">
+      <div class="risk-level" style="color:var(--green);">🟢 低风险</div>
+      <div class="risk-title">盈康生命 · 并购整合风险</div>
+      <div class="risk-desc">近年并购多家医院，存在整合不达预期、商誉减值等风险<span class="reason">并购医院业绩承诺期2025-2027年，若连续两年未达标则触发补偿</span>。<br><b>建议：</b>加强投后管理，统一运营标准，监控并购医院业绩承诺完成情况。</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="tab-indicator">
+  <div class="tab-dot active" id="dot-0"></div>
+  <div class="tab-dot" id="dot-1"></div>
+  <div class="tab-dot" id="dot-2"></div>
+  <div class="tab-dot" id="dot-3"></div>
+  <div class="tab-dot" id="dot-4"></div>
+  <div class="tab-dot" id="dot-5"></div>
+</div>
+
+<div class="report-footer">
+  <p>报告生成时间：2026-06-15 | 数据来源：上交所、深交所、Wind、东方财富、证券之星 | 数据周期：2024年报 — 2026Q1</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted);">本报告基于公开财报数据整理分析，不构成投资建议。投资有风险，入市需谨慎。</p>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.nav-tab');
+  var dots = document.querySelectorAll('.tab-dot');
+  var sections = document.querySelectorAll('.page-section');
+
+  function updateActive(id) {
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].getAttribute('href') === '#' + id) {
+        tabs[i].className = 'nav-tab nav-active';
+      } else {
+        tabs[i].className = 'nav-tab';
+      }
+    }
+    var idx = parseInt(id.replace('page-',''));
+    for (var i = 0; i < dots.length; i++) {
+      if (i === idx) { dots[i].className = 'tab-dot active'; } else { dots[i].className = 'tab-dot'; }
+    }
+  }
+
+  // Tab click -> scroll
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = this.getAttribute('href').substring(1);
+      updateActive(target);
+      document.getElementById(target).scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+
+  // Scroll spy
+  window.addEventListener('scroll', function() {
+    var scrollPos = window.scrollY + 100;
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].offsetTop <= scrollPos) {
+        updateActive(sections[i].id);
+        break;
+      }
+    }
+  });
+})();
+
+</script>
+</body>
+</html>

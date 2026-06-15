@@ -166,14 +166,10 @@ tr:hover { background:rgba(59,130,246,0.05); }
 .feature-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; text-align:center; transition:all .3s; cursor:pointer; }
 .feature-card:hover { border-color:var(--primary); transform:translateY(-4px); box-shadow:0 10px 30px rgba(59,130,246,0.2); }
 .feature-card.highlight {
-  border-color:#8b5cf6;
-  background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(99,102,241,0.08));
-  box-shadow:0 0 20px rgba(139,92,246,0.2),inset 0 0 20px rgba(139,92,246,0.05);
-  animation:highlightPulse 2.5s ease-in-out infinite;
-}
-@keyframes highlightPulse {
-  0%,100% { box-shadow:0 0 15px rgba(139,92,246,0.15); }
-  50% { box-shadow:0 0 30px rgba(139,92,246,0.35); }
+  border-color:var(--primary);
+  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));
+  box-shadow:0 0 20px rgba(59,130,246,0.25),inset 0 0 20px rgba(59,130,246,0.05);
+  position:relative;
 }
 .feature-card.highlight:hover {
   border-color:#a78bfa;
@@ -192,7 +188,20 @@ tr:hover { background:rgba(59,130,246,0.05); }
   animation:iconFloat 2s ease-in-out infinite;
 }
 .feature-card.highlight-risk::before {
-  content:'🛡️';
+  content:'';
+  position:absolute; top:-1px; right:-1px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/%3E%3C/svg%3E"),linear-gradient(135deg,#f59e0b,#ef4444);
+  background-size:18px 18px,100% 100%;
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:0 12px 0 10px;
+  box-shadow:0 0 12px rgba(245,158,11,0.4);
+  animation:iconFloat 2s ease-in-out infinite 0.5s;
+}
+.feature-card.highlight-market::before {
+  content:'📊';
   position:absolute; top:-1px; right:-1px;
   background:linear-gradient(135deg,#06b6d4,#3b82f6);
   font-size:14px;
@@ -200,7 +209,7 @@ tr:hover { background:rgba(59,130,246,0.05); }
   display:flex; align-items:center; justify-content:center;
   border-radius:0 12px 0 10px;
   box-shadow:0 0 12px rgba(6,182,212,0.4);
-  animation:iconFloat 2s ease-in-out infinite 0.5s;
+  animation:iconFloat 2s ease-in-out infinite 1s;
 }
 @keyframes iconFloat {
   0%,100% { transform:translateY(0); }
@@ -244,7 +253,7 @@ tr:hover { background:rgba(59,130,246,0.05); }
   .feature-card { padding:12px 6px; border-radius:8px; }
   .feature-icon { font-size:22px; margin-bottom:6px; }
   .feature-name { font-size:11px; }
-  .feature-card.highlight::before, .feature-card.highlight-report::before, .feature-card.highlight-risk::before { font-size:10px; width:22px; height:22px; border-radius:0 10px 0 8px; }
+  .feature-card.highlight::before, .feature-card.highlight-report::before, .feature-card.highlight-risk::before, .feature-card.highlight-market::before { font-size:10px; width:22px; height:22px; border-radius:0 10px 0 8px; }
 
   /* TOC */
   .toc-container { grid-template-columns:1fr; gap:10px; }
@@ -345,7 +354,7 @@ tr:hover { background:rgba(59,130,246,0.05); }
     <div class="feature-grid">
       <div class="feature-card highlight highlight-report" onclick="goPage(2)" style="cursor:pointer" title="点击查看财务报告目录"><span class="feature-icon"></span><span class="feature-name">财报解读</span></div>
       <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">经营归因</span></div>
-      <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">趋势预测</span></div>
+      <div class="feature-card highlight highlight-market" onclick="window.location.href='上市公司市值收入利润分析报告-mobile.html'" style="cursor:pointer" title="点击查看上市公司市值·收入·利润专项分析报告"><span class="feature-icon"></span><span class="feature-name">收入/利润/市值</span></div>
       <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">管理汇报</span></div>
       <div class="feature-card highlight highlight-risk" onclick="window.location.href='./risk_analysis-mobile.html'" style="cursor:pointer" title="点击查看风险预警分析报告"><span class="feature-icon"></span><span class="feature-name">风险预警</span></div>
       <div class="feature-card"><span class="feature-icon"></span><span class="feature-name">决策支持</span></div>
